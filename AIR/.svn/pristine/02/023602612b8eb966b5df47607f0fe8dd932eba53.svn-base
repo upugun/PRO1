@@ -1,0 +1,18 @@
+package net.jwt.value.objects
+{
+	import mx.collections.ArrayCollection;
+	
+	[RemoteClass(alias="net.jwt.value.objects.TourSegment")]
+	
+	[Bindable]
+	public class TourSegment extends CommonTreeNode
+	{
+		public function TourSegment()
+		{
+			children = new ArrayCollection;
+			data 	 = new ArrayCollection;
+			level    = 4; // lowest level
+		}
+
+	}
+}

@@ -1,0 +1,461 @@
+package net.jhl.view.RateCode
+{
+	import flash.events.Event;
+	import flash.events.KeyboardEvent;
+	import flash.events.MouseEvent;
+	
+	import mx.collections.ArrayCollection;
+	import mx.controls.Alert;
+	import mx.core.UIComponent;
+	import mx.events.ListEvent;
+	import mx.messaging.messages.ErrorMessage;
+	import mx.rpc.events.FaultEvent;
+	import mx.rpc.events.ResultEvent;
+	
+	import net.jhl.value.objects.AgentMarkets;
+	import net.jhl.value.objects.Property;
+	import net.jhl.value.objects.RateCode.AppliedAgentMarkets;
+	import net.jhl.value.objects.RateCode.RateCode;
+	import net.jhl.value.objects.RateCode.Season;
+	import net.jhl.view.common.JHHbox;
+	import net.jhl.visual.objects.AgentMarketCheckBox;
+	import net.jwt.ApplicationFacade;
+	import net.jwt.event.INotificationArguments;
+	import net.jwt.event.NotificationArguments;
+	import net.jwt.value.objects.QuerryObject;
+	import net.jwt.view.MainView;
+	import net.jwt.view.Mediator;
+
+	
+	public class RateCodeAppliedAgentMarketMediator extends Mediator
+	{
+		private var _view:RateCodeAppliedAgentMarketView;
+		private var _args:INotificationArguments;
+		
+		private var _mainView:MainView;
+		
+		private var marketList:ArrayCollection        = new ArrayCollection();
+		private var rateCodeList:ArrayCollection  	  = new ArrayCollection();
+		private var dynamicList:ArrayCollection  	  = new ArrayCollection();
+		private var appliedmarketList:ArrayCollection = new ArrayCollection();
+		private var seasonList:ArrayCollection 		  = new ArrayCollection();
+		private var propertyList:ArrayCollection      = new ArrayCollection();
+		private var deleteList:ArrayCollection        = new ArrayCollection();
+		
+		[Bindable]public var args:NotificationArguments = new NotificationArguments();
+		
+		public function RateCodeAppliedAgentMarketMediator(view:UIComponent, args:INotificationArguments)
+		{
+			super(view);
+			if(view != null)
+			{
+				_view  = view as RateCodeAppliedAgentMarketView ;
+				
+			}
+			
+			_mainView	  = (args.viewComponent as MainView);
+			
+			if(args != null)
+			{
+				_args = args;
+				_loggedInUser = (_args.viewComponent as MainView).user;
+			}
+		}
+		
+		protected override function viewComponentInitialize():void
+		{
+			setLoggedInUser();
+			loadPropertyList();
+			
+			if(_mainView.width > 0)
+			{
+				_view.V_dynamic.width  = _mainView.width - 60;
+				_view.V_dynamic.height = _mainView.height - 300;
+			}
+			else
+				_view.width	= 1100;
+				
+			_view.addEventListener(KeyboardEvent.KEY_UP, keyInputHandler);
+			_view.CMB_season.addEventListener(ListEvent.CHANGE, loadRateCodes);
+			_view.CMB_rateCode.addEventListener(ListEvent.CHANGE, loadMarketList);
+			_view.B_save.addEventListener(MouseEvent.CLICK,saveObjects);
+			_view.B_new.addEventListener(MouseEvent.CLICK,addNew);
+			_view.CMB_property.addEventListener(ListEvent.CHANGE, loadRateCodes);
+			_view.B_rateTree.addEventListener(MouseEvent.CLICK, openRateCodeAgentWindow);
+		}
+		
+		private function openRateCodeAgentWindow(e:Event):void
+		{
+			var dimention:Object = new Object;
+				dimention.width  = 1100;
+				dimention.heigth = 800;
+				args.argumentObject = new Object;
+				args.user		 = _loggedInUser;
+				
+			createPopUpCanvas(ApplicationFacade.HS743_RATE_TREE_FOR_AGENT_MAPPING,_mainView,args,"",ApplicationFacade.HS743_RATE_TREE_FOR_AGENT_MAPPING, false,dimention);
+		}
+		
+		private function loadObjects():void
+		{
+			var seasonId:String 	= "";
+			var rateCodeId:String 	= "";
+			var propertyId:String 	= "";
+			
+			if(_view.CMB_season.selectedItem!=null)
+				seasonId = (_view.CMB_season.selectedItem as Season).uuid
+			
+			if(_view.CMB_rateCode.selectedItem!=null)
+				rateCodeId = (_view.CMB_rateCode.selectedItem as RateCode).uuid	
+			
+			if(_view.CMB_property.selectedItem!=null)
+				propertyId = (_view.CMB_property.selectedItem as Property).uuid		
+			
+			var q:QuerryObject = new QuerryObject;
+				q.searchCode   = "searchBySeasonIdAndRateCodeId";
+				q.condition1   = seasonId;
+				q.condition2   = rateCodeId;
+				q.condition3   = propertyId;
+				
+			startBusyCursor();
+			rc_appliedAgentMarketsRO.dynamicSearch(q);
+		}
+		
+		private function loadSeasons():void
+		{
+			startBusyCursor();
+			rc_seasonRO.dynamicSearch("","");
+		}
+		
+		private function loadRateCodes(e:Event=null):void
+		{
+			var seasonId:String   = "";
+			var propertyId:String = "";
+			
+			if(_view.CMB_season.selectedItem!=null)
+				seasonId   = (_view.CMB_season.selectedItem as Season).uuid;
+				
+			if(_view.CMB_property.selectedItem!=null)
+				propertyId = (_view.CMB_property.selectedItem as Property).uuid;	
+				
+			var q:QuerryObject = new QuerryObject;
+				q.searchCode   = "searchByPropertyAndSeasonId";
+				q.condition1   = propertyId;
+				q.condition2   = seasonId;	
+			
+			startBusyCursor();	
+			rc_rateCodeRO.dynamicSearch(q);
+		}
+		
+		private function keyInputHandler(event:KeyboardEvent=null):void
+		{
+			if(event.keyCode == 119)
+				saveObjects();
+			else if(event.keyCode == 120)
+				Alert.show("TODO:Delete this record");
+			else if(event.keyCode == 112)
+				Alert.show("TODO:Show HELP page");
+				
+		}
+		
+		private function saveObjects(e:Event=null):void
+		{
+			var temp:ArrayCollection = new ArrayCollection;
+			
+			for(var i:int=0; i<dynamicList.length; i++)
+			{
+				
+				var checkbox:AgentMarketCheckBox = dynamicList.getItemAt(i) as AgentMarketCheckBox;
+				var obj:AppliedAgentMarkets		 = new AppliedAgentMarkets;
+					obj.marketcodeUuid			 = checkbox.agentMarket.uuid
+					obj.uuid					 = checkbox.uuid;
+					
+				var seasonId:String 	= "";
+				var rateCodeId:String 	= "";
+				var hotelId:String 		= "";
+				var currencyId:String 	= "";
+				
+				if(_view.CMB_property.selectedItem!=null)
+					hotelId = (_view.CMB_property.selectedItem as Property).uuid;
+				
+				if(_view.CMB_season.selectedItem!=null)
+					seasonId = (_view.CMB_season.selectedItem as Season).uuid;
+			
+				if(_view.CMB_rateCode.selectedItem!=null)
+				{
+					rateCodeId = (_view.CMB_rateCode.selectedItem as RateCode).uuid;
+					currencyId = (_view.CMB_rateCode.selectedItem as RateCode).currency;
+				}
+					
+					obj.seasonId		=	seasonId;
+					obj.rateCodeUuid	=	rateCodeId;
+					obj.hotelId			=	hotelId;	
+					obj.currencyId		=   currencyId;		
+				
+				if(checkbox.selected)
+					temp.addItem(obj);
+			}
+			
+			var tempDList:ArrayCollection = arrangeDeleteList();
+				
+			startBusyCursor();
+			rc_appliedAgentMarketsRO.create(temp, tempDList);
+		}
+		
+		private function arrangeDeleteList():ArrayCollection
+		{
+			var list:ArrayCollection = new ArrayCollection;
+			
+			var hotelId:String 		= "";
+				
+				if(_view.CMB_property.selectedItem!=null)
+					hotelId = (_view.CMB_property.selectedItem as Property).uuid;
+			
+			for(var i:int=0; i<deleteList.length; i++)
+			{
+				var checkbox:AgentMarketCheckBox = deleteList.getItemAt(i) as AgentMarketCheckBox;
+				var obj:AppliedAgentMarkets		 = new AppliedAgentMarkets;
+					obj.uuid					 = checkbox.uuid;
+					obj.hotelId					 = hotelId;
+				
+				list.addItem(obj);
+			}
+			
+			return list;
+		}
+		
+		private function addNew(e:Event=null):void
+		{
+			_view.V_dynamic.removeAllChildren();
+			dynamicList.removeAll();
+			_view.CMB_season.selectedItem = null;
+			_view.CMB_rateCode.selectedItem = null;
+			deleteList.removeAll();
+		}
+		
+		
+		private function generateDynamicAgentGrid():void
+		{
+			dynamicList.removeAll();
+			_view.V_dynamic.removeAllChildren();
+			
+			for( var i:int= 0; i< marketList.length; i++)
+			{
+				
+				var market:AgentMarkets = marketList.getItemAt(i) as AgentMarkets;
+				
+				var box:JHHbox = new JHHbox;
+				var hboxBgColor:String;
+					
+				var checkBox:AgentMarketCheckBox 	= new AgentMarketCheckBox;
+					checkBox.label	  	   			= market.description;
+					checkBox.agentMarket		    = market;
+					
+					checkBox.addEventListener(Event.CHANGE, marketRemoveHandler)
+					
+					if(findAlreadyAllocatedMarket(market.uuid))
+					{
+						var uuid:String   = findAlreadyAllocatedMarketUuid(market.uuid);
+						
+						checkBox.selected = true;
+						checkBox.uuid	  = uuid;
+						hboxBgColor = "#E8E9A9";
+					}
+					else
+					{
+						hboxBgColor = "#FFFFFF"
+					}
+					
+					box.setStyle("backgroundColor", hboxBgColor);
+					
+				box.originalBgColor	= hboxBgColor;
+				
+				dynamicList.addItem(checkBox);
+				
+				box.addChild(checkBox);	
+				_view.V_dynamic.addChild(box);			
+			}
+		}
+		
+		private function marketRemoveHandler(e:Event):void
+		{
+			var chkBox:AgentMarketCheckBox = e.currentTarget as AgentMarketCheckBox;
+			
+			if(!chkBox.selected)
+				deleteList.addItem(chkBox);
+		}
+		
+		private function findAlreadyAllocatedMarket(findMarketId:String):Boolean
+		{
+			var isAgentFound:Boolean = false;
+			
+			for(var i:int=0; i<appliedmarketList.length; i++)
+			{
+				if((appliedmarketList.getItemAt(i) as AppliedAgentMarkets).marketcodeUuid == findMarketId)
+				{
+					isAgentFound = true;
+					break;
+				}
+			}
+			
+			return isAgentFound;
+		}
+		
+		private function findAlreadyAllocatedMarketUuid(findMarketId:String):String
+		{
+			var uuid:String = "";
+			
+			for(var i:int=0; i<appliedmarketList.length; i++)
+			{
+				if((appliedmarketList.getItemAt(i) as AppliedAgentMarkets).marketcodeUuid == findMarketId)
+				{
+					uuid = (appliedmarketList.getItemAt(i) as AppliedAgentMarkets).uuid;
+					break;
+				}
+			}
+			
+			return uuid;
+		}
+		
+		
+		private function setLoggedInUser():void
+		{
+			initializeAgentMarketsRemortingObject();
+			agentMarketRO.setLogedInUser(_loggedInUser);
+			
+			initializeRCRemortingObject();
+			rc_rateCodeRO.setLogedInUser(_loggedInUser);
+			
+			initializeRCAppliedAgentMarketsRemortingObject();
+			rc_appliedAgentMarketsRO.setLogedInUser(_loggedInUser);
+			
+			initializeRCSeasonRemortingObject();
+			rc_seasonRO.setLogedInUser(_loggedInUser);
+			
+			initializePropertyRemortingObject();
+			propertyRO.setLogedInUser(_loggedInUser);
+		}
+		
+		private function loadMarketList(e:Event=null):void
+		{
+			if(_view.CMB_rateCode.selectedItem!=null)
+				_view.V_dynamic.enabled = true;
+			else	
+				_view.V_dynamic.enabled = false;
+				
+			var seasonId:String 	= "";
+			var rateCodeId:String 	= "";
+			var propertyId:String 	= "";
+			var currency:String 	= "";
+			
+			if(_view.CMB_season.selectedItem!=null)
+				seasonId	=	(_view.CMB_season.selectedItem as Season).uuid;
+			
+			if(_view.CMB_rateCode.selectedItem!=null)
+			{
+				rateCodeId	=	(_view.CMB_rateCode.selectedItem as RateCode).uuid;	
+				currency	=	(_view.CMB_rateCode.selectedItem as RateCode).currency;
+			}
+				
+			if(_view.CMB_property.selectedItem!=null)
+				propertyId = (_view.CMB_property.selectedItem as Property).uuid		
+			
+			var q:QuerryObject = new QuerryObject;
+				q.searchCode   = "searchForRateCodeAllocation";
+				q.condition1   = seasonId;
+				q.condition2   = rateCodeId;
+				q.condition3   = propertyId;
+				q.condition4   = currency;
+			
+			startBusyCursor();	
+			agentMarketRO.dynamicSearch(q);
+		}
+		
+		private function loadPropertyList():void
+		{
+			startBusyCursor();
+			propertyRO.dynamicSearch("","");
+		}
+		
+		public override function appliedAgentMarketsCreateResultsHandler (event:ResultEvent):void
+		{	
+			activityAknowladgment();
+			stoptBusyCursor();
+			addNew();
+		}
+		
+		public override function agentMarketFetchResultsHandler (event:ResultEvent):void
+		{	
+			stoptBusyCursor();
+			marketList = new ArrayCollection();
+			marketList = event.result as ArrayCollection;
+			
+			loadObjects();
+		}
+		
+		public override function rateCodeSeasonFetchResultsHandler (event:ResultEvent):void
+		{	
+			stoptBusyCursor();
+			seasonList = new ArrayCollection();
+			seasonList = event.result as ArrayCollection;
+			
+			_view.CMB_season.dataProvider = seasonList;
+		}
+		
+		public override function rateCodeFetchResultsHandler (event:ResultEvent):void
+		{	
+			stoptBusyCursor();
+			rateCodeList = new ArrayCollection();
+			rateCodeList = event.result as ArrayCollection;
+			
+			_view.CMB_rateCode.dataProvider = rateCodeList;
+			
+			_view.CMB_rateCode.dispatchEvent(new ListEvent(ListEvent.CHANGE));
+			
+		}
+		
+		public override function appliedAgentMarketsFetchResultsHandler (event:ResultEvent):void
+		{	
+			stoptBusyCursor();
+			appliedmarketList = new ArrayCollection();
+			appliedmarketList = event.result as ArrayCollection;
+			
+			generateDynamicAgentGrid();
+		}
+		
+		public override function faultHandler(event:FaultEvent):void {
+			stoptBusyCursor();
+			var error:ErrorMessage	=	event.message as ErrorMessage;
+			handleFaultMessage(error);
+		}
+		
+		
+		private function activityAknowladgment():void
+		{
+			createJHAlert(_view, "Record saved Successfully");
+		}
+		
+		public override function marketingPropertyFetchResultsHandler (event:ResultEvent):void
+		{	
+			stoptBusyCursor();
+			propertyList = new ArrayCollection();
+			propertyList = event.result as ArrayCollection;
+			_view.CMB_property.dataProvider = propertyList;
+			
+			//Set user's assigned property
+			if(_loggedInUser!=null)
+			{
+				if(_loggedInUser.market !=null)
+				{
+					var index:int= setUserProperty(propertyList, _loggedInUser.market.uuid);
+					_view.CMB_property.selectedIndex = index;
+					_view.CMB_property.dispatchEvent(new ListEvent(ListEvent.CHANGE));
+				}
+			}
+			
+			loadSeasons();
+			
+		}
+	}
+		
+		
+}

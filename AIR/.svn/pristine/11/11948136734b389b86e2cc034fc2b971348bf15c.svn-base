@@ -1,0 +1,2314 @@
+package net.jwt.view.RateCode.view
+{
+	import flash.events.ContextMenuEvent;
+	import flash.events.Event;
+	import flash.events.KeyboardEvent;
+	import flash.events.MouseEvent;
+	import flash.net.SharedObject;
+	import flash.ui.ContextMenu;
+	import flash.ui.ContextMenuItem;
+	
+	import mx.collections.ArrayCollection;
+	import mx.controls.Alert;
+	import mx.controls.listClasses.IListItemRenderer;
+	import mx.controls.treeClasses.TreeItemRenderer;
+	import mx.controls.treeClasses.TreeListData;
+	import mx.core.IUIComponent;
+	import mx.core.UIComponent;
+	import mx.events.CloseEvent;
+	import mx.events.DragEvent;
+	import mx.events.ListEvent;
+	import mx.events.TreeEvent;
+	import mx.formatters.DateFormatter;
+	import mx.rpc.events.FaultEvent;
+	import mx.rpc.events.ResultEvent;
+	import mx.utils.UIDUtil;
+	
+	import net.jwt.ApplicationFacade;
+	import net.jwt.Constants;
+	import net.jwt.event.NotificationArguments;
+	import net.jwt.value.objects.Members;
+	import net.jwt.value.objects.PaxDetailsObject;
+	import net.jwt.value.objects.QuerryObject;
+	import net.jwt.value.objects.RatesTreeNode;
+	import net.jwt.value.objects.User;
+	import net.jwt.view.MainView;
+	import net.jwt.view.Mediator;
+	import net.jwt.view.logic.TourTreeLogic;
+	import net.jwt.view.popup.JWTPopUp;
+	
+	public class RatesTreeMediator extends Mediator
+	{
+		private var _view:RatesTreeView;
+		private var _mainView:MainView;
+		
+		private var _app:JWTPopUp;
+		[Bindable] public var args:NotificationArguments;
+		[Bindable] public var _vehicleType:ArrayCollection;
+		[Bindable] public var _costingDetailsList:ArrayCollection;
+		
+		private const DAY_LINE_TOP:String 					= "day line top";
+		private const DAY_LINE_BOTTOM:String				= "day line bottom";
+		private const DAY_LINE:String 						= "day line";
+		private const BIN_STR:String 						= "bin-delete";
+		private const NEW_ROUTE:String 						= "new route";
+		private const TIME_LABELS:String 					= "Time Label";
+		
+		public static const FOLDER:String 					= "Folder";
+		public static const LABEL_TOUR:String 				= "Tour";
+		public static const LABEL_NEW_TOUR:String 			= "New Folder";
+		public static const LABEL_REAL:String 				= "Real";
+		public static const LABEL_NEW_REAL:String 			= "New Real";
+		public static const LABEL_NEW_VERSION:String 		= "New Costing";
+		public static const LABEL_NEW_SUPPVERSION:String 	= "New Supplementry Costing";
+		public static const LABEL_VERSION:String 			= "Version";
+		public static const LABEL_NEW_DAY:String 			= "New Day";
+		public static const LABEL_NEW_INVOICE:String 		= "New Version";
+		public static const LABEL_DAY:String 				= "Day";
+		public static const LABEL_NEW_SEGMENT:String 		= "New Segment";
+		public static const LABEL_SEGMENT:String 			= "Segment";
+		public static const LABEL_NEW_BOOKING:String 		= "New Booking";
+		
+		public static const LABEL_DELETE_FOLDER:String 		= "delete folder";
+		public static const LABEL_DELETE_TOUR:String 		= "delete tour";
+		public static const LABEL_DELETE_VERSION:String 	= "delete version";
+		public static const LABEL_DELETE_DAY:String 		= "delete day";
+		public static const LABEL_DELETE_SEGMENT:String 	= "delete segment";
+		
+		
+		private const ACTION_COPY:String 					= "Copy";
+		private const ACTION_DELETE:String 					= "Delete";
+		private const ACTION_EDIT:String 					= "Edit";
+		private const ACTION_UPLOAD:String 					= "Upload";
+		private const ACTION_CUT:String 					= "Cut";
+		private const ACTION_REFRESH:String 				= "Refresh";
+		private const ACTION_PASTE:String 					= "Paste";
+		private const ACTION_FREEZE:String 					= "Freeze";
+		private const ACTION_NEWFOLDER:String 				= "New Root Folder";
+		private const ACTION_MAKE_A_BOKING:String 			= "Make a Booking";
+		private const ACTION_TRANSFER_THIS_TO:String 		= "Send this to...";
+		private const ACTION_GET_TRANSFERED_ITEM:String		= "Get shared items";
+		
+		private const TRANSPORT_REQUISITION:String 			= "Transport Requisition";
+		private const HOTEL_RESERVATION:String 				= "Hotel Reservation";
+		
+		private const TOP_MOST_NODE:String 					= "TopMostNode";
+		
+		private var activeTypeOfTreeNode:String				= "";
+		
+		private var previouslySelectedRatesTreeNode:RatesTreeNode;
+		private var topnodeOfPreviouslySelectedRatesTreeNode:RatesTreeNode = new RatesTreeNode;
+		
+		private var copyOfLastSelectedTreeNode:RatesTreeNode;
+		private var selectedTreeListData:TreeListData; 
+		private var toCopyTreeListData:TreeListData;
+		private var totalObjectCollection:ArrayCollection;
+		private var objectCollection:ArrayCollection;
+		private var _versionList:ArrayCollection;
+		private var userCollection:ArrayCollection;
+		private var transferUser:User;
+		private var selectedUser:User;
+		
+		[Bindable] 
+		public var tree:ArrayCollection;
+		
+		[Bindable]
+		public var windowWidth:int;
+		
+		[Bindable]
+		public var windowHiegth:int;
+		          
+	    [Bindable]
+        public var contextTreeMenu:ContextMenu = new ContextMenu();
+        public var lastTreeItem:ListEvent;
+        public var lastTreeItemByMouseOver:ListEvent;
+        private var beingEdited:Boolean 		= false;
+        private var reLoadFromDB:Boolean 		= false;
+        private var _isManagerLogged:Boolean 	= false;
+        
+        [Bindable][Embed(source="assets/icons/16x23-folder.png")]  
+        public var folderFolder:Class; 
+        
+        [Bindable][Embed(source="assets/icons/16x23-folder.png")]  
+        public var folderTour:Class; 
+        
+        [Bindable][Embed(source="assets/icons/13x14-Costing.png")]  
+        public var folderVersion:Class; 
+        
+        [Bindable][Embed(source="assets/icons/16x16pencil.png")]  
+        public var folderDay:Class; 
+        
+        [Bindable][Embed(source="assets/icons/16x16games.png")]  
+        public var documentSegment:Class; 
+        
+        [Bindable][Embed(source="assets/icons/16x16chess.png")]  
+        public var documentTransReq:Class;
+        
+        [Bindable][Embed(source="assets/icons/16x16Costing-linked.png")]  
+        public var booking_open:Class;
+        
+        [Bindable][Embed(source="assets/icons/13-x14-Booking-lost.png")]  
+        public var booking_lost:Class;
+        
+        [Bindable][Embed(source="assets/icons/13-x14-Booking-paid.png")]  
+        public var booking_billed:Class;
+        
+        [Bindable][Embed(source="assets/icons/search.png")]  
+        public var search:Class;
+     	
+     	[Bindable][Embed(source="assets/icons/24x24refresh.png")]  
+        public var refresh:Class;
+        
+        [Bindable][Embed(source="assets/icons/16x16folder.png")]  
+        public var subnode:Class;
+        
+        [Bindable][Embed(source="assets/icons/16x16yellowstar.png")]  
+        public var reset:Class;
+        
+        [Bindable][Embed(source="assets/icons/13-x13-Supplementry-Costing.png")]  
+        public var supplyVersion:Class;
+        
+        
+		public function RatesTreeMediator(view:UIComponent, args:NotificationArguments)
+		{
+			super(view);
+			if(view != null)
+			{
+				_view  = view as RatesTreeView;
+			}
+			
+			if(args != null){
+				this.args 		= args;
+				_loggedInUser 	= args.user;
+			}
+			
+			_mainView	  = (args.originalViewComponent as MainView);	
+				
+			_app = args.viewComponent as JWTPopUp;	
+			var _object:Object = args.originatorObject as Object;
+			
+			if(_object != null)
+			{
+				previouslySelectedRatesTreeNode			= _object.selectedNode as RatesTreeNode
+				if(_object.topnodeOfSelectedNode != null)
+					topnodeOfPreviouslySelectedRatesTreeNode 	= _object.topnodeOfSelectedNode as RatesTreeNode;
+			}
+		}
+		
+		/**
+		 * 2014/September 27
+		 * Refer to any changes at 
+		 * TourHelperClassicLoadCostingsMediator
+		 * 
+		 **/
+		 
+		protected override function viewComponentInitialize():void{
+			setInitialIcons();
+			setSpecialFeildsForManager();
+			_view.itineryTree.doubleClickEnabled = true;
+			_view.itineryTree.dragEnabled 		 = true;
+			_view.itineryTree.dropEnabled 		 = true;
+			//_view.itineryTree.addEventListener(DragEvent.DRAG_DROP, handleTreeItemDrop);
+			_view.itineryTree.addEventListener(ListEvent.ITEM_CLICK, setLastTreeItem);
+			//_view.itineryTree.addEventListener(TreeEvent.ITEM_OPEN,  treeItemOpened);
+			//_view.itineryTree.addEventListener(TreeEvent.ITEM_CLOSE, treeIteClosed);
+			//_view.itineryTree.addEventListener(MouseEvent.CLICK, handleMouseClickOnTree);
+			_view.itineryTree.addEventListener(MouseEvent.DOUBLE_CLICK, openTransactionScreen);
+			//_view.itineryTree.addEventListener(ListEvent.ITEM_FOCUS_OUT, endEditTreeLabel);
+			//_view.itineryTree.addEventListener(MouseEvent.MOUSE_MOVE, setLastHightedTreeItem);
+			_view.itineryTree.addEventListener(KeyboardEvent.KEY_UP, handleKeyboardStrokes);
+			_view.itineryTree.contextMenu = contextTreeMenu;
+			
+			contextTreeMenu.addEventListener(ContextMenuEvent.MENU_SELECT, contextMenuTriggered);
+			
+			_view.searchText.addEventListener(KeyboardEvent.KEY_UP, searchTree);
+			_view.I_refresh.addEventListener(MouseEvent.CLICK, refreshTree);
+			_view.L_refresh.addEventListener(MouseEvent.CLICK, refreshTree);
+			
+			_view.I_reset.addEventListener(MouseEvent.CLICK, resetTree);
+			_view.L_reset.addEventListener(MouseEvent.CLICK, resetTree);
+
+			_view.chk_show_versions.addEventListener(Event.CHANGE, showCostingsOnly);
+			_view.searchBynumber.addEventListener(KeyboardEvent.KEY_UP, keyStrokesHandle);
+			_view.searchByYear.addEventListener(KeyboardEvent.KEY_UP, keyStrokesHandle);
+			_view.CMB_user.addEventListener(ListEvent.CHANGE, setSelectedUser);
+			_view.D_from.addEventListener(Event.CHANGE, showCostingsOnly);
+			_view.D_to.addEventListener(Event.CHANGE,	showCostingsOnly);
+			initializeRemoteObjects();
+			//loadUsersList();
+			setDefaultFocus();
+			setLoggedInUser();
+			getLocalData();
+			loadData();
+		}
+		
+		private function loadTreeData():void
+		{
+			_view.itineryTree.dataProvider = createTree();
+		}
+		
+		private function loadData():void
+		{
+			initializeRateCodeGenerateTreeRemortingObject();
+			rateCodeGenerateTreeRO.generateTree();
+			startBusyCursor();
+		}
+		
+		private function createTree():ArrayCollection
+		{
+			var ratesTreeNode:RatesTreeNode = new RatesTreeNode;
+				ratesTreeNode.label 		= "Cox & Kings";
+				ratesTreeNode.id			= UIDUtil.createUID();
+				ratesTreeNode.type	 		= "AGENT";
+				createHotels(ratesTreeNode);
+				
+				var tree:ArrayCollection = new ArrayCollection;
+					tree.addItem(ratesTreeNode);
+				
+				return tree;	
+		}
+		
+		private function createHotels(parentNode:RatesTreeNode):void
+		{
+			for(var i:int=0; i<5; i++)
+			{
+				var node:RatesTreeNode 	= new RatesTreeNode;
+					node.label 			= "H-" + i.toString();
+					node.id				= UIDUtil.createUID();
+					node.type	 		= "HOTEL";
+					createRatecodes(node);
+					parentNode.children.addItem(node);
+					
+			}
+		}
+		
+		private function createRatecodes(parentNode:RatesTreeNode):void
+		{
+			for(var i:int=0; i<2; i++)
+			{
+				var node:RatesTreeNode 	= new RatesTreeNode;
+					node.label 			= "RC-" + i.toString();
+					node.id				= UIDUtil.createUID();
+					node.type	 		= "RATECODE";
+					createDiscounts(node);
+					parentNode.children.addItem(node);
+					
+			}
+		}
+		
+		private function createDiscounts(parentNode:RatesTreeNode):void
+		{
+			for(var i:int=0; i<3; i++)
+			{
+				var node:RatesTreeNode 	= new RatesTreeNode;
+					node.label 			= "D-" + i.toString();
+					node.id				= UIDUtil.createUID();
+					node.type 		= "DISCOUNT";
+					parentNode.children.addItem(node);
+			}
+		}
+		
+		private function setSpecialFeildsForManager():void
+		{
+			if(_loggedInUser.manager != null && _loggedInUser.market != null)
+			{
+				if(_loggedInUser.manager.idMarket == _loggedInUser.market.uuid){
+					_view.CMB_user.enabled 		= true;
+					_isManagerLogged			=	true;
+					
+				}
+				else{
+					_view.CMB_user.enabled		= false;
+					_isManagerLogged			=	false
+				}	
+			}
+		}
+		
+		private function setAdvancedSearchBoxVisibility():void
+		{
+			
+			if(_view.chk_show_versions.selected){
+				_view.V_searchArea.height		=	76;
+				_view.H_advancedSearch.height 	= 	38;
+			}
+			else{
+				_view.V_searchArea.height		=	38;
+				_view.H_advancedSearch.height = 0;	
+			}
+		}
+		
+		private function setSelectedUser(e:Event):void
+		{
+			selectedUser	=	_view.CMB_user.selectedItem as User;
+			
+			if(_view.chk_show_versions.selected)
+				loadCostings();
+		}
+		
+		private function loadUsersList():void
+		{
+			startBusyCursor();
+			initializeUserRemortingObject();
+			userRO.dynamicSearch("allUsersBasedOnMarket",_loggedInUser.market.uuid);
+		}
+		
+		public function keyStrokesHandle(event:KeyboardEvent):void
+		{
+			if(event.keyCode == 13)
+				loadCostings()
+			else if(event.keyCode == 120)
+				Alert.show("TODO:Delete this record");
+			else if(event.keyCode == 112)
+				Alert.show("TODO:Show HELP page");
+				
+		}
+		
+		private function getLocalData():void
+		{
+			try
+				{
+				    var so:SharedObject = SharedObject.getLocal("localData");
+				    _view.searchByYear.text = so.data.bookingYear;
+				    if(so.data.dateFrom !=null)
+				   		_view.D_from.text 		= so.data.dateFrom;
+				   		
+				   	if(so.data.dateFrom !=null)	
+				    	_view.D_to.text 		= so.data.dateTo;
+				}
+				catch (error:Error)
+				{
+				    //Do nothing
+				}
+		}
+		
+		private function setLoggedInUser():void
+		{
+			tourFolderRO.setLogedInUser(_loggedInUser);
+			tourVersionRO.setLogedInUser(_loggedInUser);
+			tourMasterRO.setLogedInUser(_loggedInUser);
+			tourDayRO.setLogedInUser(_loggedInUser);
+			tourSegmentRO.setLogedInUser(_loggedInUser);
+			costingActivityRO.setLogedInUser(_loggedInUser);
+			costingBataRO.setLogedInUser(_loggedInUser);
+			costingFlightRO.setLogedInUser(_loggedInUser);
+			costingMarkupRO.setLogedInUser(_loggedInUser);
+			costingMemberRO.setLogedInUser(_loggedInUser);
+			costingTechnicalVisitRO.setLogedInUser(_loggedInUser);
+			costingLocationRO.setLogedInUser(_loggedInUser);
+			paxMasterRO.setLogedInUser(_loggedInUser);
+			
+		}
+		
+		private function setLocalData():void
+		{
+			try
+				{
+				    var so:SharedObject  	= SharedObject.getLocal("localData");
+				    	so.data.bookingYear =  _view.searchByYear.text;
+				    	so.data.dateFrom 	=  _view.D_from.text;
+				    	so.data.dateTo 		=  _view.D_to.text;
+				    	
+				}
+				catch (error:Error)
+				{
+				}
+		}
+		private function showCostingsOnly(event:Event):void
+		{
+			if(_view.chk_show_versions.selected){
+				_view.searchBynumber.visible	=	true;
+				_view.searchByYear.visible		=	true;
+				_view.L_dash.visible			=	true;
+				setAdvancedSearchBoxVisibility();
+				loadCostings();
+			}
+			else{
+				_view.itineryTree.dataProvider	=	tree;
+				
+				_view.searchBynumber.visible	=	false;
+				_view.searchByYear.visible		=	false;
+				_view.L_dash.visible			=	false;
+				setAdvancedSearchBoxVisibility();
+			}
+		}
+		
+		private function loadCostings():void
+		{
+			setLocalData();
+			startBusyCursor();
+			var q:QuerryObject	=	new QuerryObject;
+				q.searchCode	=	"searchBycostingNumber"
+				q.condition1	=	_view.searchByYear.text;
+				q.condition2	=	_view.searchBynumber.text;
+				q.condition3	=	selectedUser.uuid;
+				q.condition4	=	_view.D_from.text;
+				q.condition5	=	_view.D_to.text;
+			tourVersionRO.dynamicSearch(q);
+		}
+		
+		private function setInitialIcons():void
+		{
+			_view.I_search.source	= search;
+			_view.I_refresh.source	= refresh;
+			_view.I_subnodes.source	= subnode;
+			_view.I_reset.source	= reset;
+		}
+		
+		private function setDefaultFocus():void
+		{
+			_view.searchText.setFocus();
+		}
+		
+		private function initializeRemoteObjects():void
+		{
+			initializeTourFolderRemortingObject();
+			initializeTourMasterRemortingObject();
+			initializeTourVersionRemortingObject();
+			initializeTourDayRemortingObject();
+			initializeTourSegmentRemortingObject();
+			initializeCostingMemberRemortingObject();
+			initializeCostingFlightRemortingObject();
+			initializeLinksRemortingObject();
+			initializeCostingMarkupRemortingObject();
+			initializeCostingBataRemortingObject();
+			initializeCostingActivityRemortingObject();
+			initializeCostingTechnicalVisitRemortingObject();
+			initializeCostingShoppingRemortingObject();
+			initializeCostingVehicleRemortingObject();
+			initializeCostingLocationRemortingObject();
+			initializeCostingHotelRemortingObject();
+			initializeCostingMiscellineuosRemortingObject();
+			initializeSegmentBasedCostingCalculationRemortingObject();
+			initializePaxMasterRemortingObject();
+			initializePaxDetailsRemortingObject();
+			initializeCurrencySettingsRemortingObject();
+		}
+		
+		   /*****************************************
+		   * 	Dynamic tree structure of itinery 	*
+		   ******************************************/
+		   
+	  	private function treeChangeEventHandler(event:Event):void
+	   	{
+	   		Alert.show("treeChangeEventHandler");
+	   	}
+	   	
+		private function doNewTour(event:Event):void
+		{
+			var treeListData:TreeListData = getTreeListData();
+				
+			if(treeListData != null)
+			{
+				var listData:Object						= treeListData.item as Object;
+				var myTourCollection:ArrayCollection	= listData.children as ArrayCollection;
+				var uuid:String							= (treeListData.item as RatesTreeNode).uuid;
+				
+				if(null != myTourCollection)
+					createNewTour(myTourCollection.length+1,uuid);
+				else
+				{
+					myTourCollection = new ArrayCollection;
+					createNewTour(myTourCollection.length, uuid)
+				}
+			}	
+		}
+			
+		private function setTreeIcons():void {
+         	for(var i:int=0; i<tree.length; i++)
+         	{
+            	_view.itineryTree.setItemIcon(tree.getItemAt(i), folderFolder, folderFolder);
+            	var _objct:Object 			= tree.getItemAt(i) as Object;
+            	setSubTreeIcons(_objct);
+          	}
+        }
+        
+      private function seacrhCTN(item:RatesTreeNode):RatesTreeNode
+       {
+       	for(var _x:int=0; _x<tree.length; _x++)
+       	{
+       		var _ctn:RatesTreeNode = findCTNByUuid(tree.getItemAt(_x) as RatesTreeNode, item.uuid);
+       		if(_ctn != null)
+       		{
+       			return _ctn;
+       			break;
+       		}
+       	}
+       	return null;
+       }
+	       
+        private function findCTNByUuid(item:RatesTreeNode, uuid:String):RatesTreeNode
+        {
+    		var searchString:String = uuid;
+            var itemUuid:String 	= item.uuid;
+            
+            trace("searchString=" + searchString + ", itemUuid " + itemUuid);
+            trace(itemUuid.indexOf(searchString));
+            trace(searchString.indexOf(itemUuid));
+            
+            if (itemUuid == searchString)
+            	return item;
+            else{
+            	//return findInChildObject(item);
+            	 var _found:Boolean = false;
+            	 var _list:ArrayCollection = item.children as ArrayCollection;
+            	
+            	if(_list !=null && _list.length>0)
+            	{
+                	for(var i:Number=0; i<_list.length; i++)
+                	{
+                		var _ctn:RatesTreeNode = _list.getItemAt(i) as RatesTreeNode;
+                		if(getFilter(_ctn) == true){
+                			return _ctn;
+                			break;
+                		}
+                	}
+                }else
+                	return null;
+              }
+                	
+            return null;    
+        } 
+        
+     	private function setSubTreeIcons(_objct:Object):void 
+     	{
+     		if(_objct.children != null)
+     		{
+        	var _list:ArrayCollection	= _objct.children as ArrayCollection;
+        	
+            	for(var x:int=0; x<_list.length; x++)
+            	{
+            		var _RatesTreeNode:RatesTreeNode = _list.getItemAt(x) as RatesTreeNode;
+            		if(_RatesTreeNode != null)
+            		{
+            			if(_RatesTreeNode.type == Constants.TREE_NODE_TYPE_TOUR)
+         					_view.itineryTree.setItemIcon(_list.getItemAt(x), folderTour, folderTour );
+         				else if(_RatesTreeNode.type == Constants.TREE_NODE_TYPE_VERSION )
+         					_view.itineryTree.setItemIcon(_list.getItemAt(x), folderVersion, folderVersion );
+         				else if(_RatesTreeNode.type == Constants.COSTING_TYPE_SUPPLYMENTARY)
+         					_view.itineryTree.setItemIcon(_list.getItemAt(x), supplyVersion, supplyVersion );	
+         				else if(_RatesTreeNode.type == Constants.TREE_NODE_TYPE_DAY)
+         					_view.itineryTree.setItemIcon(_list.getItemAt(x), folderDay, folderDay );
+         				else if(_RatesTreeNode.type == Constants.TREE_NODE_TYPE_SEGMENT)
+         					_view.itineryTree.setItemIcon(_list.getItemAt(x), documentSegment, documentSegment );
+         				else if(_RatesTreeNode.type == Constants.TREE_NODE_TYPE_TRANSPORT_REQEST)
+         					_view.itineryTree.setItemIcon(_list.getItemAt(x), documentTransReq, documentTransReq );
+         				else if(_RatesTreeNode.type == Constants.TREE_NODE_TYPE_BOOKING_OPEN)
+         					_view.itineryTree.setItemIcon(_list.getItemAt(x), booking_open, booking_open );
+         				else if(_RatesTreeNode.type == Constants.TREE_NODE_TYPE_BOOKING_LOST)
+         					_view.itineryTree.setItemIcon(_list.getItemAt(x), booking_lost, booking_lost );
+         				else if(_RatesTreeNode.type == Constants.TREE_NODE_TYPE_BOOKING_BILLED)
+         					_view.itineryTree.setItemIcon(_list.getItemAt(x), booking_billed, booking_billed );		
+            		}
+         			
+         			var _subObjct:Object 			= _list.getItemAt(x) as Object;
+         			var _subList:ArrayCollection	= _subObjct.children as ArrayCollection;
+         			if(_subList != null)
+         			{
+	         			if(_subList.length >0)
+	         				setSubTreeIcons(_subObjct);
+         			}
+            	}
+          	}
+     	}
+         	
+			private function createNewTreeNode(event:Event, nodeType:String):void
+			{
+				var treeListData:TreeListData			= getTreeListData();	
+				if(treeListData != null)
+				{
+					var listData:Object						= treeListData.item as Object;
+					var nodeCollection:ArrayCollection		= listData.children as ArrayCollection;
+					
+					if(null == nodeCollection)
+					{
+						nodeCollection 		= new ArrayCollection;
+						listData.children 	= nodeCollection;
+					}
+					
+					if(nodeType == LABEL_NEW_VERSION || nodeType == LABEL_NEW_REAL)
+						createVersions(treeListData.item.uuid,nodeCollection.length+1, Constants.TREE_NODE_TYPE_VERSION);
+					else if(nodeType == LABEL_NEW_SUPPVERSION)
+						createVersions(treeListData.item.uuid,nodeCollection.length+1, Constants.COSTING_TYPE_SUPPLYMENTARY);
+					else if(nodeType == LABEL_NEW_DAY)
+						createNewDay(treeListData.item.uuid,nodeCollection.length+1);
+					else if(nodeType == LABEL_NEW_SEGMENT)
+						createNewSegment(treeListData.item.uuid,nodeCollection.length+1);
+									
+					expandAllTreeNodes(event);
+					setTreeIcons();
+					reLoadFromDB = false;
+				}
+			}
+			
+			private function createNewBookingNode(event:Event, lable:String):void
+			{
+				var _f:TreeListData 	= getTreeListData();
+           		var _g:RatesTreeNode	= findTourFolder(_f);
+           		
+           		if(	_g != null)
+           		{
+           			_g.createdTime		= currentDateTimeString();
+           			_g.type = Constants.TREE_NODE_TYPE_BOOKING_OPEN;
+           			
+		           	trace(_g.label);
+		           	saveNodeDetails(_g);
+           		}
+			}
+			
+			private function createNewFolder():void
+			{
+				createNewTopFolderStructure();
+			}
+			
+			private function LoadTourFolders():void
+			{
+				loadTopFolderStructure();
+			}
+			private function doNewVersion(event:Event):void
+			{
+				createNewTreeNode(event, LABEL_NEW_VERSION);
+			}
+			private function doNewSupplementryVersion(event:Event):void
+			{
+				createNewTreeNode(event, LABEL_NEW_SUPPVERSION);
+			}
+			
+			private function doTransferAC(event:Event):void
+			{
+				transferACtoanother(event);
+			}
+			private function doFetchTransferedAC(event:Event):void
+			{
+				fetchOwnershipTransferedItems();
+			}
+			private function doNewBooking(event:Event):void
+			{
+				doBooking(event);
+				//createNewBookingNode(event, LABEL_NEW_BOOKING);
+			}
+			private function doNewReal(event:Event):void
+			{
+				createNewTreeNode(event, LABEL_NEW_REAL);
+			}
+			
+			private function doNewDay(event:Event):void
+			{
+				createNewTreeNode(event, LABEL_NEW_DAY);
+			}
+			
+			private function doNewSegment(event:Event):void
+			{
+				createNewTreeNode(event, LABEL_NEW_SEGMENT);
+			}
+			
+			private function doNewFolder(event:Event):void
+			{
+				createNewFolder();
+			}
+			
+			private function doEditName(event:Event):void
+			{
+				_view.itineryTree.editable 	= true;
+				beingEdited					= true;
+				_view.itineryTree.setFocus(); 
+				getUserInPutToReName(getLastSelectedRatesTreeNode());
+			}
+			
+			
+			
+			private function getUserInPutToReName(version:RatesTreeNode):void
+			{
+				var dimention:Object = new Object;
+				var _defaultLabelWidth:int = 500;
+				
+				/* if(version != null)
+				{
+					if(version.label.toLocaleString().length > (_defaultLabelWidth + 20))
+						dimention.width = version.label.length + 50;
+					else
+						dimention.width  = _defaultLabelWidth;
+				} 
+				else */
+					dimention.width  = _defaultLabelWidth;
+						
+				dimention.heigth = 30;	
+				args.user 			  = _loggedInUser;
+				args.originatorObject = version;
+				createPopUp(HELP_GET_USER_INPUT_TO_RENAMEINPUT, _mainView, args, "Costing Name", ApplicationFacade.HELP_GET_USER_INPUT, true, dimention);
+			}
+			
+			private function getUserInPutForName(version:RatesTreeNode):void
+			{
+				var dimention:Object = new Object;
+				dimention.width  = 425; 
+				dimention.heigth = 30;	
+				args.user 			  = _loggedInUser;
+				args.originatorObject = version;
+				createPopUp(HELP_GET_USER_INPUT, _mainView, args, "Folder/File Name", ApplicationFacade.HELP_GET_USER_INPUT, true, dimention);
+			}
+			
+			private function doUploadFile(event:Event):void
+			{
+				args.user 			  = _loggedInUser;
+				args.originatorObject = getLastSelectedRatesTreeNode();
+				createPopUp(HELP_FILE_UPLOAD, _mainView, args, "Slect and upload files", ApplicationFacade.TOUR_FILE_UPLOAD, true);
+			}
+			
+			private function doTransportRequisition(event:Event):void
+			{
+				var dimention:Object = new Object;
+				dimention.width  = 1100; 
+				dimention.heigth = 650;
+				
+				args.user 			  = _loggedInUser;
+				args.originatorObject = getLastSelectedRatesTreeNode();
+				createPopUp(HELP_REQUEST_TRANSPORT_REQ, _mainView, args, "Transport Requisition-New", ApplicationFacade.TOUR_REQUEST_TRANSPORT, true, dimention);
+			}
+			
+			private function doBooking(event:Event):void
+			{
+				var dimention:Object = new Object;
+				dimention.width  = 1100; 
+				dimention.heigth = 650;
+				
+				args.user 			  = _loggedInUser;
+				args.originatorObject = getLastSelectedRatesTreeNode();
+				createPopUp(HELP_BOOKING_VIEW, _mainView, args, "New Booking", ApplicationFacade.TOUR_BOOKINGS_CLIENT_DETAILS_VIEW, true, dimention);
+			}
+			
+			private function transferACtoanother(event:Event):void
+			{
+				var dimention:Object = new Object;
+				dimention.width  = 600; 
+				dimention.heigth = 400;
+				
+				args.user 			  = _loggedInUser;
+				args.originatorObject = getLastSelectedRatesTreeNode();
+				createPopUp(HELP_USER, _mainView, args, "Transfer a/c to", ApplicationFacade.HELP_USER_SEARCH, true, dimention);
+			}
+			
+			private function doHotelReservations(event:Event):void
+			{
+				var dimention:Object = new Object;
+				dimention.width  = 1100; 
+				dimention.heigth = 650;
+				
+				args.user 			  = _loggedInUser;
+				args.originatorObject = getLastSelectedRatesTreeNode();
+				createPopUp(HELP_HOTEL_RESERVATION_VIEW, _mainView, args, "Hotel Bookings", ApplicationFacade.HOTEL_RESERVATION, true, dimention);
+			}
+			
+			public override function closePopup(event:Event):void
+	        {
+	        	trace((event.target as JWTPopUp).id);
+	            popup = null;
+	            if(args.argumentObject != null)
+	            {
+	            	if((event.target as JWTPopUp).id == HELP_GET_USER_INPUT)
+	            	{
+	            		saveNodeDetails(args.argumentObject as RatesTreeNode);
+	            		createNewMemberObject(args.argumentObject as RatesTreeNode);
+	            	}else if((event.target as JWTPopUp).id == HELP_GET_USER_INPUT_TO_RENAMEINPUT)
+	            	{
+	            		endEditTreeLabel();
+	            	}
+//	            	else if((event.target as JWTPopUp).id == HELP_BOOKING_VIEW)
+//	            	{
+//	            		createNewBookingNode(event, LABEL_NEW_BOOKING);
+//	            	}
+	            	else if((event.target as JWTPopUp).id == HELP_USER)
+	            	{
+	            		transferUser = args.argumentObject as User;
+	            		Alert.show("You are about to send ownership of the selected costing to the selected person. This is an irreversible action.\nIf you are certain, press ‘Yes’. Otherwise press ‘No’.", "Confirmation for sharing costing file", Alert.YES | Alert.NO, null, transferOwnership, null, Alert.NO);
+	            	}
+	            }
+	        }
+	        
+			private function doCopy(event:Event):void
+			{
+				toCopyTreeListData = selectedTreeListData as TreeListData;
+			}
+			
+			private function doPaste(event:Event):void
+			{
+				if(toCopyTreeListData != null)
+				{
+					var copyiedNode:RatesTreeNode 		= toCopyTreeListData.item as RatesTreeNode;
+						copyiedNode.label				= "Copy of " + copyiedNode.label;
+						
+					var destinationNode:RatesTreeNode 	= selectedTreeListData.item as RatesTreeNode;
+					
+					if(copyiedNode.level - destinationNode.level == 1)
+					{
+						//Alert.show("Can copy");
+						startBusyCursor();
+						if(destinationNode.level == 0)
+							tourFolderRO.copyAndPasteItem(copyiedNode, destinationNode);
+						else if(destinationNode.level == 1)
+							tourMasterRO.copyAndPasteItem(copyiedNode, destinationNode);
+						else if(destinationNode.level == 2)
+							tourVersionRO.copyAndPasteItem(copyiedNode, destinationNode);
+						else if(destinationNode.level == 3)
+							tourDayRO.copyAndPasteItem(copyiedNode, destinationNode);
+						else
+							stoptBusyCursor();	
+					}
+					else	
+						Alert.show("Wrong levels. Cann't copy/paste");
+				}else
+					Alert.show("Nothing has been copied to paste here !");
+					
+					reLoadFromDB = false;
+			}
+			
+			private function doFreeze(event:Event):void
+			{
+				
+			}
+			
+			private function fetchTreeCollection(object:Object):ArrayCollection
+			{
+				var collection:ArrayCollection = object.children as ArrayCollection;
+				if(collection != null)
+					return collection;
+				else 
+					return new ArrayCollection;	
+			}
+			
+			private function findTopNode(firstObject:Object, selectedObject:Object):Object
+			{
+				var treeSeacrh:TourTreeLogic = new TourTreeLogic;
+				return treeSeacrh.searchTopNode(firstObject, selectedObject);
+			}
+			
+			private function doDeleteItem(event:Event):void
+			{
+				getUserAcceptanceToDeleteNode();
+			}
+			
+		private function getUserAcceptanceToDeleteNode():void
+		{
+			Alert.show("This acion will delete selected item and all linked objects, permenetly. Do you want to proceede?", "Delete Confirmation", Alert.YES | Alert.NO, null, deleteConfirmationHandler, null, Alert.NO);
+		}
+		
+		private function deleteConfirmationHandler(event:CloseEvent):void
+		{
+			 if (event.detail == Alert.YES)
+			 	deleteNode();
+		}
+		
+		private function deleteNode():void
+		{
+			var treeListData:TreeListData	= getTreeListData();
+			var item:RatesTreeNode			= new RatesTreeNode;
+			
+			if(treeListData != null)	
+			{
+				if(treeListData.item != null)
+				{
+					item = treeListData.item as RatesTreeNode;
+					
+					startBusyCursor();
+					deleteTreeNode(item);
+				}
+			}
+		}
+		
+		private function deleteTreeNode(item:RatesTreeNode):void
+		{
+			var list:ArrayCollection = new ArrayCollection;
+				list.addItem(item);
+			
+				/* if(item.level == 0)
+					tourFolderRO.deleteItem(list);
+				else if(item.level == 1)
+					tourMasterRO.deleteItem(list);
+				else if(item.level == 2)
+					tourVersionRO.deleteItem(list);
+				else if(item.level == 3)
+					tourDayRO.deleteItem(list);
+				else if(item.level == 4)
+					tourSegmentRO.deleteItem(list); */
+					
+				if(item.level == 0)
+					tourFolderRO.inactivate(list);
+				else if(item.level == 1)
+					tourMasterRO.inactivate(list);
+				else if(item.level == 2)
+					tourVersionRO.inactivate(list);
+				else if(item.level == 3)
+					tourDayRO.inactivate(list);
+				else if(item.level == 4)
+					tourSegmentRO.inactivate(list);	
+		}   
+			
+			private function doRaiseInvoce(event:Event):void
+			{
+				// TODO: Raise invoice
+				
+				//Update version as final
+				var treeListData:TreeListData			= getTreeListData();	
+				var listData:Object						= treeListData.item as Object;
+				var daysArray:Array						= listData.children as Array;
+				
+				if(null != daysArray)
+					daysArray.push(createNewDay(treeListData.item.uuid,daysArray.length+1));
+				else
+				{
+					daysArray 			= new Array;
+					listData.children 	= daysArray;
+					daysArray.push(createNewDay(treeListData.item.uuid,1));
+				}
+				expandAllTreeNodes(event);
+			}
+			
+			private function getTreeListData():TreeListData
+			{
+				var treeListData:TreeListData;
+				if(lastTreeItem != null)
+				{
+					// TODO: fetch list data				
+					var itreeItemRenderer:IListItemRenderer = lastTreeItem.itemRenderer;
+					if(itreeItemRenderer != null)
+					{
+						var treeItemRenderer:TreeItemRenderer 	= itreeItemRenderer as TreeItemRenderer;
+							treeListData						= treeItemRenderer.listData as TreeListData;	
+					}
+				}
+				return treeListData;
+			}
+			
+			private function getLastSelectedRatesTreeNode():RatesTreeNode
+			{
+				if(lastTreeItem != null)
+					return lastTreeItem.currentTarget.selectedItem;
+				else
+					return null;	
+					
+			}
+			
+			private function getTopmostNodeOfLastSelectedRatesTreeNode():RatesTreeNode
+			{
+				if(lastTreeItem != null)
+				{
+					var _array:Array = lastTreeItem.currentTarget.openItems as Array;
+					if(_array.length > 0)
+						return _array[0] as RatesTreeNode;
+					else
+						return null;	
+				}
+				else
+					return null;	
+					
+			}
+			
+			private function getLastSelectedNodeDataType():String
+			{
+				if(getLastSelectedRatesTreeNode() != null)
+					return getLastSelectedRatesTreeNode().type;
+				else
+					return "";	
+			}
+			
+			private function createUserTransferMenuItem():ContextMenuItem
+			{
+				var _menuItem:ContextMenuItem = new ContextMenuItem(ACTION_TRANSFER_THIS_TO);
+                    _menuItem.addEventListener(Event.SELECT, doTransferAC);
+                    
+                    return _menuItem;
+			}
+			private function createFetchTransferedItem():ContextMenuItem
+			{
+				var _menuItem:ContextMenuItem = new ContextMenuItem(ACTION_GET_TRANSFERED_ITEM);
+                    _menuItem.addEventListener(Event.SELECT, doFetchTransferedAC);
+                    
+                    return _menuItem;
+			}
+			
+            public function contextMenuTriggered(event:ContextMenuEvent):void
+            {
+            	// Set the mouseMoved selected item as the selected item.
+            	// So that this could avoiding the need of having been selected my clicking
+            	//lastTreeItem = lastTreeItemByMouseOver;
+            	
+                if( lastTreeItem != null && getLastSelectedRatesTreeNode() != null)
+                {
+                	contextTreeMenu.removeAllItems();
+                	contextTreeMenu.customItems = new Array;
+                	
+                	if( getLastSelectedNodeDataType() == FOLDER )
+                	{
+                        var newTour:ContextMenuItem = new ContextMenuItem(LABEL_NEW_TOUR);
+                        contextTreeMenu.customItems.push(newTour);
+                        newTour.addEventListener(Event.SELECT, doNewTour);
+                    }
+                    else if(getLastSelectedNodeDataType() == LABEL_TOUR )
+                    {
+	                        if(lastTreeItem.itemRenderer.data.finalVersion)
+	                        {
+	                        	var newReal:ContextMenuItem = new ContextMenuItem(LABEL_REAL);
+		                        contextTreeMenu.customItems.push(newReal);
+		                        newReal.addEventListener(Event.SELECT, doNewReal);
+		                        contextTreeMenu.customItems.push(doUploadFile);
+	                        }else
+	                        {
+	                        	var newVersion:ContextMenuItem = new ContextMenuItem(LABEL_NEW_VERSION);
+	                        		contextTreeMenu.customItems.push(newVersion);
+	                        		newVersion.addEventListener(Event.SELECT, doNewVersion);
+	                        	
+	                        	var newSuppVersion:ContextMenuItem = new ContextMenuItem(LABEL_NEW_SUPPVERSION);
+	                        		contextTreeMenu.customItems.push(newSuppVersion);
+	                        		newSuppVersion.addEventListener(Event.SELECT, doNewSupplementryVersion);
+	                        	
+	                        	// Get transfered items
+                        		contextTreeMenu.customItems.push(createFetchTransferedItem());
+	                        }
+                    } 
+                    else if( getLastSelectedNodeDataType() == LABEL_VERSION )
+                    {
+                        // New Day
+                        //var newDay:ContextMenuItem = new ContextMenuItem(LABEL_NEW_DAY);
+                        //contextTreeMenu.customItems.push(newDay);
+                        //newDay.addEventListener(Event.SELECT, doNewDay);
+                        
+                        //Make a booking
+                        var booking:ContextMenuItem = new ContextMenuItem(ACTION_MAKE_A_BOKING);
+                        contextTreeMenu.customItems.push(booking);
+                        booking.addEventListener(Event.SELECT, doNewBooking);
+                        
+                        //Transfer the a/c to another
+                        contextTreeMenu.customItems.push(createUserTransferMenuItem());
+                        
+                    }
+                     
+                    else if( getLastSelectedNodeDataType() == LABEL_DAY )
+                    {
+                        var newSegment:ContextMenuItem = new ContextMenuItem(LABEL_NEW_SEGMENT);
+                        contextTreeMenu.customItems.push(newSegment);
+                        newSegment.addEventListener(Event.SELECT, doNewSegment);
+                    }
+                    
+                    reLoadFromDB = true;
+                    
+                    treeMenuDefaultItems();
+                    
+                }else              
+	                treeNewFolderItems();
+            }
+            
+            private function treeMenuDefaultItems():void
+            {
+            	//Freeze
+            	/* var freeze:ContextMenuItem = new ContextMenuItem(ACTION_FREEZE);
+                contextTreeMenu.customItems.push(freeze);
+                freeze.addEventListener(Event.SELECT, doFreeze);
+                freeze.enabled= false; */
+                
+                //File Upload
+            	var fileUpload:ContextMenuItem = new ContextMenuItem(ACTION_UPLOAD);
+                fileUpload.addEventListener(Event.SELECT, doUploadFile);
+                
+                if( lastTreeItem != null ){
+	                if(getLastSelectedNodeDataType() == Constants.TREE_NODE_TYPE_TOUR)
+	                {
+	                	contextTreeMenu.customItems.push(fileUpload);
+	                }
+	                
+	                if(getLastSelectedNodeDataType() == LABEL_TOUR )
+		                fileUpload.enabled= true;
+	                
+	                else
+	                	fileUpload.enabled= false;
+	            }
+                
+                //Transport requistion
+            	var transportRequisition:ContextMenuItem = new ContextMenuItem(TRANSPORT_REQUISITION);
+                 transportRequisition.addEventListener(Event.SELECT, doTransportRequisition);
+                 
+                //Hotel Reservation
+            	var hotelReservation:ContextMenuItem = new ContextMenuItem(HOTEL_RESERVATION);
+		        hotelReservation.addEventListener(Event.SELECT, doHotelReservations);
+                
+                if( lastTreeItem != null ){
+	                if(getLastSelectedNodeDataType() == Constants.TREE_NODE_TYPE_BOOKING_OPEN || getLastSelectedNodeDataType() == Constants.TREE_NODE_TYPE_BOOKING_BILLED)
+	                {
+		              	contextTreeMenu.customItems.push(transportRequisition);
+		               	contextTreeMenu.customItems.push(hotelReservation);
+		               	
+		               	// Transfer the a/c to another
+                        contextTreeMenu.customItems.push(createUserTransferMenuItem());
+                        
+                        addCommonItemsForCostings();
+		            }
+		            else
+		            {
+				        //Seperator
+		            	//var seperator:ContextMenuItem = new ContextMenuItem('————');
+		            	var seperator:ContextMenuItem = new ContextMenuItem('');
+		            	seperator.isSeparator;
+		                contextTreeMenu.customItems.push(seperator);
+		                
+		            	
+		            	addCommonItemsForCostings();
+		                
+		                //Cut
+		            	//var cut:ContextMenuItem = new ContextMenuItem(ACTION_CUT);
+		                //contextTreeMenu.customItems.push(cut);
+		                
+		                //Delete
+		            	var del:ContextMenuItem = new ContextMenuItem(ACTION_DELETE);
+		                contextTreeMenu.customItems.push(del);
+		                del.addEventListener(Event.SELECT, doDeleteItem);
+		                
+		                //Paste
+		            	var paste:ContextMenuItem = new ContextMenuItem(ACTION_PASTE);
+		                contextTreeMenu.customItems.push(paste);
+		                paste.addEventListener(Event.SELECT, doPaste);
+		                
+		                //Refresh
+		            	var refresh:ContextMenuItem = new ContextMenuItem(ACTION_REFRESH);
+		                contextTreeMenu.customItems.push(refresh);
+		
+						//Seperator
+		            	var seperator1:ContextMenuItem = new ContextMenuItem('');
+		            	seperator1.isSeparator;
+		            	seperator1.enabled = false;
+		                contextTreeMenu.customItems.push(seperator1);
+		                
+		                //New Folder
+		                treeNewFolderItems();
+		            }
+		            	
+                }
+                
+            }
+		   
+		   private function addCommonItemsForCostings():void
+		   {
+		   		// Commons
+            	//Edit Name
+            	var edit:ContextMenuItem = new ContextMenuItem(ACTION_EDIT);
+                contextTreeMenu.customItems.push(edit);
+                edit.addEventListener(Event.SELECT, doEditName);
+                
+            	//Copy
+            	var copy:ContextMenuItem = new ContextMenuItem(ACTION_COPY);
+                contextTreeMenu.customItems.push(copy);
+                copy.addEventListener(Event.SELECT, doCopy);	
+		   }
+		   
+		   private function treeNewFolderItems():void
+           {
+           	var rootFolerIsNotAvailable:Boolean = true;
+            	//New Folder
+            	for(var i:int=0; i<contextTreeMenu.items.length; i++) 
+            	{
+            		var _item:ContextMenuItem = contextTreeMenu.items[i] as ContextMenuItem;
+            		
+            		if(_item != null)
+            		{
+            			if(_item.caption == ACTION_NEWFOLDER)
+            			{
+            				rootFolerIsNotAvailable = false;
+            				break;
+            			}
+            		}
+            				
+            	}
+
+				if(rootFolerIsNotAvailable)
+				{
+	            	var newFolder:ContextMenuItem = new ContextMenuItem(ACTION_NEWFOLDER);
+	                contextTreeMenu.customItems.push(newFolder);
+	                newFolder.addEventListener(Event.SELECT, doNewFolder);
+	            }
+           }
+           
+		   private function getChild(child:Object):void 
+		   {
+//		   		if(child.type == LABEL_SEGMENT)
+//		   		{
+//		   			totalObjectCollection.addItem(child);
+//		   		}
+		   }
+		   
+		   private function getChildren(children:ArrayCollection):void
+		   {
+		   		for(var i:int=0; i<children.length; i++)
+		   		{
+		   			var _collection:ArrayCollection = children.getItemAt(i).children as ArrayCollection;
+		   			
+		   			if(_collection != null)
+		   			{
+			   			if(_collection.length > 0)
+			   				getChildren(_collection);
+			   			
+			   		}else	
+			   				getChild(children.getItemAt(i));
+		   		}
+		   }
+		   	
+		   private function getTotalObjectCollectionForTheSelectedNode(_treListData:TreeListData):void
+		   {
+		   		totalObjectCollection = new ArrayCollection;
+		   		var _collection:ArrayCollection = _treListData.item.children as ArrayCollection;
+		   		
+		   		if(_collection != null)
+		   		{
+			   		if(_collection.length > 0)
+			   		{
+			   			getChildren(_treListData.item.children as ArrayCollection);
+			   		}
+			   	}
+		   }
+		   
+		   private function refreshTree(event:Event):void
+		   {
+		   		loadMyRootFolders();
+		   }
+		   private function resetTree(event:Event):void
+		   {
+		   	 topnodeOfPreviouslySelectedRatesTreeNode 	= new RatesTreeNode();
+		   	 previouslySelectedRatesTreeNode			= new RatesTreeNode();
+		   	 _view.C_subnodes.selected = false;
+		   	 loadMyRootFolders();
+		   }
+		   
+		   public function setLastHightedTreeItem(event:MouseEvent):void
+           {
+           		//setLastTreeItem(null);
+           		//var t:TreeItemRenderer = event.currentTarget.lasHighlightItemRenderer as TreeItemRenderer;
+           		//trace((t.data as RatesTreeNode).label);
+           		//lastTreeItemByMouseOver = lastTreeItem;
+           }
+           
+           private function searchTree(event:KeyboardEvent):void
+           {
+           	if(tree != null)
+           	{
+	           	 tree.filterFunction = getFilter;
+	           	 tree.refresh();
+	           	_view.itineryTree.dataProvider = tree; 
+           	}
+           	//_view.itineryTree.dataProvider = 	getFilter(tree);
+           }
+           
+           private function getFilter(item:Object):Boolean
+	        {
+	            var searchString:String = _view.searchText.text.toLowerCase();
+                var itemName:String = (item.label as String).toLowerCase();
+                
+                trace("searchString=" + searchString + ", itemName " + itemName);
+                trace(itemName.indexOf(searchString));
+                trace(searchString.indexOf(itemName));
+                
+                if (itemName.indexOf(searchString) > -1)
+                	return itemName.indexOf(searchString) > -1;
+                else{
+                	//return findInChildObject(item);
+                	 var _found:Boolean = false;
+                	 var _list:ArrayCollection = item.children as ArrayCollection;
+                	
+                	if(_list !=null && _list.length>0)
+                	{
+	                	for(var i:Number=0; i<_list.length; i++)
+	                	{
+	                		if(getFilter(_list.getItemAt(i) as RatesTreeNode) == true){
+	                			return true;
+	                			break;
+	                		}
+	                	}
+	                }else
+	                	return false;
+	              }
+	                	
+	            return _found;    
+	        }
+	        
+	        /** Just a test methode for tree search ny Nisal **/
+	        private function test(list:ArrayCollection):ArrayCollection
+	        {
+	        	var returnList:ArrayCollection = new ArrayCollection;
+	        	for(var i:int=0; i<list.length; i++)
+	        	{
+	        		if(!filterFirst(list.getItemAt(i))){
+	        			var childernList:ArrayCollection = (list.getItemAt(i) as RatesTreeNode).children;
+	        			list = test(childernList);
+	        			
+	        			if(childernList.length == 0){
+	        				return returnList;
+	        				break;
+	        			}
+	        		}else
+	        			break;
+	        		
+	        		
+	        	}
+	        	
+	        	return list;
+	        }
+	        
+	        private function filterFirst(item:Object):Boolean
+	        {
+	                    
+	            return item["label"].match(new RegExp(_view.searchText.text, 'i'));
+	        }
+        
+           private function findInChildObject(item:Object):Boolean
+           {
+           		var _list:ArrayCollection = item.children as ArrayCollection;
+                	
+            	if(_list.length>0)
+            	{
+            		var _found:Boolean = false;
+            		
+                	for(var i:Number=0; i<_list.length; i++)
+                	{
+                		var childItem:Object = _list.getItemAt(i) as RatesTreeNode;
+                		
+                		if(childItem != null)
+                		{
+	                		var searchString:String = _view.searchText.text.toLowerCase();
+			                var itemName:String 	= (childItem.label as String).toLowerCase();
+			                
+			                trace("searchString=" + searchString + ", itemName " + itemName);
+			                trace(itemName.indexOf(searchString));
+			                trace(searchString.indexOf(itemName));
+			                
+			                if (itemName.indexOf(searchString) > -1)
+			                {
+			                	_found = true;
+			                	//break;
+			                }else
+			                {
+			                	if(childItem.children != null)
+			                	{
+				                	if(childItem.children.length>0)
+				                	{
+				                		_found = findInChildObject(childItem);
+				                	}
+				                }
+			                }
+			            }
+                	}
+                	
+                	return _found;
+                }else
+                	return false;
+                
+           }
+           
+           private function createNewMemberObject(version:RatesTreeNode):void
+           {
+           		var obj:Members = new Members;
+           			obj.memberName = version.label;
+           		initializeClassicCostingRemortingObject();
+           		classicCostingRO.generateMemberSavingObject(obj, version.uuid, _loggedInUser);
+           }
+           	
+           public function handleKeyboardStrokes(event:KeyboardEvent):void
+           {
+           		// F2 //
+	           	if(event.keyCode == 113) 
+					editLabel(event);
+				// Esc //
+				else if(event.keyCode == 27) 
+				{
+					var _popup:JWTPopUp = args.viewComponent as JWTPopUp;
+					
+						if(_popup != null)
+						_popup.dispatchEvent(new CloseEvent(CloseEvent.CLOSE));
+				}
+				// Enter //
+				else if(event.keyCode == 13) 
+				{
+					openTransactionScreen(null);
+				}
+				// UP/Down //
+				else if(event.keyCode == 40 ||event.keyCode == 38) 
+				{
+					_view.itineryTree.dispatchEvent(new ListEvent(ListEvent.ITEM_CLICK));
+				}
+           }	
+           
+           private function handleTreeItemDrop(event:DragEvent):void
+           {
+           	 	var source:IUIComponent  = event.dragInitiator;
+			    //var target:IUIComponent  = event.currentTarget;
+			
+			   // trace("Dragged......", source.selectedItem.label);
+			    trace("From.........", source.name);
+			    trace("To...........", event.currentTarget.name);
+			    trace("Target Item..", event.currentTarget.dropTarget);
+			  	var indexOfDroppedItem : int = _view.itineryTree.dataProvider.getItemIndex(event.dragSource );
+           }
+           
+           public function setLastTreeItem(event:ListEvent):void
+           {
+	            lastTreeItem = event;
+	            
+				//removeAllObjectFromScreen();
+				//resetBreifDetailsOfSelectedCostingItem();
+				
+				var _treListData:TreeListData 	= getTreeListData();
+				selectedTreeListData 			= _treListData;
+				
+				if(_treListData != null)
+	       	 		copyOfLastSelectedTreeNode		= (_treListData.item as RatesTreeNode);
+	       	 	
+	       	 	// This is to reset the view from details to design
+	       	 	/* showDesignView(null); */
+				
+				// expand and collapse all nodes bellow selectef item
+				//loadTreeNodeData();
+				
+				//Activate 12 odd costing tools based on node selected
+				//activateToolsBasedOnSelectedNode();
+				 
+				/** Load created cost objects under the selected object **/
+				//loadCostObjectOfTheNode();
+				
+				// Reset PAX  details data
+				//resetPaxDetailsData();
+				
+				// Set the current type of Active treenode. 
+				// * important; This should always come AFTER activateToolsBasedOnSelectedNode()
+				if(lastTreeItem != null)
+				{
+					if(getLastSelectedRatesTreeNode() != null)
+						activeTypeOfTreeNode = getLastSelectedNodeDataType();
+				}
+				// Set shortnote
+				/* if(getLastSelectedRatesTreeNode() != null)
+					_view.version = getLastSelectedRatesTreeNode();	 */
+				
+				openAndCloseAllTreeNodes(getTreeListData());
+           }
+ 			
+ 		   private function endEditTreeLabel(event:Event=null):void
+           {
+           	_view.itineryTree.editable 	= false;
+           	beingEdited 				= false;
+           	
+           	var _f:TreeListData 	= getTreeListData();
+           	var _g:RatesTreeNode	= findTourFolder(_f);
+           		
+           		if(	_g != null)
+           		{
+           			_g.createdTime		= currentDateTimeString();
+		           	trace(_g.label);
+		           	saveNodeDetails(_g);
+           		}
+           }
+		
+		private function transferOwnership(event:CloseEvent):void
+       	{
+       		if (event.detail == Alert.YES)
+			{
+	       		if(null != transferUser)
+	       		{
+			       	var _f:TreeListData 	= getTreeListData();
+			       	var _g:RatesTreeNode	= findTourFolder(_f);
+			       		
+			       		if(	_g != null)
+			       		{
+			       			_g.createdTime	= currentDateTimeString();
+			       			_g.ownerUuid	= transferUser.uuid;
+			       			_g.status		= 4;
+			       			
+				           	trace(_g.label);
+				           	saveNodeDetails(_g);
+			       		}
+			       }else
+			       	Alert.show("Selected User null");
+			 }
+       	}
+       	
+       	private function fetchOwnershipTransferedItems():void
+       	{
+	       	var _f:TreeListData 	= getTreeListData();
+	       	var _g:RatesTreeNode	= findTourFolder(_f);
+	       		
+	       		if(	_g != null)
+	       		{
+		           	trace(_g.label);
+		           	var _nodeCollection:ArrayCollection = new ArrayCollection;
+           				_nodeCollection.addItem(_g);
+           				
+           			tourVersionRO.setLogedInUser(_loggedInUser);
+		           	tourVersionRO.acceptAllTransferedItems(_nodeCollection);	
+	       		}
+       	}
+       	
+       	public override function acceptAllTransferedItemsResultsHandler(event:ResultEvent):void
+		{
+			Alert.show((event.result as int) + " records have been created");
+			//tourVersionRO.dynamicSearch	("dynamicSupperID", topnodeOfPreviouslySelectedRatesTreeNode.uuid, false);
+			reLoadTreeNodesOfTheFolder(topnodeOfPreviouslySelectedRatesTreeNode.uuid, 1, true);
+		}
+		
+		private function saveNodeDetails(ratesTreeNode:RatesTreeNode):void
+       	{
+       		startBusyCursor();
+           	var _nodeCollection:ArrayCollection = new ArrayCollection;
+           		_nodeCollection.addItem(RatesTreeNode);
+           		
+           	/* if(ratesTreeNode.level == 0)	
+           		tourFolderRO.create(_nodeCollection);	
+           	else if(ratesTreeNode.level == 1)	
+           		tourMasterRO.create(_nodeCollection);
+           	else if(ratesTreeNode.level == 2)	
+           		tourVersionRO.create(_nodeCollection);	
+           	else if(ratesTreeNode.level == 3)	
+           		tourDayRO.create(_nodeCollection);
+           	else if(ratesTreeNode.level == 4)	
+           		tourSegmentRO.create(_nodeCollection);	
+           	else
+           		stoptBusyCursor(); */
+           					
+       }
+           
+		private function handleMouseClickOnTree(e:MouseEvent=null):void
+        {
+       		if(e != null)
+       		{
+       			if(e.ctrlKey)
+       			{
+       				if(getLastSelectedRatesTreeNode() != null)
+   					{
+       					if(getLastSelectedNodeDataType() == Constants.TREE_NODE_TYPE_TRANSPORT_REQEST)
+           					openTransportRequest(lastTreeItem);
+       				}
+       			}
+       			else if(e.altKey)
+       			{
+       				editLabel(e);
+       			}
+       		}
+       }
+       
+       private function openTransportRequest(event:ListEvent):void
+       {
+       		var dimention:Object = new Object;
+			dimention.width  = 1100; 
+			dimention.heigth = 650;
+			dimention.X = -10;
+			dimention.Y = -10;
+			args.user 			  = _loggedInUser;
+			args.originatorObject = getLastSelectedRatesTreeNode();
+			createPopUp(HELP_REQUEST_TRANSPORT_REQ, _mainView, args, "Transport Requisition-View", ApplicationFacade.TOUR_REQUEST_TRANSPORT, true, dimention);
+       }
+       
+       private function treeItemOpened(event:Event):void
+       {
+       		//loadTreeNodesOfTheFolder();
+       }
+           
+       private function treeIteClosed(event:Event):void
+       {
+       		//Alert.show("item closed..");	
+       }
+       
+       
+       private function openTransactionScreen(e:MouseEvent=null):void
+       {
+       		if(getLastSelectedRatesTreeNode() != null)
+       		{
+           		if(getLastSelectedNodeDataType() == Constants.TREE_NODE_TYPE_TRANSPORT_REQEST)
+	           		openTransportRequest(lastTreeItem);
+	           	else if(getLastSelectedNodeDataType() == Constants.TREE_NODE_TYPE_VERSION		 || 
+	           			getLastSelectedNodeDataType() == Constants.TREE_NODE_TYPE_BOOKING_BILLED ||
+	           			getLastSelectedNodeDataType() == Constants.TREE_NODE_TYPE_BOOKING_LOST   ||
+	           			getLastSelectedNodeDataType() == Constants.TREE_NODE_TYPE_BOOKING_OPEN	 ||
+	           			getLastSelectedNodeDataType() == Constants.COSTING_TYPE_SUPPLYMENTARY)
+	           		selectAndClose();	
+           	}
+			 
+       }
+           
+       	private function selectAndClose():void
+		{
+			var _object:Object = new Object();
+				_object.selectedNode 	 		= getLastSelectedRatesTreeNode();
+				_object.topnodeOfSelectedNode 	= getTopmostNodeOfLastSelectedRatesTreeNode();
+				
+				args.argumentObject = _object;
+				_app.dispatchEvent(new CloseEvent(CloseEvent.CLOSE));
+		}
+		
+       private function editLabel(event:Event=null):void
+       {
+       		/* _view.itineryTree.editable = true;
+       		beingEdited = true;  */
+       		_view.itineryTree.setFocus(); 
+       		getUserInPutToReName(getLastSelectedRatesTreeNode());
+       }
+           
+       public function copyObjectCollectionToSegmentArrayCollection():ArrayCollection
+           {
+           		var _collection:ArrayCollection = new ArrayCollection(objectCollection.toArray());
+           	 	return _collection;		
+           } 
+           
+           private function resetLastSelectedItem(evet:Event):void
+           {
+           	lastTreeItem = null;
+           }
+           
+           private function loadTopFolderStructure():void
+		   {
+			   	var myTourArray:Array = new Array;
+	            if(tree == null)
+	            	tree = new ArrayCollection; 
+	            	
+	           	_view.itineryTree.dataProvider = tree;
+	            _view.itineryTree.selectedIndex = 0;
+	            
+	            var _selectedNode:RatesTreeNode;
+	            var _topnodeOfSelectedNode:RatesTreeNode;
+	            
+	            if(topnodeOfPreviouslySelectedRatesTreeNode.uuid != '')
+	            {
+	            	_topnodeOfSelectedNode	= seacrhCTN(topnodeOfPreviouslySelectedRatesTreeNode);
+	            	_selectedNode			= seacrhCTN(previouslySelectedRatesTreeNode);
+	            }
+	            else
+	            	_selectedNode = _view.itineryTree.selectedItem as RatesTreeNode;
+	            
+	            _view.itineryTree.selectedItem = _topnodeOfSelectedNode;		
+	            _view.itineryTree.expandItem(_topnodeOfSelectedNode, true, true);		
+	            //_view.itineryTree.expandChildrenOf(_topnodeOfSelectedNode, true);
+	            
+	            setTreeIcons();
+		   }
+           
+           private function loadTreeNodesStructure():void
+		   {
+			   	var myTourArray:Array = new Array;
+	            if(tree == null)
+	            	tree = new ArrayCollection; 
+	            	
+	           	_view.itineryTree.dataProvider = tree;
+	            _view.itineryTree.selectedIndex = 0;
+	            _view.itineryTree.expandChildrenOf(_view.itineryTree.selectedItem, true);
+	            
+	            setTreeIcons();
+		   }
+		   
+		   private function createNewTopFolderStructure():void
+		   {
+			   	var myTourArray:Array = new Array;
+	            if(tree == null)
+	            	tree = new ArrayCollection;
+	
+	            createRootFolder();
+	            _view.itineryTree.selectedIndex = 0;
+	            _view.itineryTree.expandChildrenOf(_view.itineryTree.selectedItem, true);
+	            
+	            setTreeIcons();
+	            reLoadFromDB = false;
+		   }
+		   
+		   private function createRootFolder():RatesTreeNode
+		   {
+		   	
+		   	var myTourArray:Array = new Array;
+            var myItineryCollection:ArrayCollection;
+            var itineryArray:Array = [];
+            var subItineryArray:Array = [];
+            
+            /* Wrap each top-level node in an ArrayCollection. */
+            myItineryCollection = new ArrayCollection(itineryArray);
+             
+            // Design based on access levels
+            var _uuid:String 			= UIDUtil.createUID();
+            var myTours:RatesTreeNode 	= new RatesTreeNode;
+            
+           		myTours.uuid 			= _uuid;
+	            myTours.id 				= "New Folder";
+	            myTours.supperId 		= _uuid;
+	            //myTours.label 			= FOLDER;
+	            myTours.type			= FOLDER;
+	            myTours.level			= 0;
+	            myTours.createdTime		= currentDateTimeString();	
+	            myTours.ownerUuid		= _loggedInUser.uuid;
+	            myTours.lastActivityBy	= _loggedInUser.uuid;
+	            
+	            myTours.data			= new ArrayCollection;
+	            myTours.children 		= myItineryCollection;
+	            
+	        //saveNodeDetails(myTours);   
+ 		  	getUserInPutForName(myTours);
+ 		  	 
+	        return myTours;
+		   }
+		   
+		   private function currentDateTimeString():String
+		   {               
+			    var CurrentDateTime:Date 	= new Date();
+			    var CurrentDF:DateFormatter = new DateFormatter();
+			    CurrentDF.formatString 		= "YYYY-MM-DD LL:NN:SS A";
+			    var DateTimeString:String 	= CurrentDF.format(CurrentDateTime);
+			    //Alert.show(DateTimeString);
+			    return DateTimeString;
+		   }
+		   
+		   private function loadMyRootFolders():void
+		   {
+		   	var loadAllNodes:Boolean = false;
+		   	
+		   	if(_view.C_subnodes.selected)
+		   		loadAllNodes = true;
+		   	else
+		   		loadAllNodes = false;
+		   			
+		   	if(getBusyCursorStatus())
+		   	{
+				// Don't load all children
+				initializeRemoteObjects();
+				startBusyCursor();
+				
+				if(previouslySelectedRatesTreeNode != null)
+				{
+					if(previouslySelectedRatesTreeNode.uuid == "")
+			   			tourFolderRO.dynamicSearch("","", loadAllNodes);
+			   		else
+			   			tourFolderRO.searchTopNodesByVersion(previouslySelectedRatesTreeNode, loadAllNodes);
+			   			//tourFolderRO.dynamicSearch("uuid", topnodeOfPreviouslySelectedRatesTreeNode.supperId, true);
+		  		}
+		   	}
+		   }
+		   
+		   private function loadOneLevelUpByLastSelectedFolder():void
+		   {
+		   		if(copyOfLastSelectedTreeNode.level == 0 || copyOfLastSelectedTreeNode.level == 1)
+		   			loadMyRootFolders();
+		   		else 
+		   		{
+		   			reLoadTreeNodesOfTheFolder(copyOfLastSelectedTreeNode.supperId, copyOfLastSelectedTreeNode.level-2,true);
+		   			_view.itineryTree.dispatchEvent(new ListEvent(ListEvent.ITEM_CLICK));
+		   		}	
+		   }
+		   
+		   private function createNewTour(tourId:int, topNode:String):void
+		   {
+		   	var tour:RatesTreeNode 	= new RatesTreeNode;
+	            tour.uuid 				= UIDUtil.createUID();
+	            tour.supperId 			= topNode;
+	            tour.id 				= "Tour-" + tourId;
+//	            tour.finalVersion		= false;
+//	            //tour.label 				= tour.id;
+//	            tour.type				= LABEL_TOUR;
+//	            tour.level				= 1;
+	            tour.createdTime		= currentDateTimeString();	
+	            tour.ownerUuid			= _loggedInUser.uuid;
+	            tour.lastActivityBy		= _loggedInUser.uuid;
+	            
+	            tour.data				= new ArrayCollection;
+	            //saveNodeDetails(tour);
+	            getUserInPutForName(tour);
+		   }
+		   
+		   private function createVersions(id:String, i:int, versionType:String = null):void
+		   {
+		   	 var version:RatesTreeNode	= new RatesTreeNode;
+	             version.uuid 			= UIDUtil.createUID();
+	             version.supperId 		= id;
+	             version.id 			= id + "/"  + i;
+	             //version.finalVersion	= false;
+	             objectCollection		= new ArrayCollection;
+	             version.data			= copyObjectCollectionToSegmentArrayCollection();
+ 	         	 //version.label 			= "Ver-" + i;
+ 	         	 //version.level			= 2;
+ 	         	 version.createdTime	= currentDateTimeString();	
+ 	         	 version.ownerUuid		= _loggedInUser.uuid;
+	             version.lastActivityBy	= _loggedInUser.uuid;
+		         //version.type			= versionType;
+		         //version.versionType	= versionType;
+		         
+		         getUserInPutForName(version);
+		         //saveNodeDetails(version);
+		   }
+		   
+		   private function createNewDay(id:String, i:int):void
+		   {
+		   	 var itininary:RatesTreeNode	= new RatesTreeNode;
+	            itininary.uuid 				= UIDUtil.createUID();
+	            itininary.supperId 			= id;
+	            itininary.id 				= id + "/"  + i;
+	            //itininary.label 			= "D-" + i;
+	            //itininary.type				= LABEL_DAY;
+	            //itininary.level				= 3;
+	            itininary.createdTime		= currentDateTimeString();	
+	            itininary.ownerUuid			= _loggedInUser.uuid;
+	            itininary.lastActivityBy	= _loggedInUser.uuid;
+	            
+	            itininary.data				= new ArrayCollection;
+	            
+	            saveNodeDetails(itininary);
+		   } 
+		   
+		   private function createNewSegment(id:String, i:int):void
+		   {
+		   	var segment:RatesTreeNode  = new RatesTreeNode;
+	            segment.uuid 			= UIDUtil.createUID();
+	            segment.supperId 		= id;
+	            segment.id 				= id + "/" + i;
+	            //segment.label 			= "S-" + i;
+	            //segment.type			= LABEL_SEGMENT;
+	            segment.level			= 4;
+	            segment.createdTime		= currentDateTimeString();	
+	            segment.ownerUuid		= _loggedInUser.uuid;
+	            segment.lastActivityBy	= _loggedInUser.uuid;
+	            
+	            objectCollection		= new ArrayCollection;
+	            segment.data			= copyObjectCollectionToSegmentArrayCollection();
+	            segment.children  		= null;
+	            
+	            saveNodeDetails(segment);
+		   }
+		   
+		   /* 
+		   private function addVersion(id:String):ArrayCollection
+		   {
+		   	var versionArrayCollection:ArrayCollection;
+		   	var versionArray:Array = [];
+			   	for(var i:int=1; i<2; i++)
+		            versionArray.push(createVersions(id, i));
+		            
+            return versionArrayCollection = new ArrayCollection(versionArray);
+		   }
+		   
+		   private function addDay(id:String):ArrayCollection
+		   {
+		   	var itineryArrayCollection:ArrayCollection;
+		   	var itineryArray:Array = [];
+			   	for(var i:int=1; i<2; i++)
+		            itineryArray.push(createNewDay(id, i));
+		            
+            return itineryArrayCollection = new ArrayCollection(itineryArray);
+		   }
+		   
+		   private function addSegment(id:String):ArrayCollection
+		   {
+		   	var subItineryArrayCollection:ArrayCollection;
+		   	
+		   	var subItineryArray:Array = [];
+			   	for(var i:int=1; i<2; i++)
+		            subItineryArray.push(createNewSegment(id, i));
+		            
+            return subItineryArrayCollection = new ArrayCollection(subItineryArray);
+		   }     
+		   */
+		   private function expandAllTreeNodes(event:Event):void
+           {
+	           	var _treListData:TreeListData = getTreeListData();
+	           		_view.itineryTree.expandChildrenOf(_treListData.item,false);
+           }
+           
+           private function loadTreeNodeData():void
+           {
+           		reLoadFromDB = true;
+           	
+	           	var _treListData:TreeListData = getTreeListData();
+	           	
+	           	if(_treListData != null)
+	           	{
+		           	if(_treListData.open == false)
+		           	{
+		           		if(reLoadFromDB)
+		           			loadTreeNodesOfTheFolder(false);
+		           		else
+		           			openAndCloseAllTreeNodes(_treListData);	
+		           	}
+		           	else if(_treListData.open == true)	
+		           		openAndCloseAllTreeNodes(_treListData);	
+	           	}
+	           	
+	           	reLoadFromDB = false;
+	       }
+           
+           private function openAndCloseAllTreeNodes(treListData:TreeListData):void
+           {
+           		if(treListData.open)
+	           		startOpenAndCloseAllTreeNodes(false);
+	           	else
+	           		startOpenAndCloseAllTreeNodes(true);
+
+           }
+           
+           private function startOpenAndCloseAllTreeNodes(open:Boolean):void
+           {
+           		var _treListData:TreeListData = getTreeListData();
+           		
+           		if(_treListData != null)
+           		{
+	           		/* if(open && beingEdited ==  false)
+		           		_view.itineryTree.expandChildrenOf(_treListData.item,true);
+		           	else
+		           		_view.itineryTree.expandChildrenOf(_treListData.item,false); */
+		           	
+		           	var _c:RatesTreeNode = _treListData.item as RatesTreeNode;
+		           	/* if(open && beingEdited ==  false)
+		           		_view.itineryTree.expandItem(_treListData.item,true,true);
+		           	else
+		           		_view.itineryTree.expandItem(_treListData.item,false,true); */
+		           		
+		           	if(open && beingEdited ==  false)
+		           		_view.itineryTree.expandItem(_c,true,true);
+		           	else
+		           		_view.itineryTree.expandItem(_c,false,true);
+		           		
+		           	// Set treenode icons
+		           	/* for(var i:int=0; i<tree.length; i++)
+	         		{
+		            	var _objct:Object = _view.itineryTree.dataProvider.getItemAt(i) as Object;
+		            	setSubTreeIcons(_objct);
+	          		} */
+	          			
+		        }
+		        else
+		        {
+		        	_view.itineryTree.expandItem(topnodeOfPreviouslySelectedRatesTreeNode,true, true);
+		        	_view.itineryTree.expandItem(previouslySelectedRatesTreeNode,true, true);
+		        }	
+		        
+		        if(tree != null)
+		        {
+			        for(var i:int=0; i<tree.length; i++)
+	         		{
+		            	var _objct:Object = _view.itineryTree.dataProvider.getItemAt(i) as Object;
+		            	setSubTreeIcons(_objct);
+	          		}
+	         }
+           }
+           
+           private function testItemOpen(event:Event=null):void
+           {
+
+           }
+           
+        private function loadTreeNodesOfTheFolder(openAllNode:Boolean = false):void
+		{
+			var _treeNode:RatesTreeNode = (findTourFolder(getTreeListData()));
+			if(_treeNode != null)
+			{
+				reLoadTreeNodesOfTheFolder(_treeNode.uuid, _treeNode.level, openAllNode);
+			}
+			
+			/** Moved to Line No 1940 NF 2014-04-16
+			if(_treeNode.level ==2)
+				loadPaxDetails();
+				 * */
+		}
+		
+		private function loadPaxDetails():void
+		{	
+			initializePaxDetailsRemortingObject();
+			paxDetailsObjectRO.setLogedInUser(_loggedInUser);
+			paxDetailsObjectRO.dynamicSearch("searchPaxMaster",getLastSelectedRatesTreeNode().uuid);
+		}
+		
+		private function reLoadTreeNodesOfTheFolder(uuid:String, level:int, openAllNode:Boolean = true):void
+		{
+			startBusyCursor();
+			if(level == 0)
+				tourMasterRO.dynamicSearch	("dynamicSupperID", uuid, false);
+			else if(level == 1)	
+				tourVersionRO.dynamicSearch	("dynamicSupperID", uuid, false);
+				
+				/*
+				Add conditions here to control what to be fecthed
+				*/
+		/** Looks like below process is not required to classic costing since we dont use days- NF on 2014-04-16		
+			else if(level == 2)	
+			{
+				var _q:QuerryObject = new QuerryObject;
+					_q.searchCode 	= "dynamicSelectedNodeType";
+					_q.condition1 	= uuid;
+					_q.condition2	= Constants.TREE_NODE_TYPE_TRANSPORT_REQEST;
+					
+				tourDayRO.dynamicSearch(_q, false);
+			}*/
+			else if(level == 2)
+			{
+				loadPaxDetails(); /** If selected item is version need to display summery of the costing **/
+			}
+			 /* else if(level == 3)	
+				tourSegmentRO.dynamicSearch	("dynamicSupperID", uuid, openAllNode);	  */	
+			else
+			{
+				trace("End of tree");
+				stoptBusyCursor();
+			}
+		}
+		
+		private function findTourFolder(treeListData:TreeListData):RatesTreeNode
+		{
+			if(treeListData != null)
+				return treeListData.item as RatesTreeNode;
+			else
+				return null;	
+		}
+		
+		public function treeNodeDataFetchResultsHandler(event:ResultEvent):void
+		{
+			openAndCloseAllTreeNodes(null);
+		}
+		
+		public override function tourFolderFetchResultsHandler(event:ResultEvent):void
+		{
+			stoptBusyCursor();
+			
+			tree = removeUnwantedNodesFromTree(event.result as ArrayCollection);
+				
+			loadTopFolderStructure();
+		}
+		public override function searchTopNodesByVersionResultsHandler(event:ResultEvent):void
+		{
+			stoptBusyCursor();
+			tree = removeUnwantedNodesFromTree(event.result as ArrayCollection);
+			loadTopFolderStructure();
+		}
+		
+		private function removeUnwantedNodesFromTree(tempTree:ArrayCollection):ArrayCollection
+		{
+			if(tempTree != null)
+			{
+				if(tempTree.length > 0 )
+				{
+					for(var i:int=0; i<tempTree.length; i++)
+					{
+						var _commonNode:RatesTreeNode = tempTree.getItemAt(i) as RatesTreeNode;
+						if(isDAYNodes(_commonNode))
+							_commonNode.children = null;
+						else
+							removeUnwantedNodesFromTree(_commonNode.children as ArrayCollection);	
+						
+					}
+				}
+			}
+			return tempTree;
+		}
+		
+		private function isDAYNodes(node:RatesTreeNode):Boolean
+		{
+			if(node !=  null)
+			{
+				if(node.level == Constants.TREE_FOLDER_LEVEL_VERSION)
+					return true;
+				else
+					return false	
+			}
+			else
+				return false;
+		}
+		
+		public override function tourMasterFetchResultsHandler(event:ResultEvent):void
+		{
+			stoptBusyCursor();
+			var _tempList:ArrayCollection = new ArrayCollection();
+			_tempList = removeUnwantedNodesFromTree(event.result as ArrayCollection);
+			
+			var _tourFolder:RatesTreeNode = findTourFolder(getTreeListData());
+			if(_tourFolder != null)
+				_tourFolder.children = _tempList;
+			/* else
+			{
+				topnodeOfPreviouslySelectedRatesTreeNode = seacrhCTN(topnodeOfPreviouslySelectedRatesTreeNode);
+				
+				if(topnodeOfPreviouslySelectedRatesTreeNode != null)
+				{
+        			_tourFolder = topnodeOfPreviouslySelectedRatesTreeNode;
+        			_tourFolder.children = _tempList;
+        			previouslySelectedRatesTreeNode = seacrhCTN(previouslySelectedRatesTreeNode);
+ 				}
+				
+			}	 */
+				
+			startOpenAndCloseAllTreeNodes(true);
+			
+		}
+		
+		public override function tourVersionFetchResultsHandler(event:ResultEvent):void
+		{
+			if(_view.chk_show_versions.selected){
+				_versionList					= new ArrayCollection();
+				_versionList					=	event.result as ArrayCollection;
+				_view.itineryTree.dataProvider	=	_versionList;
+				for(var i:int=0; i<_versionList.length; i++){
+					_view.itineryTree.setItemIcon(_versionList.getItemAt(i), folderVersion, folderVersion );
+				}
+			}else{
+				var _tempList:ArrayCollection = new ArrayCollection();
+				_tempList = removeUnwantedNodesFromTree(event.result as ArrayCollection);
+				
+				var _tourFolder:RatesTreeNode = findTourFolder(getTreeListData());
+				if(_tourFolder != null)
+					_tourFolder.children = _tempList;
+					
+				startOpenAndCloseAllTreeNodes(true);
+			}
+			
+			stoptBusyCursor();
+			
+		}
+		
+		public override function tourDayFetchResultsHandler(event:ResultEvent):void
+		{
+			stoptBusyCursor();
+			var _tempList:ArrayCollection = new ArrayCollection();
+			_tempList = event.result as ArrayCollection;
+			
+			var _tourFolder:RatesTreeNode = findTourFolder(getTreeListData());
+			if(_tourFolder != null)
+				_tourFolder.children = _tempList;
+				
+			startOpenAndCloseAllTreeNodes(true);
+		}
+		
+		public override function tourSegmentFetchResultsHandler(event:ResultEvent):void
+		{
+			stoptBusyCursor();
+			var _tempList:ArrayCollection = new ArrayCollection();
+			_tempList = event.result as ArrayCollection;
+			
+			var _tourFolder:RatesTreeNode = findTourFolder(getTreeListData());
+			if(_tourFolder != null)
+				_tourFolder.children = _tempList;
+				
+			startOpenAndCloseAllTreeNodes(true);
+		}
+		
+		public override function tourFolderCreateResultsHandler(event:ResultEvent):void
+		{
+			stoptBusyCursor();
+			loadMyRootFolders();
+		}
+		
+		public override function tourMasterCreateResultsHandler(event:ResultEvent):void
+		{
+			stoptBusyCursor();
+			loadTreeNodesOfTheFolder();
+		}
+		
+		public override function tourVersionCreateResultsHandler(event:ResultEvent):void
+		{
+			stoptBusyCursor();
+			loadTreeNodesOfTheFolder();
+		}
+		
+		public override function tourDayCreateResultsHandler(event:ResultEvent):void
+		{
+			stoptBusyCursor();
+			loadTreeNodesOfTheFolder();
+		}
+		
+		public override function tourSegmentCreateResultsHandler(event:ResultEvent):void
+		{
+			stoptBusyCursor();
+			loadTreeNodesOfTheFolder();
+		}
+		
+		public override function tourTreeNodeDeleteResultsHandler(event:ResultEvent):void
+		{
+			stoptBusyCursor();
+			setLastTreeItem(null);
+			loadOneLevelUpByLastSelectedFolder();
+		}
+		
+		public override function tourTreeNodeCopyAndPasteItemResultsHandler(event:ResultEvent):void
+		{
+			stoptBusyCursor();
+			loadTreeNodesOfTheFolder();
+		}
+		
+		public override function fetchCostObjectDetailsOfTreeNodeResultsHandler(event:ResultEvent):void
+		{
+		}
+		public override function faultHandler(event:FaultEvent):void
+		{
+			stoptBusyCursor();
+		}
+		
+		 public override function userFetchResultsHandler (event:ResultEvent):void
+	   {
+	   		userCollection	=	new ArrayCollection;
+	   		userCollection  =   event.result as ArrayCollection;
+	   		var allUser:User	 =	new User;
+	   			allUser.uuid	 =	"";
+	   			allUser.firstName= "All";
+	   		userCollection.addItem(allUser);
+	   		
+	   			
+	   		_view.CMB_user.dataProvider	=	userCollection;
+	   		_view.CMB_user.selectedIndex=	userCollection.length-1;
+	   		setDefaultUser();
+	   		stoptBusyCursor();
+	   		loadMyRootFolders();
+	   }  
+	   
+	   public override function paxDetailsFetchResultsHandler (event:ResultEvent):void
+		{	
+			var paxDetailsList:ArrayCollection		= new ArrayCollection;
+				paxDetailsList 	  					= event.result as ArrayCollection;
+				
+				var _pax:PaxDetailsObject			=	new PaxDetailsObject;
+				
+				for(var i:int=0; i< paxDetailsList.length; i++)
+				{
+					if((paxDetailsList.getItemAt(i) as PaxDetailsObject).selected)
+					{
+						_pax = (paxDetailsList.getItemAt(i) as PaxDetailsObject);
+						
+						if(_pax.includeTourLeader == 1)
+						{
+							_view.T_sgl.text	= _view.fomatter.format(_pax.PPSGLRateInclTL);
+							_view.T_dbl.text	= _view.fomatter.format(_pax.PPDBLRateInclTL);
+							_view.T_tpl.text	= _view.fomatter.format(_pax.PPTPLRateInclTL);
+						}
+						else
+						{
+							_view.T_sgl.text	= _view.fomatter.format(_pax.PPSGLRate);
+							_view.T_dbl.text	= _view.fomatter.format(_pax.PPDBLRate);
+							_view.T_tpl.text	= _view.fomatter.format(_pax.PPTPLRate);
+						}
+						break;	
+					}
+					else
+					{
+						_view.T_sgl.text	= "";
+						_view.T_dbl.text	= "";
+						_view.T_tpl.text	= "";
+					}
+					
+				}
+				
+				stoptBusyCursor();
+		}
+	   
+	   private function setDefaultUser():void
+	   {
+	   	
+		   	for(var i:int=0; i<userCollection.length; i++)
+		   	{
+		   		if((userCollection.getItemAt(i) as User).uuid	==	_loggedInUser.uuid){
+		   			_view.CMB_user.selectedIndex	=	i;
+		   			selectedUser					=	_view.CMB_user.selectedItem as User;
+		   			break;
+		   		}
+		   	}
+	   } 
+	   
+	   public override function rateCodeGenerateTreeResultsHandler (event:ResultEvent):void
+	   {
+	   		var list:ArrayCollection		= new ArrayCollection;
+				list 	  					= event.result as ArrayCollection;
+				
+				_view.itineryTree.dataProvider = list;
+				
+			stoptBusyCursor();	
+	   }
+		
+	}
+}

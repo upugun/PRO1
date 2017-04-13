@@ -1,0 +1,188 @@
+package net.jhl.view.helper
+{
+	import mx.collections.ArrayCollection;
+	import mx.containers.HBox;
+	import mx.controls.Label;
+	import mx.core.UIComponent;
+	import mx.events.CloseEvent;
+	import mx.events.ListEvent;
+	import mx.rpc.events.ResultEvent;
+	
+	import net.jhl.value.objects.RateCode.Discounts;
+	import net.jhl.value.objects.RateCode.RoomRateBreakdown;
+	import net.jhl.value.objects.common.Tax;
+	import net.jhl.view.JWHConstants;
+	import net.jhl.view.logic.RoomRateCalculation;
+	import net.jwt.event.NotificationArguments;
+	import net.jwt.view.Mediator;
+	import net.jwt.view.popup.JWTPopUpCanvas;
+	
+	public class HelperRoomRateBreakdownMediator extends Mediator
+	{
+		private var _view:HelperRoomRateBreakdownView;
+		
+		private var _app:JWTPopUpCanvas;
+		[Bindable] public var args:NotificationArguments;
+		private var taxesList:ArrayCollection   	= new ArrayCollection();
+		private var discountList:ArrayCollection   	= new ArrayCollection();
+		private var rateObj:RoomRateBreakdown;
+		public var isAgentsLoaded:Boolean	=	false;
+		
+		public function HelperRoomRateBreakdownMediator(view:UIComponent, args:NotificationArguments)
+		{
+			super(view);
+			if(view != null)
+			{
+				_view  = view as HelperRoomRateBreakdownView;
+			}
+			
+			if(args != null){
+				this.args 		= args;
+				_loggedInUser	= args.user;
+			}
+				
+			_app = args.viewComponent as JWTPopUpCanvas;	
+			
+			rateObj			= new RoomRateBreakdown;
+			discountList 	= new ArrayCollection;
+		}
+		
+		protected override function viewComponentInitialize():void{
+			setLoggedInUser();
+			setInitialData();
+		}
+		
+		private function setInitialData():void
+		{
+			rateObj 		= new RoomRateBreakdown;
+			discountList 	= new ArrayCollection
+			_view.grossRate = 0;
+			
+			if(args.originatorObject is RoomRateBreakdown)
+			{
+				rateObj 		= args.originatorObject as RoomRateBreakdown;
+				_view.grossRate = rateObj.grossRate;
+				discountList    = rateObj.discountList;
+				
+				generateDiscountGrid();
+			}
+		}
+		
+		private function generateDiscountGrid():void
+		{
+			var list:ArrayCollection  = RoomRateCalculation.reOrderDiscountList(discountList);
+			_view.discountedRate	  =_view.grossRate;
+			
+			for(var i:int=0; i<list.length; i++)
+			{
+				var obj:Discounts = list.getItemAt(i) as Discounts;
+				if(obj.toBeAppliedForCalculation == true && obj.applicableStatus == true)
+				{
+					var discNameLabel:Label = new Label;
+						discNameLabel.width = 325;
+						discNameLabel.text		= (list.getItemAt(i) as Discounts).discountCode;
+						
+					var discAmount:Label = new Label;
+						discAmount.width = 70;	
+						
+					var valueType:String = "";
+					
+					if((list.getItemAt(i) as Discounts).amountType == JWHConstants.CALCULATION_AMOUNT_TYPE_PERCENTAGE)
+						valueType	 = "%";
+						
+					if((list.getItemAt(i) as Discounts).dsType == JWHConstants.DISCOUNT_SUPPLEMENT_TYPE_DISCOUNT)
+						discAmount.text	= "-"+(list.getItemAt(i) as Discounts).amount+valueType;
+					else
+						discAmount.text	= "+"+(list.getItemAt(i) as Discounts).amount+valueType;	
+						
+					var discRate:Label = new Label;
+						discRate.width = 112;
+						discRate.setStyle("textAlign","right");
+							
+					if((list.getItemAt(i) as Discounts).dsType == JWHConstants.DISCOUNT_SUPPLEMENT_TYPE_DISCOUNT)		
+						_view.discountedRate = RoomRateCalculation.calculateDiscount(_view.discountedRate, list.getItemAt(i) as Discounts);
+					else	
+						_view.discountedRate = RoomRateCalculation.calculateSupplement(_view.discountedRate, list.getItemAt(i) as Discounts);
+						
+					discRate.text	=	_view.displayFinalRoundedFormattedValue(_view.discountedRate);	
+							
+					var hbox:HBox			= new HBox;
+						hbox.addChild(discNameLabel);
+						hbox.addChild(discAmount);
+						hbox.addChild(discRate);
+						
+					_view.V_discounts.addChild(hbox);
+				}
+			}
+			
+			calculateWithTaxes(_view.discountedRate)
+		}
+		
+		private function generateTaxGrid():void
+		{
+			_view.V_taxes.removeAllChildren();
+			
+			_view.totalTaxAmount	 = 0;
+			_view.totalWithTaxAmount = 0;
+			
+			for(var i:int=0; i<taxesList.length; i++)
+			{
+				var taxLine:HBox 		= new HBox;
+					taxLine.percentWidth= 100;
+				var L_taxLabel:Label 	= new Label;
+					L_taxLabel.width	= 395;
+					
+				var L_taxAmount:Label 	= new Label;
+					L_taxAmount.width	= 112;
+					L_taxAmount.setStyle("textAlign","right");
+					
+					L_taxLabel.text		= (taxesList.getItemAt(i) as Tax).taxDescription;
+					L_taxAmount.text	= _view.displayFinalRoundedFormattedValue((taxesList.getItemAt(i) as Tax).taxCalculatedAmount);
+					_view.totalTaxAmount+= (taxesList.getItemAt(i) as Tax).taxCalculatedAmount;
+					
+					//_view.totalWithTaxAmount	   = _view.discountedRate + _view.totalTaxAmount;
+					
+					taxLine.addChild(L_taxLabel);
+					taxLine.addChild(L_taxAmount);
+					
+					_view.V_taxes.addChild(taxLine);
+			}
+		}
+		
+		private function calculateWithTaxes(inValue:Number):void
+		{
+			startBusyCursor();
+			rateCalculationRO.reverseTaxesForReservation(inValue,rateObj.checkInDate)
+		}
+		
+		private function setLoggedInUser():void
+		{
+			initializeRoomRateCalculationRemortingObject();
+			rateCalculationRO.setLogedInUser(_loggedInUser);
+		}
+		
+		private function selectAndClose(event:ListEvent):void
+		{
+//			var obj:AgentMarkets =  objectsList.getItemAt(event.rowIndex) as AgentMarkets;
+//			args.argumentObject = obj;
+			_app.dispatchEvent(new CloseEvent(CloseEvent.CLOSE));
+			closeThisPopup(args.viewComponent as JWTPopUpCanvas);
+		}
+		
+		private function closeThisPopup(pcanvas:JWTPopUpCanvas):void
+		{
+			pcanvas.closeall();
+		}
+		
+		public override function calculateRateResultsHandler (event:ResultEvent):void
+		{	
+			stoptBusyCursor();
+			taxesList = new ArrayCollection();
+			taxesList = event.result as ArrayCollection;
+			
+			generateTaxGrid();
+		}
+		
+	
+	}
+}

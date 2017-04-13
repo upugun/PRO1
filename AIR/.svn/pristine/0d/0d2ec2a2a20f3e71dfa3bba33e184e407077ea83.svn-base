@@ -1,0 +1,22 @@
+package net.jwt
+{
+	public class JWSErrorMessages
+	{
+		public static const ErrorArray:Array = new Array;
+							ErrorArray[0] = "Arrival date is already reached";
+							ErrorArray[1] = "Some fields are required";
+							ErrorArray[2] = "Check your inputs and try again";
+							ErrorArray[3] = "You can't cancel this record";
+							ErrorArray[4] = "Some required feild are not filled. Cannot save this";
+							ErrorArray[5] = "This milage value is not in the system yet.\nPlease enter";
+							ErrorArray[6] = "Failed!, Please try again","Warrning";
+							ErrorArray[7] = "Not a valid user";
+							ErrorArray[8] = "Some milages of the selected, are not found.\nPlease update or enter in the '+Km'";
+			
+		public function JWSErrorMessages()
+		{
+			
+		}
+
+	}
+}

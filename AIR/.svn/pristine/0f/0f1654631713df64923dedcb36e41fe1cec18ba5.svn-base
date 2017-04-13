@@ -1,0 +1,154 @@
+/****************************************************************
+ * Change log													*
+ * Created by Nisal Fernando									*	
+ * Date: 2012/02/01												*
+ *--------------------------------------------------------------*  
+ * By	Date		Change										*	
+ *--------------------------------------------------------------*  
+ * NF	2012/02/01	Created the page							*			
+ * UG	2012/02/15	Code review started							*
+ ****************************************************************/
+package net.jwt.view
+{
+	import flash.events.Event;
+	import flash.events.KeyboardEvent;
+	import flash.events.MouseEvent;
+	
+	import mx.collections.ArrayCollection;
+	import mx.controls.Alert;
+	import mx.core.UIComponent;
+	import mx.events.CloseEvent;
+	import mx.events.ListEvent;
+	import mx.rpc.events.ResultEvent;
+	
+	import net.jwt.event.INotificationArguments;
+	import net.jwt.event.NotificationArguments;
+	import net.jwt.value.objects.TransactionGLTypeMaster;
+	public class TransactionGLTypeMediator extends Mediator
+	{
+		private var _view:TransactionGLTypeView;
+		private var _args:INotificationArguments;
+		//private var _loggedInUser:User;
+		
+		[Bindable] public var list:ArrayCollection;
+		
+		private var obj:TransactionGLTypeMaster	=	new TransactionGLTypeMaster;
+		
+		//------------------------------------------
+		
+		[Bindable] private var _selectedIndex:int = -1;
+		[Bindable] public var args:NotificationArguments = new NotificationArguments();
+		
+		
+		
+		public function TransactionGLTypeMediator(view:UIComponent, args:INotificationArguments)
+		{
+			super(view);
+			if(view != null)
+			{
+				_view  = view as TransactionGLTypeView ;
+				
+			}
+			
+			if(args != null){
+				_args = args;
+				_loggedInUser = (_args.viewComponent as MainView).user;
+			}
+		}
+		
+		protected override function viewComponentInitialize():void{ 
+			setLoggedInUser();
+			loadObjects();
+			_view.addEventListener(KeyboardEvent.KEY_UP, saveDocument);
+			_view.B_save.addEventListener(MouseEvent.CLICK, saveByButton);
+			_view.B_new.addEventListener(MouseEvent.CLICK, newRecord);
+			_view.DG_list.addEventListener(ListEvent.ITEM_CLICK, showSelectedItem);
+		}
+		
+		private function newRecord(event:Event):void
+		{
+			_view.glTypeObj	=	new TransactionGLTypeMaster;
+		}
+		private function setLoggedInUser():void
+		{
+			initializeTransactionGLTypeMasterRemortingObject();
+			transactionGLTypeMasterRO.setLogedInUser(_loggedInUser);
+		}
+		
+		private function showSelectedItem(event:ListEvent):void
+		{
+			_selectedIndex	=	event.rowIndex;
+			
+			_view.glTypeObj	=	list.getItemAt(_selectedIndex) as TransactionGLTypeMaster;
+			
+			for(var i:int=0; i< _view.transactionTypeList.length; i++)
+				{
+					if(_view.glTypeObj.baseCostType	==	_view.transactionTypeList.getItemAt(i).id)
+					{	
+						_view.CMB_type.selectedIndex	= i;
+						break;
+					}
+				}
+		}
+		
+		private function saveDocument(event:KeyboardEvent):void{
+			if(event.keyCode == 119)
+				saveObjects();
+			else if(event.keyCode == 120)
+				Alert.show("TODO:Delete this record");
+			else if(event.keyCode == 112)
+				Alert.show("TODO:Show HELP page");
+		}
+		
+		private function saveByButton(event:Event):void{
+				saveObjects();
+		}
+		
+		private function saveObjects():void
+		{
+				startBusyCursor();
+				var temp:ArrayCollection		=	new ArrayCollection;
+				
+				_view.glTypeObj.createdBy		=	_loggedInUser.uuid;
+				_view.glTypeObj.lastUpdatedBy	=	_loggedInUser.uuid;
+				
+				if(_view.CMB_type.selectedItem!=null)
+					_view.glTypeObj.baseCostType		=	_view.CMB_type.selectedItem.id;
+				
+				obj								=	_view.glTypeObj;
+				
+				temp.addItem(obj);
+					
+				transactionGLTypeMasterRO.create(temp);
+		}
+		
+		private function loadObjects():void
+		{
+			startBusyCursor();
+			transactionGLTypeMasterRO.dynamicSearch("","");
+		}
+		
+		
+		
+		// Overridden from Mediator class
+		public override function transactionGLTypeMasterFetchResultsHandler(event:ResultEvent):void {
+			
+				list	=	new ArrayCollection;
+				list	=	event.result as ArrayCollection;
+				
+				_view.DG_list.dataProvider	=	list;
+				stoptBusyCursor();
+		}
+		
+		public override function transactionGLTypeMasterCreateResultsHandler(event:ResultEvent):void {
+			stoptBusyCursor();
+			
+			_view.glTypeObj		=	new TransactionGLTypeMaster;
+			_view.statusLabel.text	=	"Successful Saved";
+			
+			loadObjects();
+			//selectAndClose();
+		}
+	
+	}
+}

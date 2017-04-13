@@ -1,0 +1,144 @@
+package net.jhl.view
+{
+	import flash.events.Event;
+	import flash.events.MouseEvent;
+	
+	import mx.collections.ArrayCollection;
+	import mx.controls.Alert;
+	import mx.controls.ComboBox;
+	import mx.controls.DateField;
+	import mx.controls.TextInput;
+	import mx.core.UIComponent;
+	import mx.events.ListEvent;
+	import mx.messaging.messages.ErrorMessage;
+	import mx.rpc.events.FaultEvent;
+	import mx.rpc.events.ResultEvent;
+	
+	import net.jwt.event.INotificationArguments;
+	import net.jwt.event.NotificationArguments;
+	import net.jwt.view.MainView;
+	import net.jwt.view.Mediator;
+
+	
+	public class CalculatorMediator extends Mediator
+	{
+		private var _view:CalculatorView;
+		private var _args:INotificationArguments;
+		
+		private var comboBox:ComboBox = new ComboBox;
+		private	var textBox:TextInput = new TextInput;
+		private	var date:DateField	  = new DateField;
+		
+		private var propertyList:ArrayCollection 		= new ArrayCollection;
+		private var roomsList:ArrayCollection 		= new ArrayCollection; 
+		private var dynamicList:ArrayCollection       	= new ArrayCollection();
+		private var seasonList:ArrayCollection   	  	= new ArrayCollection();
+		private var _mainView:MainView;
+
+		[Bindable]public var args:NotificationArguments = new NotificationArguments();
+		
+		public function CalculatorMediator(view:UIComponent, args:INotificationArguments)
+		{
+			super(view);
+			if(view != null)
+			{
+				_view  = view as CalculatorView ;
+				
+			}
+			
+			_mainView	  = (args.viewComponent as MainView);
+			
+			if(args != null){
+				_args = args;
+				_loggedInUser = (_args.viewComponent as MainView).user;
+			}
+		}
+		
+		protected override function viewComponentInitialize():void{
+			setLoggedInUser();
+			loadRooms();
+		}
+		
+		private function addNewHandler(e:Event):void
+		{
+			addNew();
+		}
+		
+		private function addNew():void
+		{
+		}
+		
+		private function showSelectedItem(e:Event):void
+		{
+			
+		}
+		
+		private function setLoggedInUser():void
+		{
+			initializeRoomCategoryRemortingObject();
+			roomCategoryRO.setLogedInUser(_loggedInUser);
+		}
+		
+		private function loadRooms():void
+		{
+			startBusyCursor();
+			roomCategoryRO.dynamicSearch("","");
+		}
+		
+		private function saveItemHandler(e:Event):void
+		{
+			saveItem();
+		}
+		
+		private function saveItem():void
+		{
+
+		}
+		
+		
+		public override function roomCategoryCreateResultsHandler (event:ResultEvent):void
+		{	
+			activityAknowladgment();
+			stoptBusyCursor();
+			addNew();
+			loadRooms();
+		}
+		
+		public override function roomCategoryFetchResultsHandler (event:ResultEvent):void
+		{	
+			stoptBusyCursor();
+			//roomsList	=	new ArrayCollection;
+			//roomsList	=	event.result as ArrayCollection;
+			
+			//_view.DG_list.dataProvider = roomsList;
+			
+		}
+		
+		
+	public override function faultHandler(event:FaultEvent):void {
+			stoptBusyCursor();
+			var error:ErrorMessage	=	event.message as ErrorMessage;
+			
+			if(error != null)
+			{
+				if(error.rootCause != null)
+				{
+					if(error.rootCause!=null)
+						Alert.show(error.rootCause.message.toString());
+					else
+						Alert.show("Error!");	
+				}
+				else
+					Alert.show("Error!");
+			}
+			else
+				Alert.show("Error!");
+		}
+		
+		private function activityAknowladgment():void
+		{
+			createJHAlert(_view, "Record saved Successfully");
+		}
+		
+	}
+}

@@ -1,0 +1,53 @@
+package net.jhl.visual.objects
+{
+	import flash.events.Event;
+	
+	import net.jhl.value.objects.RateCode.Discounts;
+	import net.jhl.view.common.JHCheckBox;
+	import net.jhl.view.common.JHHbox;
+	
+	public class DiscountLineHbox extends JHHbox
+	{
+		[Bindable]
+		public var checkBox:JHCheckBox		= new JHCheckBox;	
+		public var discount:Discounts 		= new Discounts;
+		
+		public function DiscountLineHbox(dis:Discounts)
+		{
+			
+			discount = dis;
+			
+			//this.setStyle("horizontalGap","8");
+			
+			checkBox.label	= discount.description;
+			
+			if(discount.choosable == false && discount.toBeAppliedForCalculation == true)	
+			{
+				checkBox.selected		= true;
+				checkBox.enabled		= false;
+			}
+			else if(discount.choosable == true && discount.toBeAppliedForCalculation == true)	
+			{
+				checkBox.selected		= discount.applicableStatus;
+				checkBox.enabled		= true;
+			}
+			else 
+			{
+				checkBox.selected		= false;
+				checkBox.enabled		= false;
+			}
+			
+			checkBox.addEventListener(Event.CHANGE, changeApplicableStatus);
+			
+			this.addChild(checkBox);
+		}
+		
+		
+					
+		private function changeApplicableStatus(e:Event):void 
+		{
+		    discount.applicableStatus = checkBox.selected;
+		}
+
+	}
+}

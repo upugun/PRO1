@@ -1,0 +1,77 @@
+package net.jwt.view.helper
+{
+	import mx.collections.ArrayCollection;
+	import mx.core.UIComponent;
+	import mx.events.CloseEvent;
+	import mx.events.ListEvent;
+	import mx.rpc.events.ResultEvent;
+	
+	import net.jwt.event.NotificationArguments;
+	import net.jwt.value.objects.Department;
+	import net.jwt.view.Mediator;
+	import net.jwt.view.popup.JWTPopUpCanvas;
+	
+	public class HelperDepartmentMediator extends Mediator
+	{
+		private var _view:HelperDepartmentView;
+		
+		private var _app:JWTPopUpCanvas;
+		[Bindable] public var args:NotificationArguments;
+		[Bindable] public var list:ArrayCollection;
+		
+		public function HelperDepartmentMediator(view:UIComponent, args:NotificationArguments)
+		{
+			super(view);
+			if(view != null)
+			{
+				_view  = view as HelperDepartmentView;
+			}
+			
+			if(args != null){
+				this.args = args;
+				_loggedInUser = args.user;
+			}
+				
+			_app = args.viewComponent as JWTPopUpCanvas;	
+		}
+		
+		protected override function viewComponentInitialize():void{
+			setLoggedInUser();
+			loadMarketList();		
+			_view.DG.doubleClickEnabled = true;
+			_view.DG.addEventListener(ListEvent.ITEM_DOUBLE_CLICK, selectAndClose);
+		}
+		
+		private function setLoggedInUser():void
+		{
+			initializeDepartmentRemortingObject();
+			departmentRO.setLogedInUser(_loggedInUser);
+		}
+		
+		private function selectAndClose(event:ListEvent):void
+		{
+			var obj:Department =  list.getItemAt(event.rowIndex) as Department;
+			args.argumentObject = obj;
+			_app.dispatchEvent(new CloseEvent(CloseEvent.CLOSE));
+			closeThisPopup(args.viewComponent as JWTPopUpCanvas);
+		}
+		
+		private function closeThisPopup(pcanvas:JWTPopUpCanvas):void
+		{
+			pcanvas.closeall();
+		}
+		
+		private function loadMarketList():void
+		{
+			departmentRO.dynamicSearch("","");
+		}
+		
+		// Overridden from Mediator class
+		public override function departmentFetchResultsHandler(event:ResultEvent):void {
+			list = new ArrayCollection();
+			list = event.result as ArrayCollection;
+			_view.DG.dataProvider = list;
+		}
+	
+	}
+}

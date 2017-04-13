@@ -1,0 +1,18 @@
+package net.jwt.value.objects
+{
+	[RemoteClass(alias="net.jwt.value.objects.Basis")]
+	
+	[Bindable]
+	public class SalesReportCommon
+	{
+		public var item:String 			= "";
+		public var market:String		= "";
+		public var adults:String		= "";
+		public var sales:String			= "";
+		
+		public function SalesReportCommon()
+		{
+		}
+
+	}
+}

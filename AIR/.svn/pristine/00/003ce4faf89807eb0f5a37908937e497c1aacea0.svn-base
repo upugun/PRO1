@@ -1,0 +1,80 @@
+package net.jwt.view.helper.tourHelper
+{
+	import flash.events.KeyboardEvent;
+	
+	import mx.collections.ArrayCollection;
+	import mx.core.UIComponent;
+	import mx.events.CloseEvent;
+	import mx.events.ListEvent;
+	import mx.rpc.events.ResultEvent;
+	
+	import net.jwt.event.NotificationArguments;
+	import net.jwt.value.objects.ActivitiesVehicle;
+	import net.jwt.value.objects.VehicleType;
+	import net.jwt.view.Mediator;
+	import net.jwt.view.popup.JWTPopUp;
+	
+	public class TourHelperActivitiesVehicleMediator extends Mediator
+	{
+		private var _view:TourHelperActivitiesVehicleView;
+		
+		private var _app:JWTPopUp;
+		[Bindable] public var args:NotificationArguments;
+		[Bindable] public var _vehicleType:ArrayCollection;
+		[Bindable] public var _vehicleList:ArrayCollection;
+		
+		public function TourHelperActivitiesVehicleMediator(view:UIComponent, args:NotificationArguments)
+		{
+			super(view);
+			if(view != null)
+			{
+				_view  = view as TourHelperActivitiesVehicleView;
+			}
+			
+			if(args != null)
+				this.args = args;
+				
+			_app = args.viewComponent as JWTPopUp;	
+		}
+		
+		protected override function viewComponentInitialize():void{
+				loadVehicleList()
+				//_view.T_search.addEventListener(KeyboardEvent.KEY_UP, dynamicSearch);
+				_view.DG_vehicle.doubleClickEnabled = true;
+				_view.DG_vehicle.addEventListener(ListEvent.ITEM_DOUBLE_CLICK, selectAndClose);
+				setLoggedInUser();
+		}
+		
+		private function setLoggedInUser():void
+		{
+			activitiesVehicleRO.setLogedInUser(_loggedInUser);
+		}	
+		
+		private function selectAndClose(event:ListEvent):void
+		{
+			var obj:ActivitiesVehicle =  _vehicleList.getItemAt(event.rowIndex) as ActivitiesVehicle;
+				args.argumentObject = obj;
+				_app.dispatchEvent(new CloseEvent(CloseEvent.CLOSE));
+		}
+		private function dynamicSearch(event:KeyboardEvent):void
+		{
+			loadVehicleList()
+		}
+		
+		private function loadVehicleList():void
+		{
+		
+			initializeActivitiesVehicleRemortingObject();
+			activitiesVehicleRO.dynamicSearch("","");
+		}
+		
+		// Overridden from Mediator class
+		public override function activitiesVehicleFetchResultsHandler(event:ResultEvent):void {
+			_vehicleList = new ArrayCollection();
+			_vehicleList = event.result as ArrayCollection;
+			_view.DG_vehicle.dataProvider = _vehicleList;
+		}
+		
+	
+	}
+}

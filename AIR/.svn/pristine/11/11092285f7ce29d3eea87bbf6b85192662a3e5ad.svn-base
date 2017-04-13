@@ -1,0 +1,43 @@
+package net.jhl.control
+{
+	import mx.core.UIComponent;
+	
+	import net.jhl.view.RateCode.SeasonEntryMediator;
+	import net.jhl.view.RateCode.SeasonEntryView;
+	import net.jwt.event.INotificationArguments;
+	import net.jwt.view.MainView;
+	
+	import org.puremvc.as3.interfaces.INotification;
+	import org.puremvc.as3.patterns.command.SimpleCommand;
+	
+	public class SeasonEntryCommand extends SimpleCommand
+	{
+		private var _mediator:SeasonEntryMediator;
+		private var _view:SeasonEntryView;
+		private var _args:UIComponent;
+		
+		override public function execute(notification:INotification):void
+		{
+			var args:INotificationArguments = notification.getBody() as INotificationArguments;
+			
+			if (null != args){
+				var app:MainView 				= args.viewComponent as MainView;
+				var view:SeasonEntryView  	= new SeasonEntryView
+				//When mediator is assigned, it start setting up the view and mediator in Meditor.as
+				var mediator:SeasonEntryMediator 	= new SeasonEntryMediator(view,args);
+			
+				this._mediator = mediator;
+				this._args     = args as UIComponent;
+				this._view     = view;
+				
+				facade.registerMediator(mediator);
+				app.applicationPanel.removeAllChildren();
+				app.applicationPanel.addChild(view);
+			}
+		}
+		public function SeasonEntryCommand():void
+		{
+			//Alert.show("DailyGraphPriceBasedMediator command");
+		}
+	}
+}

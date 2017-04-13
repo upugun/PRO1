@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:VBox xmlns:mx="http://www.adobe.com/2006/mxml" width="100%" height="100%">
+	<mx:Script>
+		<![CDATA[
+			import net.jwt.Constants;
+		]]>
+	</mx:Script>
+	<mx:Grid>
+		<mx:GridRow>
+			<mx:GridItem>
+			</mx:GridItem>
+			<mx:GridItem>
+			</mx:GridItem>
+			<mx:GridItem>
+			</mx:GridItem>
+		</mx:GridRow>
+		<mx:GridRow>
+			<mx:GridItem>
+			</mx:GridItem>
+			<mx:GridItem>
+				<mx:Label text="Filter Level 01"/>
+			</mx:GridItem>
+			<mx:GridItem id="searchbox">
+				<mx:ComboBox dataProvider="{Constants.salesReportFilterLevelsList}" labelField="type" id="CMB_level01"></mx:ComboBox>
+			</mx:GridItem>
+		</mx:GridRow>
+		<mx:GridRow>
+			<mx:GridItem>
+			</mx:GridItem>
+			<mx:GridItem>
+			</mx:GridItem>
+			<mx:GridItem>
+			</mx:GridItem>
+		</mx:GridRow>
+		<mx:GridRow>
+			<mx:GridItem>
+			</mx:GridItem>
+			<mx:GridItem>
+			</mx:GridItem>
+			<mx:GridItem>
+				<mx:Button label="Apply" id="B_apply"/>
+			</mx:GridItem>
+		</mx:GridRow>
+	</mx:Grid>
+	<mx:RadioButtonGroup id="RD_G_filter"/>
+</mx:VBox>

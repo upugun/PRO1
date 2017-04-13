@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Panel xmlns:mx="http://www.adobe.com/2006/mxml" xmlns:controls="net.jwt.popup.*" 
+   title="{windowTitle}"
+    layout="absolute" width="{frameWidth+20}" height="{frameHeight+38}" 
+    borderColor="#306B94" creationComplete="init()">
+    <mx:Script>
+        <![CDATA[
+        	import net.jwt.value.objects.Market;
+        	import net.jwt.value.objects.User;
+        	import mx.controls.Alert;
+        	import net.jwt.event.NotificationArguments;
+        	import net.jwt.event.INotificationArguments;
+        	import net.jwt.ApplicationFacade;
+        	import org.puremvc.as3.interfaces.IFacade;
+        	import org.puremvc.as3.patterns.facade.Facade;
+            import mx.managers.PopUpManager;
+            
+            [Bindable]public var src:String;             //the source url
+            [Bindable]public var frameWidth:Number;     //width of the iframe
+            [Bindable]public var frameHeight:Number;     //height of the iframe
+            [Bindable]public var windowTitle:String;     //title of the window
+            [Bindable]public var facade:IFacade;     
+            [Bindable]public var args:NotificationArguments;
+            [Bindable]public var commandString:String;     
+            
+            public function init():void
+            {
+	           	facade.sendNotification(commandString, args)
+            }
+//            public function closeall():void
+//            {
+//            	//Alert.show((args.argumentObject as Market).marketCode);
+//                PopUpManager.removePopUp(this);
+//                //ifr.visible = false;
+//            }
+        ]]>
+    </mx:Script>
+    <mx:Label x="91" y="96" text="Hello window !" color="#0F0E0E"/>
+    
+</mx:Panel>

@@ -1,0 +1,108 @@
+package net.jhl.view.helper
+{
+	import flash.events.Event;
+	import flash.events.MouseEvent;
+	
+	import mx.collections.ArrayCollection;
+	import mx.core.UIComponent;
+	import mx.events.CloseEvent;
+	import mx.rpc.events.ResultEvent;
+	
+	import net.jhl.value.objects.RateCode.Discounts;
+	import net.jhl.view.common.JHCheckBox;
+	import net.jhl.view.common.JHLabel;
+	import net.jhl.visual.objects.DiscountLineHbox;
+	import net.jhl.visual.objects.ReservationLineHBox;
+	import net.jwt.event.NotificationArguments;
+	import net.jwt.view.Mediator;
+	import net.jwt.view.popup.JWTPopUpCanvas;
+	
+	public class HelperDiscountChoosableMediator extends Mediator
+	{
+		private var _view:HelperDiscountChoosableView;
+		
+		private var _app:JWTPopUpCanvas;
+		[Bindable] public var args:NotificationArguments;
+		private var objectsList:ArrayCollection   	= new ArrayCollection();
+		private var line:ReservationLineHBox;
+		public var isAgentsLoaded:Boolean			=	false;
+		
+		public function HelperDiscountChoosableMediator(view:UIComponent, args:NotificationArguments)
+		{
+			super(view);
+			if(view != null)
+			{
+				_view  = view as HelperDiscountChoosableView;
+			}
+			
+			if(args != null){
+				this.args 		= args;
+				_loggedInUser	= args.user;
+			}
+				
+			_app = args.viewComponent as JWTPopUpCanvas;	
+		}
+		
+		protected override function viewComponentInitialize():void{
+			
+			initailizeArgumentObject();
+			generateDynamicGrid();
+			
+			_view.B_close.addEventListener(MouseEvent.MOUSE_UP, selectAndClose);
+		}
+		
+		private function initailizeArgumentObject():void
+		{
+			if(args.originatorObject as ReservationLineHBox)
+			{
+				line 		= args.originatorObject as ReservationLineHBox;
+				objectsList	= line.discountList;
+			}
+		}
+		
+		private function generateDynamicGrid():void
+		{
+			for(var i:int=0; i<objectsList.length; i++)
+			{
+				var disc:Discounts  = objectsList.getItemAt(i) as Discounts;
+				
+				var hbox:DiscountLineHbox		= new DiscountLineHbox(disc);
+					
+				_view.V_dynamic.addChild(hbox);	
+			}
+		}
+		
+		
+		private function setLoggedInUser():void
+		{
+			
+			initializeAgentMarketsRemortingObject();
+			agentMarketRO.setLogedInUser(_loggedInUser);
+		}
+		
+		private function selectAndClose(event:MouseEvent):void
+		{
+			args.argumentObject = line;
+			_app.dispatchEvent(new CloseEvent(CloseEvent.CLOSE));
+			closeThisPopup(args.viewComponent as JWTPopUpCanvas);
+		}
+		
+		private function closeThisPopup(pcanvas:JWTPopUpCanvas):void
+		{
+			pcanvas.closeall();
+		}
+		
+		public override function agentMarketFetchResultsHandler (event:ResultEvent):void
+		{	
+			stoptBusyCursor();
+			objectsList = new ArrayCollection();
+			objectsList = event.result as ArrayCollection;
+			
+			
+			
+			
+		}
+		
+	
+	}
+}

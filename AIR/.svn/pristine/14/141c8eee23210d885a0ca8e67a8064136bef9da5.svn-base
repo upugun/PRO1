@@ -1,0 +1,99 @@
+package net.jwt.view.helper
+{
+	import mx.collections.ArrayCollection;
+	
+	public class TreeSearch
+	{
+		public function TreeSearch()
+		{
+		}
+		
+		public function searchTopNode(firstObject:Object, selectedObject:Object):Object
+		{
+//			if (isTopNode(firstObject, selectedObject))
+//				return firstObject;
+//			else
+//			{	
+//				var collection:ArrayCollection = fetchTreeCollection(firstObject);
+//				if (collection.length > 0)
+//				{
+//					for(var i:int=0; i<collection.length; i++)
+//					{
+//						var _obj:Object = collection.getItemAt(i) as Object;
+//						if (isTopNode(_obj, selectedObject))
+//						{
+//							return _obj;
+//						}
+//						else
+//							{
+//								//var treeSearch:TreeSearch = new TreeSearch;
+//								//treeSearch.searchTopNode(_obj, selectedObject);
+//								searchTopNode(_obj, selectedObject);
+//							}	
+//							
+//					}
+//				}
+//				return null;
+//			} 
+			var collectionL1:ArrayCollection = fetchTreeCollection(firstObject);
+			if (isTopNode(firstObject, selectedObject))
+				{
+					return firstObject;
+				}
+				else 
+				{
+					for(var x:int = 0; x<collectionL1.length; x++) // Level 1
+					{
+						var _obj1:Object = collectionL1.getItemAt(x) as Object;
+						if (isTopNode(_obj1, selectedObject))
+						{
+							return _obj1;
+						}
+						else 
+						{
+							var collectionL2:ArrayCollection = fetchTreeCollection(_obj1);
+							for(var i:int=0; i<collectionL2.length; i++) // Level 2
+							{
+								var _obj2:Object = collectionL2.getItemAt(i) as Object;
+								if (isTopNode(_obj2, selectedObject))
+								{
+									return _obj2;
+								}
+								else
+								{
+									var collectionL3:ArrayCollection = fetchTreeCollection(_obj2);
+										for(var m:int=0; m<collectionL3.length; m++) // Level 3
+										{
+											var _obj3:Object = collectionL3.getItemAt(m) as Object;
+											if (isTopNode(_obj3, selectedObject))
+											{
+												return _obj3;
+											}
+										}
+								}
+							}
+						}
+					}
+					return new Object;
+				}
+		}
+		
+		private function isTopNode(object:Object, selectedObject:Object):Boolean
+		{
+			if(object.id == selectedObject.supperId)
+				return true;
+			else 
+				return false;	
+		}
+		
+		private function fetchTreeCollection(object:Object):ArrayCollection
+		{
+			var collection:ArrayCollection = object.children as ArrayCollection;
+			if(collection != null)
+				return collection;
+			else 
+				return new ArrayCollection;	
+		}
+			
+	}
+}

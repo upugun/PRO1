@@ -1,0 +1,63 @@
+package net.jhl.control.helper
+{
+	import mx.core.UIComponent;
+	
+	import net.jhl.view.helper.HelperRoomRateGraphMediator;
+	import net.jhl.view.helper.HelperRoomRateGraphView;
+	import net.jwt.event.NotificationArguments;
+	import net.jwt.view.MainView;
+	import net.jwt.view.popup.JWTPopUp;
+	import net.jwt.view.popup.JWTPopUpCanvas;
+	
+	import org.puremvc.as3.interfaces.INotification;
+	import org.puremvc.as3.patterns.command.SimpleCommand;
+	
+	public class HelperRoomRateGraphCommand extends SimpleCommand
+	{
+		private var _mediator:HelperRoomRateGraphMediator;
+		private var _view:HelperRoomRateGraphView;
+		private var _args:UIComponent;
+		
+		override public function execute(notification:INotification):void
+		{
+			var app:Object;
+			var args:NotificationArguments = notification.getBody() as NotificationArguments;
+			this._view     = new HelperRoomRateGraphView();
+			
+			var mediator:HelperRoomRateGraphMediator 	= new HelperRoomRateGraphMediator(_view,args);
+			this._mediator = new HelperRoomRateGraphMediator(_view,args);
+			
+			
+			if (null != args){
+				try
+				{
+					
+					if((args.viewComponent as MainView) != null)
+					{
+						app = args.viewComponent as MainView;
+						facade.registerMediator(mediator);
+						app.applicationPanel.removeAllChildren();
+						app.applicationPanel.addChild(_view);
+					}
+					else if((args.viewComponent as JWTPopUp) != null)
+					{
+						app = args.viewComponent as JWTPopUp;
+						facade.registerMediator(mediator);
+						app.addChild(_view);
+					}
+					else if((args.viewComponent as JWTPopUpCanvas) != null)
+					{
+						app = args.viewComponent as JWTPopUpCanvas;
+						facade.registerMediator(mediator);
+						app.canvas_body.addChild(_view);
+					}
+				}catch(e:Error)
+				{}
+			}
+		}
+		public function HelperRoomRateGraphCommand():void
+		{
+			//Alert.show("DailyGraphPriceBasedMediator command");
+		}
+	}
+}

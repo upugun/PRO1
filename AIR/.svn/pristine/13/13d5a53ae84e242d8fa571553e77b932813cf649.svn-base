@@ -1,0 +1,95 @@
+package net.jhl.value.objects
+{
+	import mx.collections.ArrayCollection;
+	
+	import net.jhl.value.objects.RateCode.RateCode;
+	import net.jhl.value.objects.common.TimeStamp;
+	import net.jhl.view.JWHConstants;
+	
+	[RemoteClass(alias="net.jhl.objects.Reservation")]
+	
+	[Bindable]
+	public class Reservation
+	{
+		public var uuid:String 				= "";
+		public var description:String 		= "";
+		public var reservationType:String 	= "";
+		public var guestType:String 		= "";
+		public var resPaxType:String 		= "";
+		public var operatorType:String 		= "";
+		public var operatorId:String 		= "";
+		public var guestId:String 			= "";
+		public var marketId:String 			= "";
+		public var rateCodeId:String 		= "";
+		public var voucherNo:String 		= "";
+		public var tourNo:String 			= "";
+		public var bookingType:String 		= "";
+		public var remarks:String 			= "";
+		public var propertyId:String 		= null;
+		public var currency:String 			= "";
+		public var paymentModeId:String 	= "";
+		public var totalAmount:String 		= "";
+		public var agentTypeId:String 		= "";
+		public var confirmedBy:String 		= "";
+		public var commentsByAgent:String 	= "";
+		public var reservationsStatus:String= JWHConstants.RESERVATION_BOOKING_STATUS_CONFIRMED;
+		public var reservedBy:String		= "";
+		public var reservationYear:String	= "";
+		
+		public var guestOrGroupName:String	= "";
+		public var contactEmail:String		= "";
+		public var contactMobileNo:String	= "";
+		public var countryId:String			= "";
+		public var originator:String		= "";
+		public var desResNo:String			= "-99";
+		public var dmcMarketId:String		= "";
+		public var promotionCode:String		= "";
+		
+		public var bedPreferences:String	= "";
+		
+		public var reservationNo:int;
+		
+		public var numberOfNights:int 		= 0;
+		public var noOfSglRooms:int 		= 0;
+		public var noOfDblRooms:int 		= 0;
+		public var noOfTplRooms:int 		= 0;
+		public var noOfAdults:int 			= 0;
+		public var noOfChildren:int 		= 0;
+		public var noOfInfants:int 			= 0;
+		public var noOfGuides:int 			= 0;
+		
+		public var desUploadStatus:Boolean		= false;
+		public var applyPromotionCode:Boolean	= false;
+		
+		public var status:String		= JWHConstants.STATUS_LABLE_ACTIVE;
+		
+		public var timeStamp:TimeStamp;
+		public var rateCode:RateCode;
+		public var mealDetails:MealDetails;
+		public var paymentDetails:PaymentDetails;
+		public var guestDetails:Guest;
+		public var agentDetails:AgentDetails;
+		public var arrivalDetails:CheckInDetails;
+		public var departureDetails:CheckOutDetails;
+		public var property:Property;
+		public var discountRequest:DiscountApprovalRequest;
+		
+		public var reservationList:ArrayCollection = new ArrayCollection;
+		public var taxDetailsList:ArrayCollection  = new ArrayCollection;
+		
+		public function Reservation()
+		{
+			timeStamp 		= new TimeStamp;
+			rateCode 		= new RateCode;
+			mealDetails 	= new MealDetails;
+			paymentDetails 	= new PaymentDetails;
+			guestDetails 	= new Guest;
+			agentDetails	= new AgentDetails;
+			arrivalDetails	= new CheckInDetails;
+			departureDetails= new CheckOutDetails;
+			property		= new Property;
+			discountRequest	= null;
+		}
+
+	}
+}

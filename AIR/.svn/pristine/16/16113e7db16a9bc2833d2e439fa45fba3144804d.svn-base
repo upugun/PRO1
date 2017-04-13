@@ -1,0 +1,45 @@
+package net.jwt.control
+{
+	import mx.core.UIComponent;
+	
+	import net.jwt.event.NotificationArguments;
+	import net.jwt.view.helper.tourHelper.TourHelperCurrencySettingMediator;
+	import net.jwt.view.helper.tourHelper.TourHelperCurrencySettingView;
+	import net.jwt.view.helper.tourHelper.TourHelperMiscellaneousMediator;
+	import net.jwt.view.helper.tourHelper.TourHelperMiscellaneousView;
+	import net.jwt.view.popup.JWTPopUp;
+	
+	import org.puremvc.as3.interfaces.INotification;
+	import org.puremvc.as3.patterns.command.SimpleCommand;
+	
+	public class TourHelperCurrencySettingCommand extends SimpleCommand
+	{
+		private var _mediator:TourHelperCurrencySettingMediator;
+		private var _view:TourHelperCurrencySettingView;
+		private var _args:UIComponent;
+		
+		override public function execute(notification:INotification):void
+		{
+			var args:NotificationArguments = notification.getBody() as NotificationArguments;
+			
+			if (null != args){
+				var app:JWTPopUp 			= args.viewComponent as JWTPopUp; // Need for popup
+				var view:TourHelperCurrencySettingView  = new TourHelperCurrencySettingView;
+				
+				//When mediator is assigned, it start setting up the view and mediator in Meditor.as
+				var mediator:TourHelperCurrencySettingMediator	= new TourHelperCurrencySettingMediator(view,args);
+			
+				this._mediator = mediator;
+				this._args     = args as UIComponent;
+				this._view     = view;
+				
+				facade.registerMediator(mediator); // Need for popup
+				app.addChild(view);
+			}
+		}
+		public function TourHelperCurrencySettingCommand():void
+		{
+			//Alert.show("DailyGraphPriceBasedMediator command");
+		}
+	}
+}

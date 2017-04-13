@@ -1,0 +1,18 @@
+package net.jwt.value.objects
+{
+	[RemoteClass(alias="net.jwt.value.objects.EnquiryManagementCategory")]
+	
+	[Bindable]
+	public class EnquiryManagementCategory
+	{
+		public var uuid:String 			= "";
+		public var code:String		= "";
+		public var description:String	= "";
+		public var status:int 			= 1;
+		
+		public function EnquiryManagementCategory()
+		{
+		}
+
+	}
+}

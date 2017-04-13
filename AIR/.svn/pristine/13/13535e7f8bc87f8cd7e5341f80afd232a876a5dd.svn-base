@@ -1,0 +1,176 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Panel xmlns:mx="http://www.adobe.com/2006/mxml" title="Tour Bookings" width="100%" height="100%"
+	paddingBottom="0" paddingLeft="0" paddingRight="0" paddingTop="0">
+<mx:Script>
+	<![CDATA[
+		import net.jwt.value.objects.EnquiryManagement;
+		import net.jwt.value.objects.CommonTreeNode;
+		import mx.events.IndexChangedEvent;
+		import net.jwt.event.NotificationArguments;
+		import org.puremvc.as3.interfaces.IFacade;
+		import mx.managers.DragManager;
+		import mx.events.DragEvent;
+		import net.jwt.ApplicationFacade;
+		import net.jwt.event.INotificationArguments;
+		
+		[Bindable]
+		public var facade:IFacade;
+		private var args:NotificationArguments = new NotificationArguments;
+		public var selectedBooking:EnquiryManagement = new EnquiryManagement;
+		
+		private function tabChanged(evet:IndexChangedEvent):void
+		{
+			/* Alert.show( "clientDetails: client Name = "+clientDetails.agnetName.text + "\n" +
+						"Transport details:date = " + transport.date.text); */
+			
+		}
+		
+	]]>
+</mx:Script>
+	<mx:TabNavigator id="tour_bookings_tab_navigator" x="10" y="10" width="100%" height="100%"   
+					 backgroundColor="#FFFFFF" color="#ADA37B" paddingBottom="0" 
+					 borderThickness="0"
+					 change="tabChanged(event)" creationPolicy="all">
+		<mx:Canvas id="TAB_0_Client" label="Tour Details" width="100%" height="100%"  backgroundDisabledColor="#FFFFFF" barColor="#FFFFFF" backgroundColor="#FFFFFF" color="#3A3A3A">
+			
+			<mx:Script>
+				<![CDATA[
+					import mx.core.UIComponent;
+					[Bindable]
+					public var args0:NotificationArguments = new NotificationArguments;
+					public function showTab_Client():void
+					{
+						args0.viewComponent 	= this.TAB_0_Client;
+						args0.originatorObject 	= selectedBooking;
+						args0.originalViewComponent = this.parentDocument as UIComponent;
+						if(facade != null)
+							facade.sendNotification(ApplicationFacade.TOUR_BOOKINGS_CLIENT_DETAILS_VIEW, args0);
+					}
+			]]>
+			</mx:Script>
+			
+		</mx:Canvas>
+		<mx:Canvas id="TAB_1_accommodation" label="Accommodation" width="100%" height="100%"  barColor="#158A39"  color="#3a3a3a">
+			<mx:Script>
+				<![CDATA[
+					public var args1:NotificationArguments = new NotificationArguments;
+					public function showTab_Accommodation():void
+					{
+						args1.viewComponent = this.TAB_1_accommodation;
+						//args1.originatorObject = args0.originatorObject;
+						args1.originatorObject 	= selectedBooking;
+						if(facade != null)
+							facade.sendNotification(ApplicationFacade.HOTEL_RESERVATION, args1);
+					}
+			]]>
+			</mx:Script>
+		</mx:Canvas>
+		<mx:Canvas id="TAB_7_meal" label="Meals" width="100%" height="100%"  barColor="#158A39"  color="#3a3a3a">
+			<mx:Script>
+				<![CDATA[
+					public var args7:NotificationArguments = new NotificationArguments;
+					public function showTab_Meals():void
+					{
+						args7.viewComponent = this.TAB_7_meal;
+						//args1.originatorObject = args0.originatorObject;
+						args7.originatorObject 	= selectedBooking;
+						if(facade != null)
+							facade.sendNotification(ApplicationFacade.TOUR_BOOKINGS_MEAL_RESERVATION_VIEW, args7);
+					}
+			]]>
+			</mx:Script>
+		</mx:Canvas>
+		<mx:Canvas id="TAB_2_transport" label="Transport" width="100%" height="100%"  backgroundColor="#FFFFFF" color="#3a3a3a">
+			<mx:Script>
+				<![CDATA[
+					public var args2:NotificationArguments = new NotificationArguments;
+					public function showTab_Transport():void
+					{
+						args2.viewComponent = this.TAB_2_transport;
+						//args2.originatorObject = args0.originatorObject;
+						args2.originatorObject 	= selectedBooking;
+						if(facade != null)
+							facade.sendNotification(ApplicationFacade.TOUR_BOOKINGS_TRANSPORT_VIEW, args2);
+					}
+			]]>
+			</mx:Script>
+		</mx:Canvas>
+		<!--mx:Canvas id="TAB_3_entrance" label="Entrance" width="100%" height="100%"  backgroundColor="#FFFFFF" color="#3a3a3a">
+			<mx:Script>
+				<![CDATA[
+					public var args3:NotificationArguments = new NotificationArguments;
+					public function showTab_Entrance():void
+					{
+						args3.viewComponent = this.TAB_3_entrance;
+						//args2.originatorObject = args0.originatorObject;
+						args3.originatorObject 	= selectedVersionNode;
+						if(facade != null)
+							facade.sendNotification(ApplicationFacade.TOUR_DESIGNER_CLASSIC_RIDES, args3);
+					}
+			]]>
+			</mx:Script>
+		</mx:Canvas-->
+		<mx:Canvas id="TAB_4_costing" label="Costing" width="100%" height="100%" backgroundColor="#FFFFFF" color="#3a3a3a" borderThickness="0">
+			<mx:Script>
+				<![CDATA[
+					public var args4:NotificationArguments = new NotificationArguments;
+					public function showTab_Costing():void
+					{
+						args4.viewComponent = this.TAB_4_costing;
+						//args3.originatorObject = args0.originatorObject;
+						args4.originatorObject 	= selectedBooking.costing;
+						if(facade != null)
+							facade.sendNotification(ApplicationFacade.TOUR_BOOKINGS_COSTING_VIEW, args4);
+					}
+			]]>
+			</mx:Script>
+		</mx:Canvas>
+		<mx:Canvas id="TAB_5_booking" label="Invoice" width="100%" height="100%" backgroundColor="#FFFFFF" color="#3a3a3a" borderThickness="0">
+			<mx:Script>
+				<![CDATA[
+					public var args5:NotificationArguments = new NotificationArguments;
+					public function showTab_Booking():void
+					{
+						args5.viewComponent = this.TAB_5_booking;
+						//args3.originatorObject = args0.originatorObject;
+						args5.originatorObject 	= selectedBooking;
+						if(facade != null)
+							facade.sendNotification(ApplicationFacade.TOUR_BOOKINGS_DETAILS_VIEW, args5);
+					}
+			]]>
+			</mx:Script>
+		</mx:Canvas>
+		<mx:Canvas id="TAB_6_booking" label="Activity" width="100%" height="100%" backgroundColor="#FFFFFF" color="#3a3a3a" borderThickness="0">
+			<mx:Script>
+				<![CDATA[
+					public var args6:NotificationArguments = new NotificationArguments;
+					public function showTab_CreditNote():void
+					{
+						args6.viewComponent = this.TAB_6_booking;
+						//args3.originatorObject = args0.originatorObject;
+						args6.originatorObject 	= selectedBooking;
+						if(facade != null)
+							facade.sendNotification(ApplicationFacade.TOUR_BOOKINGS_ACTIVITY_REQ_VIEW, args6);
+					}
+			]]>
+			</mx:Script>
+		</mx:Canvas>
+		<mx:Canvas id="TAB_7_booking" label="Tour Advance" width="100%" height="100%" backgroundColor="#FFFFFF" color="#3a3a3a" borderThickness="0">
+			<mx:Script>
+				<![CDATA[
+					public var args8:NotificationArguments = new NotificationArguments;
+					public function showTab_TourAdvance():void
+					{
+						args8.viewComponent = this.TAB_7_booking;
+						//args3.originatorObject = args0.originatorObject;
+						args8.originatorObject 	= selectedBooking;
+						if(facade != null)
+							facade.sendNotification(ApplicationFacade.TOUR_ADVANCE_VIEW, args8);
+					}
+			]]>
+			</mx:Script>
+		</mx:Canvas>
+	</mx:TabNavigator>
+	
+	
+</mx:Panel>

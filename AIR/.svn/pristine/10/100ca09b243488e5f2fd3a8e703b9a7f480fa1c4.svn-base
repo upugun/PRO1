@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Panel xmlns:mx="http://www.adobe.com/2006/mxml" title="Invoice Report View" width="100%" height="100%" fontSize="11">
+	
+	<mx:Script>
+	<![CDATA[
+		import mx.collections.ArrayCollection;
+		import net.jwt.Constants;
+		import net.jwt.value.objects.TransportVehicleOwner;
+		import net.jwt.value.objects.Location;
+		import mx.controls.Alert;
+		import mx.binding.utils.BindingUtils;
+		[Bindable] public var supplier:TransportVehicleOwner = new TransportVehicleOwner();
+		
+        [Bindable]
+        public var invoiceStatusList:ArrayCollection = new ArrayCollection([
+        { label:"ALL", id:"" },
+		{ label:Constants.ITEMM_STATUS_Approved, id:Constants.ITEMM_STATUS_Approved },
+		{ label:Constants.ITEMM_STATUS_Pending, id:Constants.ITEMM_STATUS_Pending },
+		{ label:Constants.ITEMM_STATUS_Rejected, id:Constants.ITEMM_STATUS_Rejected },
+		{ label:Constants.ITEMM_STATUS_Forward, id:Constants.ITEMM_STATUS_Forward } ]);
+		
+		 [Bindable]
+        public var bookingTypeList:ArrayCollection = new ArrayCollection([
+		{ label:Constants.BOOKING_TYPE_LABEL_BookingOpen, id:Constants.BOOKING_TYPE_LABEL_BookingOpen },
+		{ label:Constants.BOOKING_TYPE_LABEL_BookingBilled, id:Constants.BOOKING_TYPE_LABEL_BookingBilled },
+		{ label:Constants.BOOKING_TYPE_LABEL_Enquiry, id:Constants.BOOKING_TYPE_LABEL_Enquiry },
+		{ label:Constants.BOOKING_TYPE_LABEL_BookingLost, id:Constants.BOOKING_TYPE_LABEL_BookingLost } ]);
+	]]>
+</mx:Script>
+	<mx:VBox width="100%" height="100%">
+		<mx:HBox width="100%" height="45">
+			<mx:Label text="Travel Date From"/>
+			<mx:DateField id="D_from" formatString="YYYY/MM/DD"/>
+			<mx:Label text="to"/>
+			<mx:DateField id="D_to" formatString="YYYY/MM/DD"/>
+			<mx:Label text="Invoice Status"/>
+			<mx:ComboBox dataProvider="{invoiceStatusList}" labelField="label" id="CMB_invoiceStatus"></mx:ComboBox>
+			<mx:Label text="Market"/>
+			<mx:ComboBox labelField="description" id="CMB_marketList"></mx:ComboBox>
+			<mx:Button label="Search" id="B_search"/>
+			<mx:Button label="Export" id="B_export"/>
+			
+		</mx:HBox>
+		<mx:HBox width="100%" height="33" horizontalGap="5">
+			<mx:Label text="Invoice Year"/>
+			<mx:TextInput width="65" id="T_year"/>
+			<mx:Label text="Invoice Number"/>
+			<mx:TextInput width="65" id="T_sequence"/>
+		</mx:HBox>
+		<mx:HBox width="100%" height="100%">
+			<mx:DataGrid width="100%" height="100%" id="DG_list" doubleClickEnabled="true">
+				<mx:columns>
+				<mx:DataGridColumn headerText="Invoice No" dataField="invoiceNo"/>
+					<mx:DataGridColumn headerText="Tour No" dataField="tourNo"/>
+					<mx:DataGridColumn headerText="Invoiced Date" dataField="invoiceDate"/>
+					<mx:DataGridColumn headerText="Country" dataField="country"/>
+					<mx:DataGridColumn headerText="Agent" dataField="agent"/>
+					<mx:DataGridColumn headerText="User" dataField="userName"/>
+					<mx:DataGridColumn headerText="Currency" dataField="currency"/>
+					<mx:DataGridColumn headerText="Total" dataField="total"/>
+					<mx:DataGridColumn headerText="Status" dataField="status"/>
+				</mx:columns>
+			</mx:DataGrid>
+			
+		</mx:HBox>
+		
+	</mx:VBox>
+</mx:Panel>

@@ -1,0 +1,530 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<service id="remoting-service"
+    class="flex.messaging.services.RemotingService">
+
+    <adapters>
+        <adapter-definition id="java-object" class="flex.messaging.services.remoting.adapters.JavaAdapter" default="true"/>
+    </adapters>
+
+    <default-channels>
+        <channel ref="my-amf"/>
+    </default-channels>
+
+    <destination id="product">
+        <properties>
+            <source>flex.samples.product.ProductService</source>
+        </properties>
+    </destination>
+    
+    <destination id="productService">
+        <properties>
+            <source>flex.samples.dcd.product.ProductService</source>
+        </properties>
+    </destination>
+	<!-- 
+    <destination id="chat-room-service">
+        <properties>
+            <source>flex.samples.runtimeconfig.ChatRoomService</source>
+            <scope>application</scope>
+        </properties>
+    </destination>
+	 -->
+<!-- 
+    <destination id="flex-client-qos-config" channels="per-client-qos-polling-amf">
+        <properties>
+            <source>flex.samples.qos.FlexClientConfigService</source>
+        </properties>
+    </destination>
+    -->
+    
+    <destination id="UserRS">
+            	<properties>
+            		<source>net.jwt.dao.UserDAO</source>
+            		<scope>session</scope>
+            	</properties>
+    </destination>
+    
+      
+    <destination id="CountryRS">
+                    	<properties>
+                    		<source>net.jwt.dao.CountryDAO</source>
+                    		<scope>session</scope>
+                    	</properties>
+    </destination>
+	
+	<destination id="MarketRS">
+                    	<properties>
+                    		<source>net.jwt.dao.MarketDAO</source>
+                    		<scope>session</scope>
+                    	</properties>
+    </destination>
+    
+    <destination id="DepartmentRS">
+                        	<properties>
+                        		<source>net.jwt.dao.DepartmentDAO</source>
+                        		<scope>session</scope>
+                        	</properties>
+    </destination>
+    
+    <destination id="ManagerRS">
+                            	<properties>
+                            		<source>net.jwt.dao.ManagerDAO</source>
+                            		<scope>session</scope>
+                            	</properties>
+    </destination>
+	 <destination id="HotelMasterRS">
+                            	<properties>
+                            		<source>net.jwt.dao.HotelDAO</source>
+                            		<scope>session</scope>
+                            	</properties>
+    </destination>
+	 <destination id="HotelRatesRS">
+                            	<properties>
+                            		<source>net.jwt.dao.HotelRatesDAO</source>
+                            		<scope>session</scope>
+                            	</properties>
+    </destination>
+	 <destination id="LocationRS">
+                            	<properties>
+                            		<source>net.jwt.dao.LocationDAO</source>
+                            		<scope>session</scope>
+                            	</properties>
+    </destination>
+	 <destination id="HotelCancellationPolicyRS">
+                            	<properties>
+                            		<source>net.jwt.dao.HotelCancellationDAO</source>
+                            		<scope>session</scope>
+                            	</properties>
+    </destination>
+	<destination id="HotelPaymentPolicyRS">
+                            	<properties>
+                            		<source>net.jwt.dao.HotelPaymentDAO</source>
+                            		<scope>session</scope>
+                            	</properties>
+    </destination>
+	<destination id="RoomCategoriesOfHotelRS">
+                            	<properties>
+                            		<source>net.jwt.dao.RoomCategoriesOfHotelDAO</source>
+                            		<scope>session</scope>
+                            	</properties>
+    </destination>
+	<destination id="RoomCategoriesRS">
+                            	<properties>
+                            		<source>net.jwt.dao.RoomCategoryDAO</source>
+                            		<scope>session</scope>
+                            	</properties>
+    </destination>
+	<destination id="RoomOccupationRS">
+                            	<properties>
+                            		<source>net.jwt.dao.RoomOccupationDAO</source>
+                            		<scope>session</scope>
+                            	</properties>
+    </destination>
+	<destination id="BasisRS">
+                            	<properties>
+                            		<source>net.jwt.dao.BasisDAO</source>
+                            		<scope>session</scope>
+                            	</properties>
+    </destination>
+		
+    <destination id="RoleMasterRS">
+                            	<properties>
+                            		<source>net.jwt.dao.RoleMasterDAO</source>
+                            		<scope>session</scope>
+                            	</properties>
+    </destination>
+	<destination id="AccessDetailsRS">
+                            	<properties>
+                            		<source>net.jwt.dao.AccessDetailsDAO</source>
+                            		<scope>session</scope>
+                            	</properties>
+    </destination>
+	<destination id="CurrencyRS">
+                            	<properties>
+                            		<source>net.jwt.dao.CurrencyDAO</source>
+                            		<scope>session</scope>
+                            	</properties>
+    </destination>
+	<destination id="CurrencyRateRS">
+                            	<properties>
+                            		<source>net.jwt.dao.CurrencyRateDAO</source>
+                            		<scope>session</scope>
+                            	</properties>
+    </destination>
+	<destination id="CurrencyMasterRS">
+                            	<properties>
+                            		<source>net.jwt.dao.CurrencyMasterDAO</source>
+                            		<scope>session</scope>
+                            	</properties>
+    </destination>
+	
+	<destination id="LoginRS">
+                            	<properties>
+                            		<source>net.jwt.dao.LoginDAO</source>
+                            		<scope>session</scope>
+                            	</properties>
+    </destination>
+		
+	<destination id="FileUtilsRS">
+                            	<properties>
+                            		<source>net.jwt.helper.FileUtils</source>
+                            		<scope>session</scope>
+                            	</properties>
+    </destination>
+	
+	<destination id="AccessGroupMasterRS">
+                            	<properties>
+                            		<source>net.jwt.dao.AccessGroupMasterDAO</source>
+                            		<scope>session</scope>
+                            	</properties>
+    </destination>
+	<destination id="AccessDetailsOfGroupsRS">
+                            	<properties>
+                            		<source>net.jwt.dao.AccessDetailsOfGroupsDAO</source>
+                            		<scope>session</scope>
+                            	</properties>
+    </destination>
+	
+	<destination id="NotificationRS">
+                            	<properties>
+                            		<source>net.jwt.dao.NotificationDAO</source>
+                            		<scope>session</scope>
+                            	</properties>
+    </destination>
+	<destination id="NotificationTemplateRS">
+                            	<properties>
+                            		<source>net.jwt.dao.NotificationTemplateDAO</source>
+                            		<scope>session</scope>
+                            	</properties>
+    </destination>
+	
+	<destination id="LanguagesRS">
+                            	<properties>
+                            		<source>net.jwt.dao.LanguagesDAO</source>
+                            		<scope>session</scope>
+                            	</properties>
+    </destination>
+	<destination id="LanguageSkillsRS">
+                            	<properties>
+                            		<source>net.jwt.dao.LanguageSkillsDAO</source>
+                            		<scope>session</scope>
+                            	</properties>
+    </destination>
+	
+	<destination id="ImageUploadRS">
+                            	<properties>
+                            		<source>net.jwt.dao.ImageUploadDAO</source>
+                            		<scope>session</scope>
+                            	</properties>
+    </destination>
+	
+	<destination id="LocationMatrixRS">
+                            	<properties>
+                            		<source>net.jwt.dao.LocationMatrixDAO</source>
+                            		<scope>session</scope>
+                            	</properties>
+    </destination>
+	
+	<destination id="NotesRS">
+                            	<properties>
+                            		<source>net.jwt.dao.NotesDAO</source>
+                            		<scope>session</scope>
+                            	</properties>
+    </destination>
+	
+	<destination id="BuggReportRS">
+                            	<properties>
+                            		<source>net.jwt.dao.BuggReportDAO</source>
+                            		<scope>session</scope>
+                            	</properties>
+    </destination>
+	
+	<destination id="JWSUtilsRS">
+                                <properties>
+                                                <source>net.jwt.helper.JWSUtils</source>
+                                                <scope>session</scope>
+                                </properties>
+    </destination>
+	<destination id="EmailPoolRS">
+                                <properties>
+                                                <source>net.jwt.dao.EmailPoolDAO</source>
+                                                <scope>session</scope>
+                                </properties>
+    </destination>
+	<destination id="EmailAttachmentRS">
+                                <properties>
+                                                <source>net.jwt.dao.EmailAttachmentDAO</source>
+                                                <scope>session</scope>
+                                </properties>
+    </destination>
+	<destination id="FilesRS">
+                                <properties>
+                                                <source>net.jwt.dao.FilesDAO</source>
+                                                <scope>session</scope>
+                                </properties>
+    </destination>
+	
+	<destination id="PDFGeneratorHelperRS">
+                                <properties>
+                                                <source>net.jwt.helper.PDFGeneratorHelper</source>
+                                                <scope>session</scope>
+                                </properties>
+    </destination>
+	
+	<destination id="LocationDetailsRS">
+                                <properties>
+                                                <source>net.jwt.dao.LocationDetailsDAO</source>
+                                                <scope>session</scope>
+                                </properties>
+    </destination>
+	<destination id="ImageGalleryRS">
+                                <properties>
+                                                <source>net.jwt.dao.ImageGalleryDAO</source>
+                                                <scope>session</scope>
+                                </properties>
+    </destination>
+	
+	<destination id="MISReportingHelperRS">
+                                <properties>
+                                                <source>net.jwt.helper.MISReportingHelper</source>
+                                                <scope>session</scope>
+                                </properties>
+    </destination>
+	<destination id="ApprovalWorkFlowRS">
+                                <properties>
+                                                <source>net.jwt.dao.ApprovalWorkFlowDAO</source>
+                                                <scope>session</scope>
+                                </properties>
+    </destination>
+	
+	<destination id="UserLocalDataRS">
+                                <properties>
+                                                <source>net.jwt.dao.UserLocalDataDAO</source>
+                                                <scope>session</scope>
+                                </properties>
+    </destination>
+	<destination id="TransportVehicleFuelChartRS">
+                                <properties>
+                                                <source>net.jwt.dao.TransportVehicleFuelChartDAO</source>
+                                                <scope>session</scope>
+                                </properties>
+    </destination>
+	<destination id="SystemRS">
+                                <properties>
+                                                <source>net.jwt.dao.SystemDAO</source>
+                                                <scope>session</scope>
+                                </properties>
+    </destination>
+	<destination id="GuestQuestionsRS">
+                                <properties>
+                                                <source>net.jwt.dao.GuestQuestionsDAO</source>
+                                                <scope>session</scope>
+                                </properties>
+    </destination>
+	
+	<destination id="MarketingCostCategoryRS">
+                                <properties>
+                                                <source>net.jwt.dao.MarketingCostCategoryDAO</source>
+                                                <scope>session</scope>
+                                </properties>
+    </destination>
+	<destination id="MarketingCostAccountRS">
+                                <properties>
+                                                <source>net.jwt.dao.MarketingCostAccountDAO</source>
+                                                <scope>session</scope>
+                                </properties>
+    </destination>
+	<destination id="MarketingAllocateBudgetForPropertiesRS">
+                                <properties>
+                                                <source>net.jwt.dao.MarketingAllocateBudgetForPropertiesDAO</source>
+                                                <scope>session</scope>
+                                </properties>
+    </destination>
+	<destination id="MarketingAllocateBudgetForCostCategoryRS">
+                                <properties>
+                                                <source>net.jwt.dao.MarketingAllocateBudgetForCostCategoryDAO</source>
+                                                <scope>session</scope>
+                                </properties>
+    </destination>
+	<destination id="MarketingAllocateBudgetForCostAccountRS">
+                                <properties>
+                                                <source>net.jwt.dao.MarketingAllocateBudgetForCostAccountDAO</source>
+                                                <scope>session</scope>
+                                </properties>
+    </destination>
+	<destination id="MarketingSeasonRS">
+                                <properties>
+                                                <source>net.jwt.dao.MarketingSeasonDAO</source>
+                                                <scope>session</scope>
+                                </properties>
+    </destination>
+	<destination id="PropertyRS">
+                                <properties>
+                                                <source>net.jhl.dao.PropertyDAO</source>
+                                                <scope>session</scope>
+                                </properties>
+    </destination>
+	<destination id="MarketingAllocatePercentageForPropertiesRS">
+                                <properties>
+                                                <source>net.jwt.dao.MarketingAllocatePercentageForPropertiesDAO</source>
+                                                <scope>session</scope>
+                                </properties>
+    </destination>
+	<destination id="MarketingPaymentRS">
+                                <properties>
+                                                <source>net.jwt.dao.MarketingPaymentDAO</source>
+                                                <scope>session</scope>
+                                </properties>
+    </destination>
+	<destination id="RateCodeBaseRateRS">
+                                <properties>
+                                                <source>net.jhl.dao.ratecode.BaseRateDAO</source>
+                                                <scope>session</scope>
+                                </properties>
+    </destination>
+	<destination id="RateCodeRS">
+                                <properties>
+                                                <source>net.jhl.dao.ratecode.RateCodeDAO</source>
+                                                <scope>session</scope>
+                                </properties>
+    </destination>
+	<destination id="RateCodeSeasonalBaseRateRS">
+                                <properties>
+                                                <source>net.jhl.dao.ratecode.SeasonalRateDAO</source>
+                                                <scope>session</scope>
+                                </properties>
+    </destination>
+	<destination id="RoomCategoryRS">
+                                <properties>
+                                                <source>net.jhl.dao.RoomCategoryDAO</source>
+                                                <scope>session</scope>
+                                </properties>
+    </destination>
+	<destination id="GuestRS">
+                                <properties>
+                                                <source>net.jhl.dao.GuestDAO</source>
+                                                <scope>session</scope>
+                                </properties>
+    </destination>
+	<destination id="GuestPreferenceRS">
+                                <properties>
+                                                <source>net.jhl.dao.GuestPreferenceDAO</source>
+                                                <scope>session</scope>
+                                </properties>
+    </destination>
+	<destination id="SeasonsRS">
+                                <properties>
+                                                <source>net.jhl.dao.ratecode.SeasonsDAO</source>
+                                                <scope>session</scope>
+                                </properties>
+    </destination>
+	<destination id="DiscountRS">
+                                <properties>
+                                                <source>net.jhl.dao.ratecode.DiscountsDAO</source>
+                                                <scope>session</scope>
+                                </properties>
+    </destination>
+	<destination id="SpecialOffersRS">
+                                <properties>
+                                                <source>net.jhl.dao.ratecode.SpecialOffersDAO</source>
+                                                <scope>session</scope>
+                                </properties>
+    </destination>
+	<destination id="OtherCostsMasterRS">
+                                <properties>
+                                                <source>net.jhl.dao.ratecode.OtherCostsMasterDAO</source>
+                                                <scope>session</scope>
+                                </properties>
+    </destination>
+	<destination id="AgentDetailsRS">
+                                <properties>
+                                                <source>net.jhl.dao.AgentDetailsDAO</source>
+                                                <scope>session</scope>
+                                </properties>
+    </destination>
+	<destination id="AgentMarketsRS">
+                                <properties>
+                                                <source>net.jhl.dao.AgentMarketsDAO</source>
+                                                <scope>session</scope>
+                                </properties>
+    </destination>
+	<destination id="AppliedAgentMarketsRS">
+                                <properties>
+                                                <source>net.jhl.dao.ratecode.AppliedAgentMarketsDAO</source>
+                                                <scope>session</scope>
+                                </properties>
+    </destination>
+	<destination id="AgentTypeRS">
+                                <properties>
+                                                <source>net.jhl.dao.AgentTypeDAO</source>
+                                                <scope>session</scope>
+                                </properties>
+    </destination>
+	<destination id="RoomCategoryByHotelRS">
+                                <properties>
+                                                <source>net.jhl.dao.RoomCategoryByHotelDAO</source>
+                                                <scope>session</scope>
+                                </properties>
+    </destination>
+	<destination id="ModeOfPaymentRS">
+                                <properties>
+                                                <source>net.jhl.dao.ModeOfPaymentDAO</source>
+                                                <scope>session</scope>
+                                </properties>
+    </destination>
+	<destination id="ApplicationSettingsHelperRS">
+                                <properties>
+                                                <source>net.jhl.helper.ApplicationSettingsHelper</source>
+                                                <scope>session</scope>
+                                </properties>
+    </destination>
+	<destination id="ReservationRS">
+                                <properties>
+                                                <source>net.jhl.dao.ReservationDAO</source>
+                                                <scope>session</scope>
+                                </properties>
+    </destination>
+	<destination id="EnquiryRS">
+                                <properties>
+                                                <source>net.jhl.dao.EnquiryDAO</source>
+                                                <scope>session</scope>
+                                </properties>
+    </destination>
+	<destination id="RoomRateExportHelperRS">
+                                <properties>
+                                                <source>net.jhl.helper.RoomRateExportHelper</source>
+                                                <scope>session</scope>
+                                </properties>
+    </destination>
+	<destination id="RateCalculationRS">
+                                <properties>
+                                                <source>net.jhl.business.RateCalculation</source>
+                                                <scope>session</scope>
+                                </properties>
+    </destination>
+	<destination id="TaxRS">
+                                <properties>
+                                                <source>net.jhl.dao.TaxDAO</source>
+                                                <scope>session</scope>
+                                </properties>
+    </destination>
+	<destination id="RoomFacilitiesMasterRS">
+                                <properties>
+                                                <source>net.jhl.dao.RoomFacilitiesMasterDAO</source>
+                                                <scope>session</scope>
+                                </properties>
+    </destination>
+	<destination id="RoomFacilitiesByPropertyRS">
+                                <properties>
+                                                <source>net.jhl.dao.RoomFacilitiesByPropertyDAO</source>
+                                                <scope>session</scope>
+                                </properties>
+    </destination>
+	<destination id="DmcMarketRS">
+                                <properties>
+                                                <source>net.jhl.dao.DmcMarketDAO</source>
+                                                <scope>session</scope>
+                                </properties>
+    </destination>
+  </service>
+

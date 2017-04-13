@@ -1,0 +1,552 @@
+/****************************************************************
+ * Change log													*
+ * Created by Nisal Fernando									*	
+ * Date: 2012/02/01												*
+ *--------------------------------------------------------------*  
+ * By	Date		Change										*	
+ *--------------------------------------------------------------*  
+ * NF	2012/02/01	Created the page							*			
+ * UG	2012/02/15	Code review started							*
+ ****************************************************************/
+package net.jwt.view
+{
+	import flash.events.Event;
+	import flash.events.KeyboardEvent;
+	import flash.events.MouseEvent;
+	
+	import mx.collections.ArrayCollection;
+	import mx.controls.Alert;
+	import mx.core.UIComponent;
+	import mx.events.ListEvent;
+	import mx.formatters.DateFormatter;
+	import mx.messaging.messages.ErrorMessage;
+	import mx.rpc.events.FaultEvent;
+	import mx.rpc.events.ResultEvent;
+	
+	import net.jwt.Constants;
+	import net.jwt.event.INotificationArguments;
+	import net.jwt.event.NotificationArguments;
+	import net.jwt.value.objects.CurrencyMaster;
+	import net.jwt.value.objects.CurrencyRate;
+	public class CurrencyRateMediator extends Mediator
+	{
+		private var _view:CurrencyRateView;
+		private var _args:INotificationArguments;
+		//private var _loggedInUser:User;
+		
+		[Bindable] private var _selectedIndex:int = -1;
+		[Bindable] private var _selectedCurrencyIndex:int = -1;
+		[Bindable] public var _currencyRateObj:CurrencyRate = new CurrencyRate();
+		[Bindable] public var _currencyObj:CurrencyMaster = new CurrencyMaster();
+		[Bindable] public var _currencyRateList:ArrayCollection;
+		[Bindable] public var _currencyList:ArrayCollection;
+		
+		[Bindable] public var args:NotificationArguments = new NotificationArguments();
+		
+		private const ENQUIRYONUSER:String 				= "ENQUIRY_BASED_ON_USER";
+		private const ENQUIRYMETIRIALISED:String 		= "ENQUIRY_BASED_ON_MATERIALISED";
+		private const ENQUIRYOPEN:String 				= "ENQUIRY_BASED_ON_OPEN";
+		private const ENQUIRYLOST:String 				= "ENQUIRY_BASED_ON_LOST";
+		
+		public var _user:ArrayCollection;
+		//public var _objLoc:Location 	= new Location();
+		
+		public function CurrencyRateMediator(view:UIComponent, args:INotificationArguments)
+		{
+			super(view);
+			if(view != null)
+			{
+				_view  = view as CurrencyRateView ;
+				_currencyRateList = new ArrayCollection();
+				
+			}
+			
+			if(args != null)
+				_args = args;
+				_loggedInUser = (_args.viewComponent as MainView).user;
+		}
+		
+		protected override function viewComponentInitialize():void{
+			
+			_view.addEventListener(KeyboardEvent.KEY_UP, saveDocument);
+//			_view.DG_CurrencyRatesList.addEventListener(ListEvent.ITEM_CLICK, showSelectedItem);
+//			_view.DG_CurrencyRatesList.addEventListener(ListEvent.CHANGE, showSelectedItem);
+			_view.DG_CurrencyList.addEventListener(ListEvent.ITEM_CLICK, showSelectedCurrencyItem);
+			_view.DG_CurrencyList.addEventListener(ListEvent.CHANGE, showSelectedCurrencyItem);
+			_view.T_search.addEventListener(KeyboardEvent.KEY_UP, dynamicSearch);
+			_view.T_searchCurrency.addEventListener(KeyboardEvent.KEY_UP, dynamicSearchForCurrency);
+			_view.RD_Code.addEventListener(MouseEvent.CLICK, resetDynamicSearch);
+			_view.T_searchCurrency.addEventListener(MouseEvent.CLICK, resetDynamicSearch);
+			_view.B_new.addEventListener(MouseEvent.CLICK, createNewHandler);
+			_view.B_save.addEventListener(MouseEvent.CLICK, saveByButton);
+//			_view.RD_Type.addEventListener(MouseEvent.CLICK, resetDynamicSearch);
+//			_view.RD_S_Open.addEventListener(MouseEvent.CLICK, sortOpentickets);
+//			_view.RD_S_Lost.addEventListener(MouseEvent.CLICK, sortLosttickets);
+//			_view.RD_S_Materialisrd.addEventListener(MouseEvent.CLICK, sortMetirialisedtickets);
+//			_view.RD_Lost.addEventListener(MouseEvent.CLICK, commentsBoxVisibility);
+			_view.addEventListener(MouseEvent.CLICK, resetStatus);
+////			
+			initializeCurrencyRateRemortingObject();
+			initializeCurrencyMasterRemortingObject();
+			setLoggedInUser();
+			CurrentDateTimeString();
+			reloadCurrencyList();
+		}
+		
+		private function saveByButton(e:Event):void
+		{
+			saveCurrencyRate();
+		}
+		
+		private function createNewHandler(e:Event):void
+		{
+			createNew();
+		}
+		private function createNew():void
+		{
+			_view.currencRate	=	new CurrencyRate;
+			
+			_view.currencRate	=	new CurrencyRate;
+			_view.currencRate	=	new CurrencyRate;
+			_view.currencRate	=	new CurrencyRate;
+			_view.currencRate	=	new CurrencyRate;
+			
+			_view.usdToLkrObj = new CurrencyRate();
+			_view.eurToLkrObj = new CurrencyRate();
+			_view.gbpToLkrObj = new CurrencyRate();
+			_view.jpyToLkrObj = new CurrencyRate();
+								  
+			_view.lkrToUsd = new CurrencyRate();
+			_view.eurToUsd = new CurrencyRate();
+			_view.gbpToUsd = new CurrencyRate();
+			_view.jpyToUsd = new CurrencyRate();
+								  
+			_view.lkrToEur = new CurrencyRate();
+			_view.usdToEur = new CurrencyRate();
+			_view.gbpToEur = new CurrencyRate();
+			_view.jpyToEur = new CurrencyRate();
+			
+			_view.lkrToGbp = new CurrencyRate();
+			_view.usdToGbp = new CurrencyRate();
+			_view.eurToGbp = new CurrencyRate();
+			_view.jpyToGbp = new CurrencyRate();
+			
+			_view.lkrToJpy = new CurrencyRate();
+			_view.usdToJpy = new CurrencyRate();
+			_view.eurToJpy = new CurrencyRate();
+			_view.gbpToJpy = new CurrencyRate();
+		}
+		
+		private function setLoggedInUser():void
+		{
+			currencyRateRO.setLogedInUser(_loggedInUser);
+			currencyMasterRO.setLogedInUser(_loggedInUser);
+		}
+		
+		private function resetStatus(event:Event):void
+		{
+			_view.statusLabel.text = "";
+		}
+		
+		public function showRoomsCategory() :void
+		{
+			initializeRoomCategoriesRemortingObject();
+			RoomCategoriesRO.dynamicSearch("","");
+			
+		}	
+		
+		
+		private function reloadCurrencyRateList():void
+		{
+			
+			currencyRateRO.dynamicSearch("","");
+		}
+		private function reloadCurrencyList():void
+		{
+			
+			currencyMasterRO.dynamicSearch("","");
+		}
+		//Currency Rate
+		
+		private function setSelectedIndex(event:ListEvent):void
+		{
+			Alert.show();
+			//_selectedIndex 	  	  = event.rowIndex;
+			//_currencyRateObj	  = _currencyRateList.getItemAt(_selectedIndex) as CurrencyRate;
+			//_view.CB_currencyFrom.se;
+			//_view.CB_currencyTo.setFocus();
+				
+			_view.currencRate	  = _currencyRateObj;	
+		}
+		private function showSelectedItem(event:ListEvent):void
+		{
+			if(event.rowIndex > -1){
+				_selectedIndex 	  	  = event.rowIndex;
+				_currencyRateObj	  = _currencyRateList.getItemAt(_selectedIndex) as CurrencyRate;
+				//_view.CB_currencyFrom.selectedIndex
+				//_view.CB_currencyTo.setFocus();
+					
+				_view.currencRate	  = _currencyRateObj;
+			
+				
+				setConversionType(_view.currencRate.conversionType);	
+			}
+		}
+		
+		private function setConversionType(condition:String):void
+		{
+			for(var i:int=0; i<Constants.currencyConversionTypeList.length; i++){
+					if(Constants.currencyConversionTypeList.getItemAt(i).label == condition){
+						_view.CB_conversionType.selectedIndex = i;
+						break;
+					}
+				}
+		}
+		
+		private function showSelectedCurrencyItem(event:ListEvent):void
+		{
+			if(event.rowIndex > -1){
+			_selectedCurrencyIndex 	 = event.rowIndex;
+			_currencyObj	 		 = _currencyList.getItemAt(_selectedCurrencyIndex) as CurrencyMaster;
+			_view.currency  		 = _currencyObj;
+			}
+				
+		}
+		
+	
+		
+		public function saveDocument(event:KeyboardEvent):void
+		{
+			if(event.keyCode == 119){
+				saveCurrencyRate();
+				//saveCurrency();
+			}
+			else if(event.keyCode == 120)
+				Alert.show("TODO:Delete this record");
+			else if(event.keyCode == 112)
+				Alert.show("TODO:Show HELP page");
+				
+		}
+		
+		private function dynamicSearch(event:Event):void
+		{
+			reloadListforDynamic();
+		}
+		private function dynamicSearchForCurrency(event:Event):void
+		{
+			reloadListforDynamicCurrency();
+		}
+	
+		private function reloadListforDynamic():void
+		{
+			
+			if(_view.RD_description.selected == true)
+				currencyRateRO.dynamicSearch("dynamicCurrency",_view.T_search.text.toString());
+		}
+		private function reloadListforDynamicCurrency():void
+		{
+			
+			if(_view.RD_CurrencyDescription.selected == true)
+				currencyMasterRO.dynamicSearch("dynamicName",_view.T_searchCurrency.text.toString());
+		    else if(_view.RD_Code.selected == true)
+				currencyMasterRO.dynamicSearch("dynamicCode",_view.T_searchCurrency.text.toString());		
+		}
+		
+		private function resetDynamicSearch(event:Event):void
+		{
+			// Let it search by what in already
+			//_view.TextAagentSearch.text = "";
+			reloadListforDynamicCurrency();
+		}
+		private function commentsBoxVisibility(event:Event):void
+		{
+//			if(_view.RD_Lost.selected == true)
+//				_view.dynamicLostComments.visible = true;
+//			else
+//			_view.dynamicLostComments.visible = false;	
+		}
+		public function saveCurrencyRate():void
+		{
+			_currencyRateObj 					= _view.currencRate;
+			_currencyRateObj.createdBy			= _loggedInUser.uuid;
+			_currencyRateObj.effectiveDate		= _view.L_effectiveFrom.text;
+			
+			
+			if(_view.CB_conversionType.selectedItem!=null)
+				_currencyRateObj.conversionType = _view.CB_conversionType.selectedItem.label;
+			 
+			
+			_currencyRateObj.createdDate = CurrentDateTimeString();
+			
+			_view.usdToLkrObj.currencyFrom.uuid = "USD";
+			_view.usdToLkrObj.currencyTo.uuid   = "LKR";
+			_view.eurToLkrObj.currencyFrom.uuid = "EUR";
+			_view.eurToLkrObj.currencyTo.uuid   = "LKR";
+			_view.gbpToLkrObj.currencyFrom.uuid = "GBP";
+			_view.gbpToLkrObj.currencyTo.uuid   = "LKR";
+			_view.jpyToLkrObj.currencyFrom.uuid = "JPY";
+			_view.jpyToLkrObj.currencyTo.uuid   = "LKR";
+			
+			_view.lkrToUsd.currencyFrom.uuid = "LKR";
+			_view.lkrToUsd.currencyTo.uuid  = "USD";
+			_view.eurToUsd.currencyFrom.uuid = "EUR";
+			_view.eurToUsd.currencyTo.uuid   = "USD";
+			_view.gbpToUsd.currencyFrom.uuid = "GBP";
+			_view.gbpToUsd.currencyTo.uuid   = "USD";
+			_view.jpyToUsd.currencyFrom.uuid = "JPY";
+			_view.jpyToUsd.currencyTo.uuid   = "USD";
+			
+			_view.lkrToEur.currencyFrom.uuid = "LKR";
+			_view.lkrToEur.currencyTo.uuid   = "EUR";
+			_view.usdToEur.currencyFrom.uuid = "USD";
+			_view.usdToEur.currencyTo.uuid	= "EUR";
+			_view.gbpToEur.currencyFrom.uuid = "GBP";
+			_view.gbpToEur.currencyTo.uuid	= "EUR";
+			_view.jpyToEur.currencyFrom.uuid = "JPY";
+			_view.jpyToEur.currencyTo.uuid	= "EUR";
+			
+			_view.lkrToGbp.currencyFrom.uuid = "LKR";
+			_view.lkrToGbp.currencyTo.uuid	= "GBP";
+			_view.usdToGbp.currencyFrom.uuid = "USD";
+			_view.usdToGbp.currencyTo.uuid	= "GBP";
+			_view.eurToGbp.currencyFrom.uuid = "EUR";
+			_view.eurToGbp.currencyTo.uuid	= "GBP";
+			_view.jpyToGbp.currencyFrom.uuid = "JPY";
+			_view.jpyToGbp.currencyTo.uuid	= "GBP";
+			
+			_view.lkrToJpy.currencyFrom.uuid = "LKR";
+			_view.lkrToJpy.currencyTo.uuid	= "JPY";
+			_view.usdToJpy.currencyFrom.uuid = "USD";
+			_view.usdToJpy.currencyTo.uuid	= "JPY";
+			_view.eurToJpy.currencyFrom.uuid = "EUR";
+			_view.eurToJpy.currencyTo.uuid	= "JPY";
+			_view.gbpToJpy.currencyFrom.uuid = "GBP";
+			_view.gbpToJpy.currencyTo.uuid	= "JPY";
+							  
+			_view.usdToLkrObj.createdBy			= _currencyRateObj.createdBy;
+			_view.usdToLkrObj.effectiveDate		= _currencyRateObj.effectiveDate;
+			_view.usdToLkrObj.createdDate		= _currencyRateObj.createdDate;
+			_view.usdToLkrObj.conversionType	= _currencyRateObj.conversionType;
+			
+			_view.eurToLkrObj.createdBy			= _currencyRateObj.createdBy;
+			_view.eurToLkrObj.effectiveDate		= _currencyRateObj.effectiveDate;
+			_view.eurToLkrObj.createdDate		= _currencyRateObj.createdDate;
+			_view.eurToLkrObj.conversionType	= _currencyRateObj.conversionType;
+			
+			_view.gbpToLkrObj.createdBy			= _currencyRateObj.createdBy;
+			_view.gbpToLkrObj.effectiveDate		= _currencyRateObj.effectiveDate;
+			_view.gbpToLkrObj.createdDate		= _currencyRateObj.createdDate;
+			_view.gbpToLkrObj.conversionType	= _currencyRateObj.conversionType;
+			
+			_view.jpyToLkrObj.createdBy			= _currencyRateObj.createdBy;
+			_view.jpyToLkrObj.effectiveDate		= _currencyRateObj.effectiveDate;
+			_view.jpyToLkrObj.createdDate		= _currencyRateObj.createdDate;
+			_view.jpyToLkrObj.conversionType	= _currencyRateObj.conversionType;
+			
+			_view.lkrToUsd.createdBy		= _currencyRateObj.createdBy;
+			_view.lkrToUsd.effectiveDate	= _currencyRateObj.effectiveDate;
+			_view.lkrToUsd.createdDate		= _currencyRateObj.createdDate;
+			_view.lkrToUsd.conversionType	= _currencyRateObj.conversionType;
+			
+			_view.eurToUsd.createdBy		= _currencyRateObj.createdBy;
+			_view.eurToUsd.effectiveDate	= _currencyRateObj.effectiveDate;
+			_view.eurToUsd.createdDate		= _currencyRateObj.createdDate;
+			_view.eurToUsd.conversionType	= _currencyRateObj.conversionType;
+			
+			_view.gbpToUsd.createdBy		= _currencyRateObj.createdBy;
+			_view.gbpToUsd.effectiveDate	= _currencyRateObj.effectiveDate;
+			_view.gbpToUsd.createdDate		= _currencyRateObj.createdDate;
+			_view.gbpToUsd.conversionType	= _currencyRateObj.conversionType;
+			
+			_view.jpyToUsd.createdBy		= _currencyRateObj.createdBy;
+			_view.jpyToUsd.effectiveDate	= _currencyRateObj.effectiveDate;
+			_view.jpyToUsd.createdDate		= _currencyRateObj.createdDate;
+			_view.jpyToUsd.conversionType	= _currencyRateObj.conversionType;
+			
+			
+			_view.lkrToEur.createdBy		= _currencyRateObj.createdBy;
+			_view.lkrToEur.effectiveDate	= _currencyRateObj.effectiveDate;
+			_view.lkrToEur.createdDate		= _currencyRateObj.createdDate;
+			_view.lkrToEur.conversionType	= _currencyRateObj.conversionType;
+			
+			_view.usdToEur.createdBy		= _currencyRateObj.createdBy;
+			_view.usdToEur.effectiveDate	= _currencyRateObj.effectiveDate;
+			_view.usdToEur.createdDate		= _currencyRateObj.createdDate;
+			_view.usdToEur.conversionType	= _currencyRateObj.conversionType;
+			
+			_view.gbpToEur.createdBy		= _currencyRateObj.createdBy;
+			_view.gbpToEur.effectiveDate	= _currencyRateObj.effectiveDate;
+			_view.gbpToEur.createdDate		= _currencyRateObj.createdDate;
+			_view.gbpToEur.conversionType	= _currencyRateObj.conversionType;
+			
+			_view.jpyToEur.createdBy		= _currencyRateObj.createdBy;
+			_view.jpyToEur.effectiveDate	= _currencyRateObj.effectiveDate;
+			_view.jpyToEur.createdDate		= _currencyRateObj.createdDate;
+			_view.jpyToEur.conversionType	= _currencyRateObj.conversionType;
+			
+			_view.lkrToGbp.createdBy		= _currencyRateObj.createdBy;
+			_view.lkrToGbp.effectiveDate	= _currencyRateObj.effectiveDate;
+			_view.lkrToGbp.createdDate		= _currencyRateObj.createdDate;
+			_view.lkrToGbp.conversionType	= _currencyRateObj.conversionType;
+			
+			_view.usdToGbp.createdBy		= _currencyRateObj.createdBy;
+			_view.usdToGbp.effectiveDate	= _currencyRateObj.effectiveDate;
+			_view.usdToGbp.createdDate		= _currencyRateObj.createdDate;
+			_view.usdToGbp.conversionType	= _currencyRateObj.conversionType;
+			
+			_view.eurToGbp.createdBy		= _currencyRateObj.createdBy;
+			_view.eurToGbp.effectiveDate	= _currencyRateObj.effectiveDate;
+			_view.eurToGbp.createdDate		= _currencyRateObj.createdDate;
+			_view.eurToGbp.conversionType	= _currencyRateObj.conversionType;
+			
+			_view.jpyToGbp.createdBy		= _currencyRateObj.createdBy;
+			_view.jpyToGbp.effectiveDate	= _currencyRateObj.effectiveDate;
+			_view.jpyToGbp.createdDate		= _currencyRateObj.createdDate;
+			_view.jpyToGbp.conversionType	= _currencyRateObj.conversionType;
+			
+			_view.lkrToJpy.createdBy		= _currencyRateObj.createdBy;
+			_view.lkrToJpy.effectiveDate	= _currencyRateObj.effectiveDate;
+			_view.lkrToJpy.createdDate		= _currencyRateObj.createdDate;
+			_view.lkrToJpy.conversionType	= _currencyRateObj.conversionType;
+			
+			_view.usdToJpy.createdBy		= _currencyRateObj.createdBy;
+			_view.usdToJpy.effectiveDate	= _currencyRateObj.effectiveDate;
+			_view.usdToJpy.createdDate		= _currencyRateObj.createdDate;
+			_view.usdToJpy.conversionType	= _currencyRateObj.conversionType;
+			
+			_view.eurToJpy.createdBy		= _currencyRateObj.createdBy;
+			_view.eurToJpy.effectiveDate	= _currencyRateObj.effectiveDate;
+			_view.eurToJpy.createdDate		= _currencyRateObj.createdDate;
+			_view.eurToJpy.conversionType	= _currencyRateObj.conversionType;
+			
+			_view.gbpToJpy.createdBy		= _currencyRateObj.createdBy;
+			_view.gbpToJpy.effectiveDate	= _currencyRateObj.effectiveDate;
+			_view.gbpToJpy.createdDate		= _currencyRateObj.createdDate;
+			_view.gbpToJpy.conversionType	= _currencyRateObj.conversionType;
+			
+			var _temp:ArrayCollection = new ArrayCollection;
+			
+			
+				if(_view.usdToLkrObj.buyRate.length>0 || _view.usdToLkrObj.sellRate.length>0)
+					_temp.addItem(_view.usdToLkrObj);
+				if(_view.eurToLkrObj.buyRate.length>0 || _view.eurToLkrObj.sellRate.length>0)
+					_temp.addItem(_view.eurToLkrObj);	
+				if(_view.gbpToLkrObj.buyRate.length>0 || _view.gbpToLkrObj.sellRate.length>0)
+					_temp.addItem(_view.gbpToLkrObj);
+				if(_view.jpyToLkrObj.buyRate.length>0 || _view.jpyToLkrObj.sellRate.length>0)
+					_temp.addItem(_view.jpyToLkrObj);
+					
+				if(_view.lkrToUsd.buyRate.length>0 || _view.lkrToUsd.sellRate.length>0)
+					_temp.addItem(_view.lkrToUsd);
+				if(_view.eurToUsd.buyRate.length>0 || _view.eurToUsd.sellRate.length>0)
+					_temp.addItem(_view.eurToUsd);
+				if(_view.gbpToUsd.buyRate.length>0 || _view.gbpToUsd.sellRate.length>0)
+					_temp.addItem(_view.gbpToUsd);
+				if(_view.jpyToUsd.buyRate.length>0 || _view.jpyToUsd.sellRate.length>0)
+					_temp.addItem(_view.jpyToUsd);
+					
+				if(_view.lkrToEur.buyRate.length>0 || _view.lkrToEur.sellRate.length>0)
+					_temp.addItem(_view.lkrToEur);
+				if(_view.usdToEur.buyRate.length>0 || _view.usdToEur.sellRate.length>0)
+					_temp.addItem(_view.usdToEur);
+				if(_view.gbpToEur.buyRate.length>0 || _view.gbpToEur.sellRate.length>0)
+					_temp.addItem(_view.gbpToEur);
+				if(_view.jpyToEur.buyRate.length>0 || _view.jpyToEur.sellRate.length>0)
+					_temp.addItem(_view.jpyToEur);
+					
+				if(_view.lkrToGbp.buyRate.length>0 || _view.lkrToGbp.sellRate.length>0)
+					_temp.addItem(_view.lkrToGbp);
+				if(_view.usdToGbp.buyRate.length>0 || _view.usdToGbp.sellRate.length>0)
+					_temp.addItem(_view.usdToGbp);
+				if(_view.eurToGbp.buyRate.length>0 || _view.eurToGbp.sellRate.length>0)
+					_temp.addItem(_view.eurToGbp);
+				if(_view.jpyToGbp.buyRate.length>0 || _view.jpyToGbp.sellRate.length>0)
+					_temp.addItem(_view.jpyToGbp);
+					
+				if(_view.lkrToJpy.buyRate.length>0 || _view.lkrToJpy.sellRate.length>0)
+					_temp.addItem(_view.lkrToJpy);
+				if(_view.usdToJpy.buyRate.length>0 || _view.usdToJpy.sellRate.length>0)
+					_temp.addItem(_view.usdToJpy);
+				if(_view.eurToJpy.buyRate.length>0 || _view.eurToJpy.sellRate.length>0)
+					_temp.addItem(_view.eurToJpy);
+				if(_view.gbpToJpy.buyRate.length>0 || _view.gbpToJpy.sellRate.length>0)
+					_temp.addItem(_view.gbpToJpy);			
+													
+				
+				currencyRateRO.create(_temp);
+		}
+		
+        public function saveCurrency():void
+		{
+			_currencyObj 				= _view.currency;
+			
+			var _temp2:ArrayCollection = new ArrayCollection;
+			
+			if(_currencyObj.description.length>0)
+				_temp2.addItem(_currencyObj);
+				
+			currencyMasterRO.create(_temp2);	
+		
+			
+		}
+        
+        
+		public override function faultHandler (event:FaultEvent):void {
+			var error:ErrorMessage	=	event.message as ErrorMessage;
+			
+			Alert.show(error.rootCause.message.toString());
+		}
+		
+	private function CurrentDateTimeString():String
+	{               
+	    var CurrentDateTime:Date = new Date();
+	    var CurrentDF:DateFormatter = new DateFormatter();
+	    CurrentDF.formatString = "YYYY-MM-DD";
+	    var DateTimeString:String = CurrentDF.format(CurrentDateTime);
+	    _view.L_effectiveFrom.text 		 	 = DateTimeString;
+	    return DateTimeString;
+	}
+	
+		
+		public override function currencyRateFetchResultsHandler (event:ResultEvent):void
+		{
+			_currencyRateList 						= new ArrayCollection();
+			_currencyRateList						= event.result as ArrayCollection;
+			_view.DG_CurrencyRatesList.dataProvider 	= _currencyRateList;
+			
+				if(_selectedIndex >-1)
+					_view.DG_CurrencyRatesList.selectedIndex = _selectedIndex;
+		}
+		public override function currencyMasterFetchResultsHandler (event:ResultEvent):void
+		{
+			_currencyList 						= new ArrayCollection();
+			_currencyList						= event.result as ArrayCollection;
+			_view.DG_CurrencyList.dataProvider 	= _currencyList;
+			
+			setConversionType(Constants.LABLE_CURRENCY_INVOICE_CONVERSION);	
+		 
+		 if(_selectedCurrencyIndex >-1)
+					_view.DG_CurrencyList.selectedIndex = _selectedCurrencyIndex;	
+					
+			reloadCurrencyRateList();		
+			
+		}
+		
+		public override function currencyMasterCreateResultsHandler (event:ResultEvent):void
+		{
+			_view.statusLabel.text = "Saved Successfully";
+			reloadCurrencyList();
+			createNew();
+		}
+		
+		public override function currencyRateCreateResultsHandler (event:ResultEvent):void
+		{
+			_view.statusLabel.text = "Saved Successfully";
+			reloadCurrencyList();
+			saveCurrency()
+			
+			
+		}
+
+	}
+}

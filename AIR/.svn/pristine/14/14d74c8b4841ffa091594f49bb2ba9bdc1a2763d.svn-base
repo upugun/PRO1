@@ -1,0 +1,33 @@
+package net.jhl.visual.objects
+{
+	import flash.events.Event;
+	
+	import net.jhl.value.objects.AgentDetails;
+	import net.jhl.view.common.JHCheckBox;
+	
+	public class AgentCheckBox extends JHCheckBox
+	{
+		public var agentDetails:AgentDetails = new AgentDetails;
+		public var isMarketIdChanged:Boolean = false;
+		
+		public function AgentCheckBox()
+		{
+			
+			this.addEventListener(Event.CHANGE, setNotSelectedStatus);
+		}
+		
+		
+		private function setNotSelectedStatus(e:Event):void
+		{
+			if(!this.selected)
+				agentDetails.agentMarketUuid = "NA";
+			
+			isMarketIdChanged = true;	
+		}
+		
+		
+		
+		
+
+	}
+}

@@ -1,0 +1,103 @@
+package net.jwt.view.helper.tourHelper
+{
+	import flash.events.KeyboardEvent;
+	
+	import mx.collections.ArrayCollection;
+	import mx.core.UIComponent;
+	import mx.events.CloseEvent;
+	import mx.events.ListEvent;
+	import mx.rpc.events.ResultEvent;
+	
+	import net.jwt.event.NotificationArguments;
+	import net.jwt.value.objects.VehicleType;
+	import net.jwt.value.objects.costing.VehicleCostObject;
+	import net.jwt.view.Mediator;
+	import net.jwt.view.popup.JWTPopUp;
+	
+	public class TourHelperVehicleTypeMediator extends Mediator
+	{
+		private var _view:TourHelperVehicleTypeView;
+		
+		private var _app:JWTPopUp;
+		[Bindable] public var args:NotificationArguments;
+		[Bindable] public var _vehicleType:ArrayCollection;
+		[Bindable] public var _vehicleList:ArrayCollection;
+		
+		public function TourHelperVehicleTypeMediator(view:UIComponent, args:NotificationArguments)
+		{
+			super(view);
+			if(view != null)
+			{
+				_view  = view as TourHelperVehicleTypeView;
+			}
+			
+			if(args != null)
+				this.args = args;
+				
+			_app = args.viewComponent as JWTPopUp;	
+		}
+		
+		protected override function viewComponentInitialize():void{
+				loadVehicleList()
+				//_view.T_search.addEventListener(KeyboardEvent.KEY_UP, dynamicSearch);
+				_view.DG_vehicle.doubleClickEnabled = true;
+				_view.DG_vehicle.addEventListener(ListEvent.ITEM_DOUBLE_CLICK, selectAndClose);
+				setLoggedInUser();
+		}
+		
+		private function setLoggedInUser():void
+		{
+			vehicleTypeRO.setLogedInUser(_loggedInUser);
+		}	
+		
+		private function selectAndClose(event:ListEvent):void
+		{
+			var obj:VehicleType =  _vehicleList.getItemAt(event.rowIndex) as VehicleType;
+				args.argumentObject = obj;
+				_app.dispatchEvent(new CloseEvent(CloseEvent.CLOSE));
+		}
+		private function dynamicSearch(event:KeyboardEvent):void
+		{
+			loadVehicleList()
+		}
+		
+		private function loadVehicleList():void
+		{
+		
+			initializeVehicleTypeRemortingObject();
+			vehicleTypeRO.dynamicSearch("","");
+		}
+		
+		
+		private function setSelectedItemOfVehicleList():void
+		{
+			var _vehicleCostObject:VehicleCostObject = args.originatorObject as VehicleCostObject;
+			if(_vehicleCostObject != null)
+			{				
+				for(var i:int=0; i< _vehicleList.length; i++)
+				{
+					var _vehicle:VehicleType = _vehicleList.getItemAt(i) as VehicleType;
+					if(_vehicle != null)
+					{
+						if(_vehicle.uuid == _vehicleCostObject.vehicleUuid)
+						{
+							_view.DG_vehicle.selectedIndex = i;
+							break;
+						}
+					}
+				}
+			}
+		}
+		
+		// Overridden from Mediator class
+		public override function vehicleTypeFetchResultsHandler(event:ResultEvent):void {
+			_vehicleList = new ArrayCollection();
+			_vehicleList = event.result as ArrayCollection;
+			_view.DG_vehicle.dataProvider = _vehicleList;
+			
+			setSelectedItemOfVehicleList();
+		}
+		
+	
+	}
+}

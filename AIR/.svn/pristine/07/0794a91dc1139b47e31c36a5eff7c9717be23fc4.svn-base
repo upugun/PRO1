@@ -1,0 +1,502 @@
+package net.jwt.view
+{
+	import flash.events.Event;
+	import flash.events.KeyboardEvent;
+	import flash.events.MouseEvent;
+	import flash.net.FileReference;
+	
+	import mx.collections.ArrayCollection;
+	import mx.controls.Alert;
+	import mx.core.UIComponent;
+	import mx.events.ListEvent;
+	import mx.formatters.DateFormatter;
+	import mx.rpc.events.FaultEvent;
+	import mx.rpc.events.ResultEvent;
+	
+	import net.jwt.ApplicationFacade;
+	import net.jwt.event.INotificationArguments;
+	import net.jwt.event.NotificationArguments;
+	import net.jwt.value.objects.QuerryObject;
+	import net.jwt.value.objects.ReportActivityList;
+	import net.jwt.value.objects.TransportVehicleOwner;
+	import net.jwt.value.objects.User;
+	
+	public class ReportsActivityMediator extends Mediator
+	{
+		private var _view:ReportsActivityView;
+		private var _args:INotificationArguments;
+		//private var _loggedInUser:User;
+		
+		[Bindable] private var _selectedIndex:int = -1;
+		[Bindable] private var _selectedIndexOfCategory:int = -1;
+		[Bindable] public var _obj:User = new User();
+		
+		[Bindable] public var _activityList:ArrayCollection = new ArrayCollection;
+		private var userCollection:ArrayCollection;
+		private var marketCollection:ArrayCollection;
+		private var supplierCollection:ArrayCollection;
+		
+		private var filterdList:ArrayCollection = new ArrayCollection;
+		
+		[Bindable] public var _supplierObj:TransportVehicleOwner = new TransportVehicleOwner();
+//		[Bindable] public var popup:JWTPopUp;
+		[Bindable] public var args:NotificationArguments = new NotificationArguments();
+		
+		private var querryObject:QuerryObject = new QuerryObject;	
+				
+
+		public function ReportsActivityMediator(view:UIComponent, args:INotificationArguments)
+		{
+			super(view);
+			if(view != null)
+			{
+				_view  = view as ReportsActivityView ;
+	
+			}
+			
+			if(args != null)
+			{
+				_args = args;
+				_loggedInUser = (_args.viewComponent as MainView).user;
+			}
+		}
+		
+		protected override function viewComponentInitialize():void
+		{
+			setDynamicFields();
+			setLoggedInUser();
+			loadUsersList();
+			
+			_view.CHK_guideName.addEventListener(MouseEvent.CLICK,setDynamicFieldsHandler); 
+//			_view.CHK_market.addEventListener(MouseEvent.CLICK,setDynamicFieldsHandler); 
+			_view.CHK_pax.addEventListener(MouseEvent.CLICK,setDynamicFieldsHandler); 
+			_view.CHK_shoopingNo.addEventListener(MouseEvent.CLICK,setDynamicFieldsHandler);
+			_view.CHK_startDate.addEventListener(MouseEvent.CLICK,setDynamicFieldsHandler);
+//			_view.CHK_user.addEventListener(MouseEvent.CLICK,setDynamicFieldsHandler);
+			_view.CHK_sale.addEventListener(MouseEvent.CLICK,setDynamicFieldsHandler);
+			
+			_view.CMB_type.addEventListener(ListEvent.CHANGE,reLoadReport);
+			_view.CMB_user.addEventListener(ListEvent.CHANGE,reLoadReport);
+			_view.CMB_market.addEventListener(ListEvent.CHANGE,reLoadReport);
+			_view.CMB_establishment.addEventListener(ListEvent.CHANGE,reLoadReport);
+			_view.D_to.addEventListener(Event.CHANGE,reLoadReport);
+			
+			_view.B_print.addEventListener(MouseEvent.CLICK, generatePdf);
+			_view.B_export.addEventListener(MouseEvent.CLICK, exportDataGrid);
+			_view.RD_shopWsie.addEventListener(MouseEvent.CLICK, filterByShop);
+			_view.RD_marketWise.addEventListener(MouseEvent.CLICK, filterByMarket)
+			_view.RD_detail.addEventListener(MouseEvent.CLICK, doNotFilter)
+			
+		}
+		
+		private function filterByShop(e:Event):void
+		{
+			if(_view.RD_shopWsie.selected)
+			{
+				var list:ArrayCollection = filterReport(supplierCollection, "uuid", "supplierId", "description");
+				arrangeTotal(list);
+				
+				_view.H_data.source = filterdList;
+			}
+		}
+		
+		private function doNotFilter(e:Event):void
+		{
+			if(_view.RD_detail.selected)
+			{
+				arrangeTotal(_activityList);
+				_view.H_data.source = filterdList;
+			}
+		}
+		
+		private function filterByMarket(e:Event):void
+		{
+			if(_view.RD_marketWise.selected)
+			{
+				var list:ArrayCollection = filterReport(marketCollection, "uuid", "marketId", "description");
+				arrangeTotal(list);
+				
+				_view.H_data.source = filterdList;
+			}
+		}
+		
+		private function filterReport(list:ArrayCollection, attrid1:String, attrid2:String, label:String):ArrayCollection
+		{
+			var returnList:ArrayCollection = new ArrayCollection;
+			
+			for(var i:int=0; i<list.length; i++)
+			{
+				var obj:ReportActivityList = new ReportActivityList
+					obj.label	= list.getItemAt(i)[label];
+					
+				var totalSale:Number 	= 0;
+				var totalVehicle:Number = 0;
+				var totalPax:int 		= 0;
+					
+				for(var j:int=0; j<_activityList.length; j++)
+				{
+					if(list.getItemAt(i)[attrid1] == _activityList.getItemAt(j)[attrid2])
+					{
+						var rep:ReportActivityList = _activityList.getItemAt(j) as ReportActivityList;
+						totalVehicle += rep.noOfVehicles;
+						totalPax 	 += rep.noOfPax;
+						
+						obj.children.addItem(rep);
+					}
+				}
+				
+				obj.noOfVehicles 		=  totalVehicle;
+				obj.noOfPax 			=  totalPax;
+				
+				returnList.addItem(obj);
+			} 
+			
+			return returnList;
+		}
+		
+	private function arrangeTotal(list:ArrayCollection):void
+	{
+		var totalVehicle:Number = 0;
+		var totalPax:int  	 	= 0;
+		
+		var obj:ReportActivityList = new ReportActivityList();
+		
+		filterdList = new ArrayCollection;
+		
+			for(var j:int=0; j<list.length;j++)
+			{
+				var rep:ReportActivityList = list.getItemAt(j) as ReportActivityList;
+					totalVehicle += rep.noOfVehicles;
+					totalPax  	 += rep.noOfPax;
+				
+				obj.children.addItem(rep);
+			}
+			
+			obj.label	=	"Jetwing Travels";
+			obj.noOfVehicles	=  totalVehicle;
+			obj.noOfPax 		=  totalPax;
+			
+			filterdList.addItem(obj);
+	}
+		
+		private function exportDataGrid(e:Event):void
+		{
+            var exportStr:String = "";
+            var delimiter:String = ",";
+            var fileName:String;
+             var arr:ArrayCollection = filterdList;
+            fileName = "export.csv";
+            exportStr += "Label" + delimiter; 
+            exportStr += "Req No" + delimiter; 
+            exportStr += "Start Date" + delimiter;
+            exportStr += "Guide Name" + delimiter;
+            exportStr += "No of Pax" + delimiter;
+            exportStr += "No of Vehicles" + delimiter;
+
+            exportStr += delimiter+delimiter+delimiter+"\n";
+
+            for(var j:int=0; j<arr.length; j++){
+            	var item:ReportActivityList = arr.getItemAt(j) as ReportActivityList;
+            	
+            	if(_view.CHK_level_01.selected)
+                	exportStr += setReportFeilds(item);
+                	
+                for(var n:int=0; n<item.children.length; n++)
+	            {
+	            	var item2:ReportActivityList = item.children.getItemAt(n) as ReportActivityList;
+	            	
+	            	if(_view.CHK_level_02.selected)
+	            		exportStr += setReportFeilds(item2);
+	            	
+	            	for(var c:int=0; c<item2.children.length; c++)
+		            {
+		            	var item3:ReportActivityList = item2.children.getItemAt(c) as ReportActivityList;
+		            	
+		            	if(_view.CHK_level_03.selected)
+		            		exportStr += setReportFeilds(item3);
+		            }
+	            }
+            }
+            
+            var fileReference:FileReference = new FileReference();
+            fileReference.save(exportStr, fileName);
+        }
+		
+		private function setReportFeilds(item:ReportActivityList):String
+		{
+				var exportStr:String = "";
+				var delimiter:String = ",";
+				 
+				exportStr += "\""+item.label+"\""+delimiter;
+                exportStr += "\""+item.reqNo+"\""+delimiter;
+                exportStr += "\""+item.startDate+"\""+delimiter;
+                exportStr += "\""+item.guideName+"\""+delimiter;
+                exportStr += "\""+item.noOfPax+"\""+delimiter;
+                exportStr += "\""+item.noOfVehicles+"\"\n";
+                
+                return exportStr;
+		}
+		private function generatePdf(e:Event):void
+		{
+			initializePDFGeneratorHelperRemortingObject();
+			if(_activityList.length>0){
+				startBusyCursor();
+				PDFGeneratorHelperRO.generateShoppingListReport(_activityList, _loggedInUser, querryObject);
+			}
+		}
+		
+		private function setLoggedInUser():void
+		{
+			initializeActivityRequisitionRemortingObject();
+			activityRequisitionRO.setLogedInUser(_loggedInUser);
+			initializeUserRemortingObject();
+			userRO.setLogedInUser(_loggedInUser);
+			initializeMarketRemortingObject();
+			marketRO.setLogedInUser(_loggedInUser);
+			initializeActivitySupplierMasterRemortingObject();
+			activitySupplierMasterRO.setLogedInUser(_loggedInUser);
+		}
+		
+		private function loadUsersList():void
+		{
+			startBusyCursor();
+			initializeUserRemortingObject();
+			userRO.dynamicSearch("","");
+		}
+		
+		private function loadMarketList():void
+		{
+			startBusyCursor();
+			marketRO.dynamicSearch("","");
+		}
+		
+		private function loadSupplierList():void
+		{
+			startBusyCursor();
+			activitySupplierMasterRO.dynamicSearch("","");
+		}
+		
+		private function reLoadReport(e:Event):void
+		{
+			loadReport();
+		}
+		
+		private function loadReport():void
+		{
+				
+				querryObject.searchCode = "searForReporting";
+			
+				
+				
+				querryObject.condition1 = _view.D_from.text;
+				querryObject.condition2 = _view.D_to.text;
+				
+				if(_view.CMB_type.selectedItem!=null)
+					querryObject.condition3 = _view.CMB_type.selectedItem.id;
+				
+			startBusyCursor();
+			activityRequisitionRO.dynamicSearchForReport(querryObject);
+		}
+		
+		private function setDynamicFieldsHandler(e:Event):void
+		{
+			setDynamicFields();
+		}
+		private function setDynamicFields():void
+		{
+			if(_view.CHK_shoopingNo.selected)
+				_view.D_C_reqNo.visible = true;
+			else
+				_view.D_C_reqNo.visible = false;
+				
+			if(_view.CHK_startDate.selected)
+				_view.D_C_startDate.visible = true;
+			else
+				_view.D_C_startDate.visible = false;
+				
+			
+			if(_view.CHK_guideName.selected)
+				_view.D_C_guide.visible = true;
+			else
+				_view.D_C_guide.visible = false;
+				
+			if(_view.CHK_pax.selected)
+				_view.D_C_noOfPax.visible = true;
+			else
+				_view.D_C_noOfPax.visible = false;
+				
+			if(_view.CHK_sale.selected)
+				_view.D_C_vehicles.visible = true;
+			else
+				_view.D_C_vehicles.visible = false;
+				
+				
+				
+		}
+		
+		private function resetStatus(event:Event):void
+		{
+			//_view.statusLabel.text = "";
+		}
+		
+		
+		public override function closePopup(event:Event):void
+            {
+                popup = null;
+                if(args != null)
+                {
+//                	if((event.target as JWTPopUp).id == HELP_LOCATION)
+//                		_view.activities.location = args.argumentObject as Location;
+                	
+                }
+               // _supplierObj = _view.supplier;
+            }
+		
+		
+		private function openLocationHelp(event:MouseEvent):void
+		{
+			createPopUp(HELP_LOCATION, _view, args, "Search and select Location", ApplicationFacade.HELP_LOCATION_SEARCH, true);
+		}
+		
+		private function loadObjectsList():void
+		{
+			var q:QuerryObject = new QuerryObject;
+				q.searchCode   = "";
+				q.condition1   = "";
+			
+			transportVehicleOwnerRO.dynamicSearch(q);
+		}
+		
+		
+		
+		public function saveDocument(event:KeyboardEvent):void
+		{
+			if(event.keyCode == 119)
+				saveObject();
+			else if(event.keyCode == 120)
+				Alert.show("TODO:Delete this record");
+			else if(event.keyCode == 112)
+				Alert.show("TODO:Show HELP page");
+				
+		}
+		public function saveObject():void
+		{
+				
+			
+				
+		}
+		
+		private function CurrentDateTimeString():String
+		{               
+		    var CurrentDateTime:Date 	= new Date();
+		    var CurrentDF:DateFormatter = new DateFormatter();
+		    	CurrentDF.formatString 	= "YYYY/MM/DD HH:NN:SS";
+		    var DateTimeString:String 	= CurrentDF.format(CurrentDateTime);
+		    
+		    return DateTimeString;
+		}
+		
+		private function DynamicSearch(event:Event):void
+		{
+			filter();
+		}
+		
+		public function filter():void {
+             
+             
+               _activityList.filterFunction = filterFirst;
+               _activityList.refresh();
+                 
+        }
+            
+            
+         private function filterFirst(item:Object):Boolean
+        {
+            var searchBy:String = "";
+            
+//            if(_view.RD_fname.selected)
+//            	searchBy = "ownerName";
+//            else if(_view.RD_lname.selected)
+//            	searchBy = "surename";	
+//            else if(_view.RD_code.selected)
+//            	searchBy = "glCode";
+            
+            return item[searchBy].match(new RegExp("", 'i'))
+        }
+		
+				
+		 public override function userFetchResultsHandler (event:ResultEvent):void
+	   {
+	   		userCollection	=	new ArrayCollection;
+	   		userCollection  =   event.result as ArrayCollection;
+	   		var allUser:User	 =	new User;
+	   			allUser.uuid	 =	"";
+	   			allUser.firstName= "All";
+	   		userCollection.addItem(allUser);
+	   		
+	   			
+	   		_view.CMB_user.dataProvider	=	userCollection;
+	   		_view.CMB_user.selectedIndex=	userCollection.length-1;
+	   		stoptBusyCursor();
+	   		loadMarketList();
+	   }
+	   
+	    public override function marketFetchResultsHandler (event:ResultEvent):void
+	   {
+	   		marketCollection	=	new ArrayCollection;
+	   		marketCollection  	 =   event.result as ArrayCollection;
+//	   		var allUser:Market	 =	new Market;
+//	   			allUser.uuid	 =	"";
+//	   			allUser.description= "All";
+//	   		marketCollection.addItem(allUser);
+	   		
+	   			
+	   		_view.CMB_market.dataProvider	=	marketCollection;
+	   		_view.CMB_market.selectedIndex=	marketCollection.length-1;
+	   		stoptBusyCursor();
+	   		loadSupplierList();
+	   }   
+	   
+	   
+		public override function activitySupplierMasterFetchResultsHandler (event:ResultEvent):void
+	   {
+	   		supplierCollection				 =	new ArrayCollection;
+	   		supplierCollection  	 		 =   event.result as ArrayCollection;
+//	   		var allUser:ShoppingMaster	 =	new ShoppingMaster;
+//	   			allUser.uuid	 		 =	"";
+//	   			allUser.description		 = "All";
+//	   		shopCollection.addItem(allUser);
+	   		
+	   			
+	   		_view.CMB_establishment.dataProvider	=	supplierCollection;
+	   		_view.CMB_establishment.selectedIndex   =	supplierCollection.length-1;
+	   		stoptBusyCursor();
+	   }
+		
+		public override function activityRequisitionFetchResultsHandler (event:ResultEvent):void
+		{	
+			stoptBusyCursor();
+			_activityList = new ArrayCollection();
+			_activityList = event.result as ArrayCollection;
+			
+			if(_view.RD_detail.selected)
+				_view.RD_detail.dispatchEvent(new MouseEvent(MouseEvent.CLICK));
+			else if(_view.RD_shopWsie.selected)
+				_view.RD_shopWsie.dispatchEvent(new MouseEvent(MouseEvent.CLICK));
+			else if(_view.RD_marketWise.selected)
+				_view.RD_marketWise.dispatchEvent(new MouseEvent(MouseEvent.CLICK));		
+			
+		}
+		
+		public override function PDFGeneratorResultsHandler (event:ResultEvent):void
+		{	
+			stoptBusyCursor();
+			
+		}
+		public override function faultHandler (event:FaultEvent):void
+		{	
+			stoptBusyCursor();
+			Alert.show("Error");
+		}
+	}
+}

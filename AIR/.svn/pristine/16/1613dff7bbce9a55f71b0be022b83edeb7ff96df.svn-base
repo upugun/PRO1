@@ -1,0 +1,23 @@
+package net.jhl.value.objects.RateCode
+{
+	import mx.collections.ArrayCollection;
+	
+	
+	[RemoteClass(alias="net.jhl.objects.ratecode.RoomRateBreakdown")]
+	
+	[Bindable]
+	public class RoomRateBreakdown
+	{
+		public var uuid:String  		  = "";
+		public var checkInDate:String  	  = "";
+		public var grossRate:Number  	  = 0;
+		public var netRate:Number  	  	  = 0;
+		
+		public var discountList:ArrayCollection = new ArrayCollection;
+		
+		public function RoomRateBreakdown()
+		{
+		}
+
+	}
+}

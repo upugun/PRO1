@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:VBox xmlns:mx="http://www.adobe.com/2006/mxml" width="100%" height="100%">
+	<mx:Canvas width="100%" height="100%"> 
+		<mx:HBox width="100%" height="20%" maxHeight="50">
+		</mx:HBox>
+			<mx:VBox width="100%" height="100%">
+				<mx:VBox width="100%">
+				  <mx:HBox width="100%" height="100%">
+					<mx:Label text="By"/>
+					<mx:ComboBox id="C_vehiclelist" color="#0A0909" labelField="description" width="117"></mx:ComboBox>
+					<mx:RadioButton label="Registration No" id="CB_regNo" selected="true" />
+					<mx:RadioButton label="Make" id="CB_make" selected="false" x="204" y="33"/>
+					<mx:RadioButton label="Model" id="CB_model" x="204" y="33"/>
+				  	
+				  </mx:HBox>
+				   <mx:HBox width="100%">	
+					<mx:TextInput color="#000000" id="T_search"/>
+				   </mx:HBox>	
+				</mx:VBox>
+		<mx:HBox width="100%" height="100%">
+			<mx:DataGrid id="DG" width="100%" height="100%" 
+						 dragEnabled="true" dragMoveEnabled="false">
+				<mx:columns>
+					<mx:DataGridColumn headerText="Registration No" dataField="registrationNo" />
+					<mx:DataGridColumn headerText="Model" dataField="model"/>
+				</mx:columns>
+			</mx:DataGrid>
+			
+		</mx:HBox>
+		</mx:VBox>	
+	</mx:Canvas>	
+</mx:VBox>

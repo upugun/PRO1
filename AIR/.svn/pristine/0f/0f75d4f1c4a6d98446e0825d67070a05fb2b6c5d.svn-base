@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<!-- Custom control for the header area of the printed page. -->
+
+<mx:HBox xmlns:mx="http://www.adobe.com/2006/mxml" width="100%"
+    horizontalAlign="center" >
+
+	<mx:Script>
+        <![CDATA[
+            [Bindable]
+            public var from:String	 = "";
+            [Bindable]
+			public var toDate:String = "";
+        ]]>
+	</mx:Script>
+	<mx:Label text="Details of attached costs for tour : " />
+</mx:HBox>

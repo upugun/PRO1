@@ -1,0 +1,531 @@
+/****************************************************************
+ * Change log													*
+ * Created by Nisal Fernando									*	
+ * Date: 2012/02/01												*
+ *--------------------------------------------------------------*  
+ * By	Date		Change										*	
+ *--------------------------------------------------------------*  
+ * NF	2012/02/01	Created the page							*			
+ * UG	2012/02/15	Code review started							*
+ ****************************************************************/
+package net.jwt.view
+{
+	import flash.events.Event;
+	import flash.events.KeyboardEvent;
+	import flash.events.MouseEvent;
+	import flash.net.FileReference;
+	
+	import mx.collections.ArrayCollection;
+	import mx.core.UIComponent;
+	import mx.formatters.DateFormatter;
+	import mx.rpc.events.FaultEvent;
+	import mx.rpc.events.ResultEvent;
+	
+	import net.jwt.event.INotificationArguments;
+	import net.jwt.event.NotificationArguments;
+	import net.jwt.value.objects.Agent;
+	import net.jwt.value.objects.EnquiryManagement;
+	import net.jwt.value.objects.FIT;
+	import net.jwt.value.objects.QuerryObject;
+	import net.jwt.value.objects.User;
+	public class EnquiryManagementUsersReportingMediator extends Mediator
+	{
+		private var _view:EnquiryManagementUsersReportingView;
+		private var _args:INotificationArguments;
+		//private var _loggedInUser:User;
+		
+		[Bindable] private var _selectedIndex:int = -1;
+		[Bindable] private var _selectedIndexUserReport:int = -1;
+		[Bindable] public var _enquiryManagementObj:EnquiryManagement = new EnquiryManagement();
+		[Bindable] public var _userObj:User = new User();
+		//[Bindable] public var data:Reporting = new Reporting();
+		[Bindable] public var _enquiryList:ArrayCollection;
+		[Bindable] public var _confirmedList:ArrayCollection = new ArrayCollection();
+		[Bindable] public var _enquiriesHandledByList:ArrayCollection = new ArrayCollection();
+		[Bindable] public var _enquiryCategoryList:ArrayCollection = new ArrayCollection();
+		[Bindable] public var _LostList:ArrayCollection = new ArrayCollection();
+		[Bindable] public var _OpenList:ArrayCollection = new ArrayCollection();
+		[Bindable] public var _notSelected:ArrayCollection = new ArrayCollection();
+		[Bindable] public var _MetirialisList:ArrayCollection = new ArrayCollection();
+		
+		//----arrays for datagrid report
+		[Bindable] public var _DGLostList:ArrayCollection = new ArrayCollection();
+		[Bindable] public var _DGOpenList:ArrayCollection = new ArrayCollection();
+		[Bindable] public var _DGMetirialisList:ArrayCollection = new ArrayCollection();
+		[Bindable] public var _DGconfirmedList:ArrayCollection = new ArrayCollection();
+		[Bindable] public var _DGupMarketList:ArrayCollection = new ArrayCollection();
+		[Bindable] public var _DGbudgetList:ArrayCollection = new ArrayCollection();
+		[Bindable] public var _DGgenaralList:ArrayCollection = new ArrayCollection();
+		[Bindable] public var _DGconferenceList:ArrayCollection = new ArrayCollection();
+		private var userCollection:ArrayCollection;
+		[Bindable] public var avaregeValue:Number = new Number();
+		[Bindable] public var profit:Number = new Number();
+		[Bindable] public var totalValue:Number = new Number();
+		
+		
+		
+		[Bindable] public var _tempUserrepotList:ArrayCollection = new ArrayCollection();
+		
+		[Bindable] public var _upMarketList:ArrayCollection = new ArrayCollection();
+		[Bindable] public var _budgetList:ArrayCollection = new ArrayCollection();
+		[Bindable] public var _genaralList:ArrayCollection = new ArrayCollection();
+		//[Bindable] public var _conferenceList:ArrayCollection = new ArrayCollection();
+		
+		[Bindable] public var args:NotificationArguments = new NotificationArguments();
+		
+		private const ENQUIRYONALLBYCREATEDDATE:String 	= "REPORT_FOR_INDIVIDUAL_USER";
+		private const ENQUIRYONALLBYTRAVELDATE:String 	= "REPORT_FOR_INDIVIDUAL_USER_by_TRAVLE_DATE";
+		private const ENQUIRYMETIRIALISED:String 		= "ENQUIRY_BASED_ON_MATERIALISED";
+		private const ENQUIRYOPEN:String 				= "ENQUIRY_BASED_ON_OPEN";
+		private const ENQUIRYLOST:String 				= "ENQUIRY_BASED_ON_LOST";
+		
+		public var _user:ArrayCollection;
+		//public var _objLoc:Location 	= new Location();
+		
+		public function EnquiryManagementUsersReportingMediator(view:UIComponent, args:INotificationArguments)
+		{
+			super(view);
+			if(view != null)
+			{
+				_view  = view as EnquiryManagementUsersReportingView;
+				_enquiryList = new ArrayCollection();
+				
+			}
+			
+			if(args != null)
+				_args = args;
+				_loggedInUser = (_args.viewComponent as MainView).user;
+		}
+		
+		protected override function viewComponentInitialize():void{
+			setSpecialFeildsForManager();
+			_view.B_date.addEventListener(MouseEvent.MOUSE_UP, dateRangedynamicSearch);
+			_view.T_search.addEventListener(KeyboardEvent.KEY_UP, dynamicSearch);
+			_view.B_export.addEventListener(MouseEvent.CLICK, exportDataGrid);
+			CurrentDateTimeString();
+			initializeEnquiryManagementRemortingObject();
+			initializeUserRemortingObject();
+			setLoggedInUser();
+			loadUsersList();
+			CurrentYear();
+			
+		}
+		
+		private function setSpecialFeildsForManager():void
+		{
+			
+			if(checkForForManager() == true)
+			{
+				_view.CMB_user.enabled = true;
+			}
+			else
+				_view.CMB_user.enabled = false;
+		}
+		
+		private function checkForForManager():Boolean
+		{
+			var _isEnable:Boolean = false;
+			
+			if(_loggedInUser.manager != null && _loggedInUser.market != null)
+			{
+				if(_loggedInUser.manager.idMarket == _loggedInUser.market.uuid){
+					_isEnable 	= true;
+				}
+				else{
+					_isEnable 	= false;
+				}	
+			}
+			return _isEnable;
+		}
+		
+		private function loadUsersList():void
+		{
+			startBusyCursor();
+			initializeUserRemortingObject();
+			userRO.dynamicSearch("allUsersBasedOnMarket",_loggedInUser.market.uuid);
+		}
+		
+		
+		private function exportDataGrid(e:Event):void
+		{
+            var exportStr:String = "";
+            var delimiter:String = ",";
+            var fileName:String;
+            var arr:ArrayCollection = _view.DG_usrReport.dataProvider as ArrayCollection
+            
+            fileName = "export.csv";
+            exportStr += "Tour No" + delimiter; 
+            exportStr += "Travel Date" + delimiter; 
+            exportStr += "Tour Name" + delimiter;
+            exportStr += "Agent" + delimiter;
+            exportStr += "Country" + delimiter;
+            exportStr += "Status" + delimiter;
+            exportStr += "Enquiry Type" + delimiter;
+            exportStr += "Invoice Value" + delimiter;
+            exportStr += "Profit" + delimiter;
+
+            exportStr += delimiter+delimiter+delimiter+"\n";
+
+            for each(var item:EnquiryManagement in arr){
+                exportStr += "\""+getTourNo(item)+"\""+delimiter;
+                exportStr += "\""+item.travelDate+"\""+delimiter;
+                exportStr += "\""+item.tourId+"\""+delimiter;
+                exportStr += "\""+item.client.name+"\""+delimiter;
+                exportStr += "\""+getCountry(item)+"\""+delimiter;
+                exportStr += "\""+item.bookingType+"\""+delimiter;
+                exportStr += "\""+item.creditType+"\""+delimiter;
+                exportStr += "\""+item.itineryValue+"\""+delimiter;
+                exportStr += "\""+item.profit+"\"\n";
+            }
+            var fileReference:FileReference = new FileReference();
+            fileReference.save(exportStr, fileName);
+        }
+        
+         private function getStatus(item:Object):String {
+         	var Status:String = new String();
+         	if(item.materialised == 1)
+         		Status = "confirmed";
+         	if(item.open == 1)
+         		Status = "Pending";
+         	if(item.lost == 1)
+         		Status = "Lost";
+		  return Status ;
+		}
+        
+         private function getTourNo(item:EnquiryManagement):String {
+         	var Type:String = new String();
+         		Type = item.tourIdYear +"-" +item.tourIdSequence;
+         		
+		  return Type ;
+		}
+		
+		private function getCountry(item:EnquiryManagement):String {
+         	var Type:String = new String();
+         	if(item.client is Agent)
+         		Type = (item.client as Agent).country.countryName;
+         	else if(item.client is FIT)
+         		Type = (item.client as FIT).country.countryName;	
+         		
+		  return Type ;
+		}
+		
+    	 private function enquiryType(item:Object):String {
+         	var Type:String = new String();
+         		Type = item.enquiryType.description;
+         		
+		  return Type ;
+		}
+		
+		
+		public function showRoomsCategory() :void
+		{
+			initializeRoomCategoriesRemortingObject();
+			RoomCategoriesRO.dynamicSearch("","");
+			
+		}	
+		
+		
+		private function setLoggedInUser():void
+		{
+			userRO.setLogedInUser(_loggedInUser);
+			enquiryManagementRO.setLogedInUser(_loggedInUser);
+		}
+		
+		
+		private function reloadEnquiryList():void
+		{
+			
+			var _q:QuerryObject = new QuerryObject;
+			_q.condition1 = "";
+			_q.condition2 = _view.Date_from.text;
+			_q.condition3 = _view.Date_to.text
+			_q.sessionId  = _userObj.uuid;
+			
+			if(_view.CMB_user.selectedItem!=null)
+				_q.condition4	=	(_view.CMB_user.selectedItem as User).uuid;
+			//}
+			//else
+			//reloadEnquiryListBasedOnUser();
+			if(_view.CB_createdDate.selected == true){
+				startBusyCursor();
+				_q.searchCode = ENQUIRYONALLBYCREATEDDATE;
+				enquiryManagementRO.dynamicSearchForList(_q, _loggedInUser);
+			}
+			else if(_view.CB_arrivalDate.selected == true){
+				startBusyCursor();
+				_q.searchCode = ENQUIRYONALLBYTRAVELDATE;
+				enquiryManagementRO.dynamicSearchForList(_q, _loggedInUser);
+			}
+		}
+		
+		
+	
+		
+		private function dateRangedynamicSearch(event:Event):void
+		{
+			reloadEnquiryList();
+			//reloadUserList();
+		}
+		
+		private function dynamicSearch(event:Event):void
+		{
+			reloadListforDynamic();
+		}
+	
+		private function reloadListforDynamic():void
+		{	
+			var _q:QuerryObject = new QuerryObject;
+			_q.condition1 = _view.T_search.text.toString();
+			_q.searchCode = "dynamicTicketForIndividual";
+			
+			if(_view.CB_ticketNo.selected == true)
+				enquiryManagementRO.dynamicSearch(_q, _loggedInUser);
+		}
+		
+		private function countEnquiryStatus():void
+		{
+				var data1:Object = new Object();// this is to count the size of each list
+				var _tempForMetirialise:Object = new Object();//_MetirialisList
+				var _tempForLost:Object = new Object();//_LostList
+				var _tempForPending:Object = new Object();//_OpenList
+				var _tempForNotSelected:Object = new Object();//No data
+				 avaregeValue = 0;
+				 totalValue = 0;
+				 profit		= 0;
+				
+				_confirmedList.removeAll();
+				_MetirialisList.removeAll();
+				_LostList.removeAll();
+				_OpenList.removeAll();
+				_notSelected.removeAll();
+				//_enquiriesHandledByList.removeAll();
+				
+				var totalAdults:Number 	= 0;
+				var totalChild:Number 	= 0;
+			
+			for(var i:int =0; i< _enquiryList.length; i++)
+			{	
+				
+				if((_enquiryList.getItemAt(i) as EnquiryManagement).materialised == "1"){
+					data1.status 	= "1";
+					_MetirialisList.addItem(data1);
+					_tempForMetirialise.Gold = _MetirialisList.length;
+					_tempForMetirialise.Status = "Confirmed";
+					totalValue += Number((_enquiryList.getItemAt(i) as EnquiryManagement).itineryValue);
+					avaregeValue = totalValue ;
+					profit += Number((_enquiryList.getItemAt(i) as EnquiryManagement).profit);
+					//avaregeValue = Number(totalValue / _MetirialisList.length);
+					//avaregeValue = Value;
+					
+				}else if((_enquiryList.getItemAt(i) as EnquiryManagement).lost == "1"){
+					data1.status 	= "1";
+					_LostList.addItem(data1);
+					_tempForLost.Gold = _LostList.length;
+					_tempForLost.Status = "Lost";
+					
+				}else if((_enquiryList.getItemAt(i) as EnquiryManagement).open == "1"){
+					data1.status 	= "1";
+					_OpenList.addItem(data1);
+					_tempForPending.Gold = _OpenList.length;
+					_tempForPending.Status = "Pending";
+					
+				}
+				
+				totalAdults 	+= (_enquiryList.getItemAt(i) as EnquiryManagement).adults;
+				totalChild	 	+= (_enquiryList.getItemAt(i) as EnquiryManagement).childs;
+			}
+			_confirmedList.addItem(_tempForMetirialise);
+			_confirmedList.addItem(_tempForLost);
+			_confirmedList.addItem(_tempForPending);
+			//_confirmedList.addItem(_tempForNotSelected);
+			var totalInquiries:Number = new Number;
+			//totalInquiries = _MetirialisList.length + _LostList.length + _OpenList.length;
+			totalInquiries = _MetirialisList.length + _LostList.length + _OpenList.length;
+			_view.L_totalEnq.text = totalInquiries.toString();
+			_view.L_avValue.text = _view.currencyFormatForGraphs.format(avaregeValue.toString());
+			_view.L_profit.text = _view.currencyFormatForGraphs.format(profit.toString());
+			_view.L_totalpax.text = totalAdults.toString() +'/' + totalChild.toString();
+		}
+		
+		private function setEnquiryStatus():void
+		{
+//			for(var i:int =0; i< _enquiryList.length; i++)
+//			{	
+//				if((_enquiryList.getItemAt(i) as EnquiiryManagement).materialised == "1")
+//					_enquiryManagementObj.enquiryStatus = "Confiremed" ;
+//				else if((_enquiryList.getItemAt(i) as EnquiiryManagement).open == "1")
+//					_enquiryManagementObj.enquiryStatus = "Pending" ;
+//				else if((_enquiryList.getItemAt(i) as EnquiiryManagement).lost == "1")
+//					_enquiryManagementObj.enquiryStatus = "Lost" ;
+//			}		
+//		//--------Enquiry Type
+//			if(_enquiryManagementObj.enquiryType.uuid == "01")
+//				_view.CK_upmarket.selected = true;
+//			else
+//				_view.CK_upmarket.selected = false;	
+//			if(_enquiryManagementObj.enquiryType.uuid == "02")
+//				_view.CK_budget.selected = true;
+//			else
+//				_view.CK_budget.selected = false;
+//			if(_enquiryManagementObj.enquiryType.uuid == "03")
+//				_view.CK_general.selected = true;
+//			else
+//				_view.CK_general.selected = false;
+//			if(_enquiryManagementObj.enquiryType.uuid == "04")
+//				_view.CK_conference.selected = true;
+//			else
+//				_view.CK_conference.selected = false;		
+			
+		}
+		
+		private function countInquiryCategoryItems():void
+		{
+				var data1:Object = new Object();// this is to count the size of each list
+				var _tempEnquiryTypeObj:Object = new Object();
+				_tempEnquiryTypeObj.enquiry_type = "Category of Enquiry";
+				
+				_enquiryCategoryList.removeAll();
+				_upMarketList.removeAll();
+				_budgetList.removeAll();
+				_genaralList.removeAll();
+				//_conferenceList.removeAll();
+			
+			for(var i:int =0; i< _enquiryList.length; i++)
+			{	
+				
+				if((_enquiryList.getItemAt(i) as EnquiryManagement).enquiryCategory.description == "UP Market"){
+					data1.status 	= "1";
+					_upMarketList.addItem(data1);
+					_tempEnquiryTypeObj.UP_Market = _upMarketList.length;
+					
+				}else if((_enquiryList.getItemAt(i) as EnquiryManagement).enquiryCategory.description == "Budjet"){
+					data1.status 	= "1";
+					_budgetList.addItem(data1);
+					_tempEnquiryTypeObj.Budget = _budgetList.length;
+					
+				}else if((_enquiryList.getItemAt(i) as EnquiryManagement).enquiryCategory.description == "Medium"){
+					data1.status 	= "1";
+					_genaralList.addItem(data1);
+					_tempEnquiryTypeObj.Medium = _genaralList.length;
+					
+				}
+//				else if((_enquiryList.getItemAt(i) as EnquiryManagement).enquiryCategory.description == "Conference"){
+//					data1.status 	= "1";
+//					_conferenceList.addItem(data1);
+//					_tempEnquiryTypeObj.Conference = _conferenceList.length;
+//					
+//				}
+				
+			}
+			_enquiryCategoryList.addItem(_tempEnquiryTypeObj);
+		}
+		
+		
+		private function resetDynamicSearch(event:Event):void
+		{
+			reloadListforDynamic();
+		}
+		private function sortOpentickets(event:Event):void
+		{
+		var _q:QuerryObject = new QuerryObject;
+			_q.condition1 = "";
+			_q.searchCode = ENQUIRYOPEN;
+			enquiryManagementRO.dynamicSearch(_q, _loggedInUser);		
+		}
+		private function sortLosttickets(event:Event):void
+		{
+		var _q:QuerryObject = new QuerryObject;
+			_q.condition1 = "";
+			_q.searchCode = ENQUIRYLOST;
+			enquiryManagementRO.dynamicSearch(_q, _loggedInUser);			
+		}
+		private function sortMetirialisedtickets(event:Event):void
+		{
+			var _q:QuerryObject = new QuerryObject;
+			_q.condition1 = "";
+			_q.searchCode = ENQUIRYMETIRIALISED;
+			enquiryManagementRO.dynamicSearch(_q, _loggedInUser);
+		}
+        
+		public override function faultHandler (event:FaultEvent):void {
+//			//To be overridden...
+//			_view.statusLabel.text = "Failed, please contact the admin";
+//			Alert.show("Transaction Failed. \nPlease check your inputs and try again \n " + event.message.toString(), "Error Notification");
+		}
+		
+    private function CurrentDateTimeString():void
+		{               
+			    var CurrentDateTime:Date = new Date();
+			    var CurrentDF:DateFormatter = new DateFormatter();
+			    CurrentDF.formatString = "YYYY/MM/DD";
+			    var DateTimeString:String = CurrentDF.format(CurrentDateTime);
+			    _view.Date_to.text = DateTimeString;
+			    
+		}
+		
+	private function CurrentYear():void
+		{               
+			    var CurrentYear:Date = new Date();
+			    var CurrentDF:DateFormatter = new DateFormatter();
+			    CurrentDF.formatString = "YYYY";
+			    var DateTimeString:String = CurrentDF.format(CurrentYear);
+			    _view.Date_from.text = DateTimeString + "/01/01";
+			    
+		}
+		
+		
+		public override function enquiryManagementForListFetchResultsHandler (event:ResultEvent):void
+		{
+			_enquiryList 						= new ArrayCollection();
+			_enquiryList						= event.result as ArrayCollection;
+			_view.DG_usrReport.dataProvider		= _enquiryList;
+			
+			countEnquiryStatus();
+			countInquiryCategoryItems();
+			setEnquiryStatus();
+			//setMonthForrepoting();
+			
+			_view.chart.dataProvider 	   	    = _confirmedList;
+			_view.column.dataProvider    		= _enquiryCategoryList;
+			
+			stoptBusyCursor();
+	
+		}
+		
+		public override function enquiryManagementCreateResultsHandler (event:ResultEvent):void
+		{
+//			_view.statusLabel.text = "Saved Successfully";
+//			reloadEnquiryList();
+		}
+		
+		 public override function userFetchResultsHandler (event:ResultEvent):void
+	   {
+	   		userCollection	=	new ArrayCollection;
+	   		userCollection  =   event.result as ArrayCollection;
+	   		var allUser:User	 =	new User;
+	   			allUser.uuid	 =	"";
+	   			allUser.firstName= "All";
+	   		userCollection.addItem(allUser);
+	   		
+	   			
+	   		_view.CMB_user.dataProvider	=	userCollection;
+	   		_view.CMB_user.selectedIndex=	userCollection.length-1;
+	   		setDefaultUser();
+	   		stoptBusyCursor();
+	   } 
+	   
+	   private function setDefaultUser():void
+	   {
+	   	
+		   	for(var i:int=0; i<userCollection.length; i++)
+		   	{
+		   		if((userCollection.getItemAt(i) as User).uuid	==	_loggedInUser.uuid){
+		   			_view.CMB_user.selectedIndex	=	i;
+		   			break;
+		   		}
+		   	}
+	   } 
+		
+		
+	}
+}

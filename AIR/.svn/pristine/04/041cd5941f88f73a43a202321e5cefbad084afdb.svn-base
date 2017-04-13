@@ -1,0 +1,148 @@
+package net.jwt.view.helper
+{
+	import flash.events.Event;
+	import flash.events.MouseEvent;
+	
+	import mx.collections.ArrayCollection;
+	import mx.core.UIComponent;
+	import mx.events.CloseEvent;
+	import mx.rpc.events.ResultEvent;
+	
+	import net.jwt.Constants;
+	import net.jwt.event.NotificationArguments;
+	import net.jwt.value.objects.MISChartValueItems;
+	import net.jwt.value.objects.MISChartValueObject;
+	import net.jwt.view.Mediator;
+	import net.jwt.view.popup.JWTPopUp;
+	
+	public class HelperXYZValuesMediator extends Mediator
+	{
+		private var _view:HelperXYZValuesView;
+		
+		private var _app:JWTPopUp;
+		[Bindable] public var args:NotificationArguments;
+		[Bindable] public var list:ArrayCollection;
+		
+		private var cordinatesList:ArrayCollection = new ArrayCollection;
+		
+		private const CLASS_NAME:String 	= "net.jwt.view.mis.HelperXYZValuesView.mxml \n" +
+											  "net.jwt.view.mis.HelperXYZValuesMediator.cs \n" +
+											  "net.jwt.control.HelperXYZValuesCommand.cs \n" ;
+											  
+		public function HelperXYZValuesMediator(view:UIComponent, args:NotificationArguments)
+		{
+			super(view);
+			if(view != null)
+			{
+				_view  = view as HelperXYZValuesView;
+			}
+			
+			if(args != null){
+				this.args 		= args;
+				_loggedInUser	= args.user;
+			}
+				
+			_app = args.viewComponent as JWTPopUp;	
+		}
+		
+		protected override function viewComponentInitialize():void{
+			
+			setLoggedInUser();
+			loadCordinateList();		
+			_view.B_OK.addEventListener(MouseEvent.CLICK, selectAndClose);
+			
+//			_view.DG.doubleClickEnabled = true;
+//			_view.DG.addEventListener(ListEvent.ITEM_DOUBLE_CLICK, selectAndClose);
+//			_view.T_search.addEventListener(Event.CHANGE ,dynamicSearch);
+		}
+		
+		private function setLoggedInUser():void
+		{
+			initializeCountryRemortingObject();
+			countryRO.setLogedInUser(_loggedInUser);
+		}
+		
+		private function selectAndClose(event:Event):void
+		{
+			var chatVO:MISChartValueObject = new MISChartValueObject();
+				chatVO.chartTitle 	= _view.T_title.text;
+				chatVO.chartType	= Constants.GRAPH_TYPE_BUBBLE;
+				chatVO.xField		= (_view.CMB_Xlist.selectedItem as  MISChartValueItems).valueItem;
+				chatVO.xTitle		= (_view.CMB_Xlist.selectedItem as  MISChartValueItems).legend;
+				
+				chatVO.yField		= (_view.CMB_Ylist.selectedItem as  MISChartValueItems).valueItem;
+				chatVO.yTitle		= (_view.CMB_Ylist.selectedItem as  MISChartValueItems).legend;
+				
+				chatVO.radiusField	= (_view.CMB_Zlist.selectedItem as  MISChartValueItems).valueItem;
+				chatVO.zTitle		= (_view.CMB_Zlist.selectedItem as  MISChartValueItems).legend;
+				
+				args.argumentObject =  chatVO;
+				
+				_app.dispatchEvent(new CloseEvent(CloseEvent.CLOSE));
+		}
+		
+		private function dynamicSearch(event:Event):void
+		{
+			//loadCountryList();
+		}
+		
+		private function loadCordinateList():void
+		{
+			var m1:MISChartValueItems = new MISChartValueItems;
+				m1.legend 		= "Per Person Profts (Profits/Adult pax count)";
+				m1.uuid 		= "1";
+				m1.valueLabel	= "PPP";
+				m1.valueItem	= "ppp";
+				
+			var m2:MISChartValueItems = new MISChartValueItems;
+				m2.legend 		= "Total Profit";
+				m2.uuid 		= "2";
+				m2.valueLabel	= "Profits";
+				m2.valueItem	= "profit";
+			
+			var m3:MISChartValueItems = new MISChartValueItems;
+				m3.legend 		= "Total Sale (Invoice Value)";
+				m3.uuid 		= "3";
+				m3.valueLabel	= "Sale";
+				m3.valueItem	= "sale";
+			
+			var m4:MISChartValueItems = new MISChartValueItems;
+				m4.legend 		= "Tour length (No. of days per tour)";
+				m4.uuid 		= "4";
+				m4.valueLabel	= "No. of Days";
+				m4.valueItem	= "noDays";
+				
+			var m5:MISChartValueItems = new MISChartValueItems;
+				m5.legend 		= "Total Adult pax count";
+				m5.uuid 		= "5";
+				m5.valueLabel	= "Pax count";
+				m5.valueItem	= "aduts";
+				
+			var m6:MISChartValueItems = new MISChartValueItems;
+				m6.legend 		= "Per Person Cost (Sales / Pax count)";
+				m6.uuid 		= "6";
+				m6.valueLabel	= "PPC";
+				m6.valueItem	= "ppc";
+						
+			cordinatesList.addItem(m1);
+			cordinatesList.addItem(m2);
+			cordinatesList.addItem(m3);
+			cordinatesList.addItem(m4);
+			cordinatesList.addItem(m5);
+			cordinatesList.addItem(m6);
+			
+			_view.CMB_Xlist.dataProvider = cordinatesList;	
+			_view.CMB_Ylist.dataProvider = cordinatesList;	
+			_view.CMB_Zlist.dataProvider = cordinatesList;	
+			
+		}
+		
+		// Overridden from Mediator class
+		public override function countryFetchResultsHandler(event:ResultEvent):void {
+			list = new ArrayCollection();
+			list = event.result as ArrayCollection;
+			//_view.DG.dataProvider = list;
+		}
+	
+	}
+}

@@ -1,0 +1,105 @@
+package net.jwt.view.helper
+{
+	import flash.events.KeyboardEvent;
+	import flash.events.MouseEvent;
+	
+	import mx.collections.ArrayCollection;
+	import mx.core.UIComponent;
+	import mx.events.CloseEvent;
+	import mx.events.ListEvent;
+	import mx.rpc.events.ResultEvent;
+	
+	import net.jwt.event.INotificationArguments;
+	import net.jwt.event.NotificationArguments;
+	import net.jwt.value.objects.Agent;
+	import net.jwt.value.objects.QuerryObject;
+	import net.jwt.value.objects.User;
+	import net.jwt.view.Mediator;
+	import net.jwt.view.popup.JWTPopUp;
+	
+	public class HelperEnquiryAgentSearchMediator extends Mediator
+	{
+		private var _view:HelperEnquiryAgentSearchView;
+		
+		private var _app:JWTPopUp;
+		[Bindable] public var args:NotificationArguments;
+		private var _args:INotificationArguments;
+		[Bindable] public var _enquiryAgentList:ArrayCollection;
+		//private var _loggedInUser:User;
+		
+		public function HelperEnquiryAgentSearchMediator(view:UIComponent, args:NotificationArguments)
+		{
+			super(view);
+			if(view != null)
+			{
+				_view  = view as HelperEnquiryAgentSearchView;
+			}
+			
+			if(args != null){
+				this.args = args;
+				_loggedInUser = args.user;
+			}
+				
+			_app = args.viewComponent as JWTPopUp;	
+			_loggedInUser = args.originatorObject as User;
+		}
+		
+		protected override function viewComponentInitialize():void{
+			setLoggedInUser();
+			loadAgentList();		
+			_view.DG.doubleClickEnabled = true;
+			_view.DG.addEventListener(ListEvent.ITEM_DOUBLE_CLICK, selectAndClose);
+			_view.T_search.addEventListener(KeyboardEvent.KEY_UP, dynamicSearch);
+			_view.CB_code.addEventListener(MouseEvent.CLICK, resetDynamicSearch);
+			_view.CB_name.addEventListener(MouseEvent.CLICK, resetDynamicSearch);
+		}
+
+		private function setLoggedInUser():void
+		{
+			initializeAgentRemortingObject();
+			agentsRO.setLogedInUser(_loggedInUser);
+		}
+		
+		private function selectAndClose(event:ListEvent):void
+		{
+			var obj:Agent	    =  _enquiryAgentList.getItemAt(event.rowIndex) as Agent;
+			args.argumentObject = obj;
+			_app.dispatchEvent(new CloseEvent(CloseEvent.CLOSE));
+		}
+		private function resetDynamicSearch(event:Event):void
+		{
+			// Let it search by what in already
+			//_view.TextAagentSearch.text = "";
+			loadAgentList();
+		}
+		
+		private function dynamicSearch(event:KeyboardEvent):void
+		{
+			loadAgentList()
+		}
+		private function loadAgentList():void
+		{
+			var _q:QuerryObject = new QuerryObject;
+			_q.condition1 = _view.T_search.text.toString();
+			
+			if(_view.CB_name.selected == true)
+				_q.searchCode = "dynamicFName";
+			else if(_view.CB_code.selected == true)	
+				_q.searchCode = "dynamicCode";
+			else if(_view.CB_accessCode.selected == true)	
+				_q.searchCode = "dynamicAccessCode";
+				
+			startBusyCursor();	
+			agentsRO.dynamicSearch(_q, _loggedInUser);
+			
+		}
+		// Overridden from Mediator class
+		public override function agentFetchResultsHandler(event:ResultEvent):void {
+			_enquiryAgentList 	  	= new ArrayCollection();
+			_enquiryAgentList		= event.result as ArrayCollection;
+			_view.DG.dataProvider 	= _enquiryAgentList;
+			stoptBusyCursor();
+		}
+	
+	}
+}

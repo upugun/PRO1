@@ -1,0 +1,27 @@
+package net.jwt.value.objects
+{
+	import net.jhl.value.objects.common.TimeStamp;
+	import net.jhl.view.JWHConstants;
+	
+	[RemoteClass(alias="net.jwt.value.objects.MarketingCostAccount")]
+	
+	[Bindable]
+	public class MarketingCostAccount
+	{
+		public var uuid:String 			= "";
+		public var categoryId:String 	= "";
+		public var seasonId:String 		= "";
+		public var code:String			= "";
+		public var description:String	= "";
+		public var createdByid:String	= "";
+		public var status:String		=	JWHConstants.STATUS_LABLE_ACTIVE;
+		
+		public var timeStamp:TimeStamp;
+		
+		public function MarketingCostAccount()
+		{
+			timeStamp = new TimeStamp();
+		}
+
+	}
+}

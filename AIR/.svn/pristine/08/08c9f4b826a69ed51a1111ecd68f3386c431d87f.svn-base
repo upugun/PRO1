@@ -1,0 +1,43 @@
+package net.jwt.control
+{
+	import mx.core.UIComponent;
+	
+	import net.jwt.event.NotificationArguments;
+	import net.jwt.view.helper.TransportHelperDriverOrGuideMediator;
+	import net.jwt.view.helper.TransportHelperDriverOrGuideView;
+	import net.jwt.view.helper.TransportHelperTermitationMediator;
+	import net.jwt.view.helper.TransportHelperTermitationView;
+	import net.jwt.view.popup.JWTPopUp;
+	
+	import org.puremvc.as3.interfaces.INotification;
+	import org.puremvc.as3.patterns.command.SimpleCommand;
+	
+	public class TransportHelperTermitationCommand extends SimpleCommand
+	{
+		private var _mediator:TransportHelperTermitationMediator
+		private var _view:TransportHelperTermitationView
+		private var _args:UIComponent;
+		
+		override public function execute(notification:INotification):void
+		{
+			var args:NotificationArguments = notification.getBody() as NotificationArguments;
+			
+			if (null != args){
+				var app:JWTPopUp 									= args.viewComponent as JWTPopUp;
+				var view:TransportHelperTermitationView  			= new TransportHelperTermitationView;
+				var mediator:TransportHelperTermitationMediator 	= new TransportHelperTermitationMediator(view,args);
+			
+				this._mediator = mediator;
+				this._args     = args as UIComponent;
+				this._view     = view;
+				
+				facade.registerMediator(mediator);
+				app.addChild(view);
+			}
+		}
+		public function TransportHelperTermitationCommand():void
+		{
+			//Alert.show("DailyGraphPriceBasedMediator command");
+		}
+	}
+}

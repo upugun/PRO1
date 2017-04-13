@@ -1,0 +1,56 @@
+package com.objects
+{
+	import flash.events.MouseEvent;
+	
+	import mx.controls.Alert;
+	import mx.controls.Label;
+
+	public class JWTHyperLinkText extends Label
+	{
+		private var huperLink:String 	= "";
+		public var lable:String 		= "";
+		
+		public function JWTHyperLinkText()
+		{
+			super();
+		}
+		
+		public function set link(link:String):void
+		{
+			if(link.length > 0)
+			{
+				this.huperLink = link;
+				this.setStyle("color", "#086db4");
+				this.addEventListener(MouseEvent.CLICK, openLink);
+				this.addEventListener(MouseEvent.MOUSE_MOVE, mouseMove);
+				this.addEventListener(MouseEvent.MOUSE_OUT, mouseOut);
+			}
+		}
+		
+		public function get link():String
+		{
+			return this.huperLink;
+		}
+		
+		private function openLink(e:MouseEvent):void
+		{
+			this.setStyle("color", "#740ca4");
+			
+			//if(this.huperLink.length>0)
+				//Alert.show(this.huperLink);
+			
+		}
+		
+		private function mouseMove(e:MouseEvent):void
+		{
+			this.setStyle("textDecoration", "underline");
+		}
+		
+		private function mouseOut(e:MouseEvent):void
+		{
+			this.setStyle("color", "#086db4");
+			this.setStyle("textDecoration", "normal");
+		}
+		
+	}
+}

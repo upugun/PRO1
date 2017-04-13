@@ -1,0 +1,636 @@
+<?xml version="1.0" encoding="utf-8"?>
+<common:JHCanvas xmlns:mx="http://www.adobe.com/2006/mxml" title="Reservation - {resNo}" width="100%" height="100%" fontSize="11" xmlns:objects="com.objects.*" xmlns:common="net.jhl.view.common.*" >
+	<mx:Script>
+		<![CDATA[
+			import mx.validators.NumberValidator;
+			import net.jhl.value.objects.Reservation;
+			import net.jhl.value.objects.Guest;
+			
+			import mx.events.ValidationResultEvent;
+			
+			[Embed(source='assets/icons/24x24add.png')]
+	     	private static const add:Class;
+	     	
+	     	[Embed(source='assets/icons/24x24trash.png')]
+	     	private static const trash:Class;
+	     	
+	     	[Embed(source='assets/icons/24x24res.png')]
+	     	private static const res:Class;
+	     	
+	     	private function getguestName(item:Guest):String {
+			 	var str:String = "";
+			 		str =item.personalDetails.firstName + ' ' + item.personalDetails.lastName;
+			  return str;
+			}
+			
+			[Bindable]
+			  public var reservation:Reservation = new Reservation();
+			  
+			[Bindable] public var errorFree:Boolean = true; 
+			  
+			[Bindable]public var totalNetAmount:Number 		= 0; 
+			[Bindable]public var totalDisplayAmount:Number 	= 0;  // dynamic amount when removing taxes
+			[Bindable]public var totalTaxAmount:Number 		= 0; 
+			[Bindable]public var totalWithTaxAmount:Number  = 0;  // original with tax amount
+			[Bindable]public var totalRooms:Number 	  		= 0;
+			[Bindable]public var resNo:String				= "";
+			[Bindable]public var currencyType:String		= "";
+			
+			
+			public function roundOffLastTwoDecimals(number:Number):Number
+			{
+				return Math.round((number)*100)/100;
+			}
+		
+			public function numberFormatting(value:String):String
+			{
+				var formatter:NumberFormatter = new NumberFormatter;
+				formatter.precision	= 2;
+				return formatter.format(value);
+			}
+			
+			public function displayFinalRoundedFormattedValue(number:Number):String
+			{
+				
+				
+				var roundedfValue:Number = roundOffLastTwoDecimals(number);
+				
+				var str:String			 = numberFormatting(roundedfValue.toString());
+				
+				return str;
+			}
+		
+			  
+		]]>
+	</mx:Script>
+	<mx:NumberFormatter id="formatter"/>
+	<mx:NumberFormatter id="undoformatter" precision="2" useThousandsSeparator="false"/>
+	<mx:VBox width="100%">
+
+		<mx:HBox width="100%" height="100%" horizontalGap="10">
+			<mx:VBox width="39%" height="100%" verticalGap="10" paddingLeft="4">
+				<mx:VBox width="100%">
+					<mx:Label text="Hotel Reservation "  styleName="labelType1"/>
+					<mx:HRule height="1" width="100%"/>
+					<mx:HBox width="100%">
+						<mx:Grid width="100%" paddingTop="10"> 
+							<!--mx:GridRow width="100%">
+								<mx:GridItem>
+									<mx:Label text="Reservation No"  width="180"/>
+								</mx:GridItem>
+								<mx:GridItem >
+									<common:JHTextInput id="T_resNo"  minWidth="250" width="80%" editable="false" text="{reservation.originator + '-' +reservation.reservationYear + '-' +reservation.reservationNo}"/>
+								</mx:GridItem>
+							</mx:GridRow-->
+							<mx:GridRow>
+								<mx:GridItem>
+									<mx:Label text="Hotel"  width="180"/>
+								</mx:GridItem>
+								<mx:GridItem >
+									<common:JHComboBox id="CMB_property" labelField="propertyName" minWidth="250" width="80%"></common:JHComboBox>
+								</mx:GridItem>
+							</mx:GridRow>
+							<mx:GridRow>
+								<mx:GridItem>
+									<mx:Label text="Currency"  width="180"/>
+								</mx:GridItem>
+								<mx:GridItem >
+									<common:JHComboBox id="CMB_currency" labelField="currencyCode" minWidth="250" width="80%"></common:JHComboBox>
+								</mx:GridItem>
+							</mx:GridRow>
+							<mx:GridRow>
+								<mx:GridItem>
+									<mx:Label text="Chk-in"  width="180"/>
+								</mx:GridItem>
+								<mx:GridItem>
+									<mx:HBox horizontalGap="15">
+										<common:JHDateField id="D_checkin" text="{reservation.arrivalDetails.checkInDate}" change="{reservation.arrivalDetails.checkInDate = D_checkin.text}" editable="true"/>
+									</mx:HBox>
+									<mx:Label text=" "/>
+									<objects:JwtNumberInput width="53" text="{reservation.numberOfNights.toString()}" id="T_no_ofDays" change="{reservation.numberOfNights = int(T_no_ofDays.text)}"/>
+									<mx:Label text="Nights"/>
+								</mx:GridItem>
+							</mx:GridRow>
+							<mx:GridRow>
+								<mx:GridItem>
+									<mx:Label text="Chk-out"  width="180"/>
+								</mx:GridItem>
+								<mx:GridItem>
+									<mx:HBox horizontalGap="15">
+										<common:JHDateField id="D_checkout" text="{reservation.departureDetails.checkOutDate}" change="{reservation.departureDetails.checkOutDate = D_checkout.text}" enabled="false"/>
+									</mx:HBox>
+								</mx:GridItem>
+							</mx:GridRow>
+							<mx:GridRow>
+								<mx:GridItem>
+									<mx:Label text="Meal"  width="45"/>
+								</mx:GridItem>
+								<mx:GridItem>
+									<mx:HBox horizontalGap="8">
+										<mx:Label text="Arrival"  width="56"/>
+										<common:JHComboBox id="CMB_arrivalMeal" dataProvider="{JWHConstants.mealTypeList}" labelField="label" width="57"></common:JHComboBox>
+										<mx:Label text="Leave"  width="45"/>
+										<common:JHComboBox id="CMB_leaveMeal" dataProvider="{JWHConstants.mealTypeList}" labelField="label" width="57"></common:JHComboBox>
+									</mx:HBox>
+								</mx:GridItem>
+							</mx:GridRow>
+							<mx:GridRow>
+								<mx:GridItem>
+									<mx:Label text="Pax"  width="45"/>
+								</mx:GridItem>
+								<mx:GridItem>
+									<mx:HBox horizontalGap="8">
+										<mx:Label text="Adults*"  width="56"/>
+										<objects:JwtNumberInput enableValication="true" id="T_adults"  width="57" text="{reservation.noOfAdults.toString()}" change="{reservation.noOfAdults = int(T_adults.text)}"/>
+										<mx:Label text="Child"  width="45"/>
+										<objects:JwtNumberInput id="T_child" width="57" text="{reservation.noOfChildren.toString()}" change="{reservation.noOfChildren = int(T_child.text)}" />
+									</mx:HBox>
+								</mx:GridItem>
+							</mx:GridRow>
+							<mx:GridRow>
+								<mx:GridItem>
+									<mx:Label text="Tour Number"  width="180"/>
+								</mx:GridItem>
+								<mx:GridItem>
+									<mx:HBox horizontalGap="5">
+										<common:JHTextInput id="T_tourNumber"  minWidth="250" width="80%" editable="true" text="{reservation.tourNo}" change="{reservation.tourNo = T_tourNumber.text.toString()}"/>
+									</mx:HBox>
+								</mx:GridItem>
+							</mx:GridRow>
+							<mx:GridRow>
+								<mx:GridItem>
+									<mx:Label text="Hotel Voucher Number"  width="180"/>
+								</mx:GridItem>
+								<mx:GridItem>
+									<mx:HBox horizontalGap="5">
+										<common:JHTextInput id="T_voucherNumber"  minWidth="250" width="80%" editable="true" text="{reservation.voucherNo}" change="{reservation.voucherNo = T_voucherNumber.text}"/>
+									</mx:HBox>
+								</mx:GridItem>
+							</mx:GridRow>
+							<!--mx:GridRow >
+								<mx:GridItem>
+									<mx:Label text="Comments by agent/guest"  width="180"/>
+								</mx:GridItem>
+								<mx:GridItem>
+									<mx:HBox horizontalGap="5">
+										<common:JHTextArea id="T_agentComments"  height="120" minWidth="250" width="80%" editable="true" text="{reservation.commentsByAgent}" change="{reservation.commentsByAgent=T_agentComments.text}"/>
+									</mx:HBox>
+								</mx:GridItem>
+							</mx:GridRow-->
+						</mx:Grid>
+						<mx:VBox width="200" height="210">
+							<mx:VBox width="100%" height="80" verticalAlign="middle" horizontalAlign="right">
+								<common:JHButton id="B_avaiability" JLabel="Availability" JStyle="jhButtonStyleB2"/>
+							</mx:VBox>
+							<mx:VBox width="100%" height="80" verticalAlign="middle" horizontalAlign="right">
+								<common:JHButton id="B_showRates" JLabel="Rates" JStyle="jhButtonStyleB2" />
+								
+							</mx:VBox>
+						</mx:VBox>
+					</mx:HBox>
+					
+				</mx:VBox>
+				
+				
+				<mx:VBox width="100%">
+					<mx:Label text="Guest / Operator Details" styleName="labelType1"/>
+					<mx:HRule height="1" width="100%"/>
+					
+					<mx:VBox width="100%">
+					
+						<mx:Grid paddingTop="10" width="100%">
+							<mx:GridRow width="100%" height="0">
+								<mx:GridItem>
+									<mx:Label text="Reserved By"  width="180"/>
+								</mx:GridItem>
+								<mx:GridItem >
+									<mx:RadioButton label="FIT   " groupName="radiogroup1" id="RD_bt_fit" selected="true"/>
+									<mx:RadioButton label="OTA    " groupName="radiogroup1" id="RD_bt_ota"/>
+									<mx:RadioButton label="Agent/Operator" groupName="radiogroup1" id="RD_bt_agent"/>
+									<mx:RadioButtonGroup id="radiogroup2"/>
+								</mx:GridItem>
+								<mx:GridItem width="100%">
+								</mx:GridItem>
+							</mx:GridRow>
+							<mx:GridRow width="100%">
+								<mx:GridItem verticalAlign="top">
+									<mx:Label text="Agent/Operator"  width="180"/>
+								</mx:GridItem>
+								<mx:GridItem>
+										<common:JHTextInput id="T_agent" enableValication="true"  editable="false" text="{reservation.agentDetails.agentName}" minWidth="250" width="80%"/>
+								</mx:GridItem>
+									
+								<mx:GridItem verticalAlign="middle" horizontalAlign="right">
+									<common:JHButton id="B_agent_search" JLabel="Agent" JStyle="jhButtonStyleB2"/>
+								</mx:GridItem>
+							</mx:GridRow>
+							<mx:GridRow width="100%" id="gr_dmc" height="0">
+								<mx:GridItem verticalAlign="top">
+									<mx:Label text="DMC Market"  width="180"/>
+								</mx:GridItem>
+								<mx:GridItem>
+									<mx:ComboBox width="250" id="CMB_dmcMarket" labelField="dmcName"></mx:ComboBox>
+								</mx:GridItem>
+									
+								<mx:GridItem verticalAlign="middle" horizontalAlign="right">
+								</mx:GridItem>
+							</mx:GridRow>
+							<mx:GridRow width="100%">
+								<mx:GridItem>
+									<mx:Label text="Pax Type"  width="180"/>
+								</mx:GridItem>
+								<mx:GridItem >
+									<mx:RadioButton label="Individual   " groupName="radiogroupig" id="RD_bt_individual" selected="true" width="96"/>
+									<mx:RadioButton label="Group    " groupName="radiogroupig" id="RD_bt_group"/>
+									<mx:RadioButtonGroup id="radiogroupig"/>
+								</mx:GridItem>
+								<mx:GridItem width="100%">
+								</mx:GridItem>
+							</mx:GridRow>
+							<mx:GridRow width="100%">
+								<mx:GridItem>
+									<mx:Label text="Guest Type"  width="180"/>
+								</mx:GridItem>
+								<mx:GridItem >
+									<mx:RadioButton label="Local   " groupName="radiogrouplf" id="RD_bt_local" selected="true" width="96"/>
+									<mx:RadioButton label="Foreign    " groupName="radiogrouplf" id="RD_bt_foreign"/>
+									<mx:RadioButtonGroup id="radiogrouplf"/>
+								</mx:GridItem>
+								<mx:GridItem width="100%">
+								</mx:GridItem>
+							</mx:GridRow>
+							<mx:GridRow  width="100%">
+								<mx:GridItem>
+									<mx:Label text="First Name/ Group Name"  width="180"/>
+								</mx:GridItem>
+								<mx:GridItem >
+										<common:JHTextInput id="T_guest" enableValication="true"   editable="false" text="{reservation.guestFirstName}" change="{reservation.guestFirstName = T_guest.text}" minWidth="250" width="80%"/>
+								</mx:GridItem>
+								<mx:GridItem verticalAlign="middle" horizontalAlign="right">
+									<common:JHButton id="B_guestDetails" JLabel="Guest" JStyle="jhButtonStyleB2"/>
+								</mx:GridItem>
+							</mx:GridRow>
+							<mx:GridRow  width="100%">
+								<mx:GridItem>
+									<mx:Label text="Last Name/ TL Name"  width="180"/>
+								</mx:GridItem>
+								<mx:GridItem >
+										<common:JHTextInput id="T_guestLname" enableValication="true"   editable="false" text="{reservation.guestLastName}" change="{reservation.guestLastName = T_guestLname.text}" minWidth="250" width="80%"/>
+								</mx:GridItem>
+								<mx:GridItem verticalAlign="middle" horizontalAlign="right">
+								</mx:GridItem>
+							</mx:GridRow>
+							<mx:GridRow  width="100%">
+								<mx:GridItem>
+									<mx:Label text="Country"  width="180"/>
+								</mx:GridItem>
+								<mx:GridItem >
+										<common:JHTextInput id="T_country" enableValication="true"   editable="false" text="{reservation.guestDetails.personalDetails.country.countryName}"  minWidth="250" width="80%"/>
+								</mx:GridItem>
+								<mx:GridItem verticalAlign="middle" horizontalAlign="right">
+									<common:JHButton id="B_country" JLabel="Country" JStyle="jhButtonStyleB2" enabled="false"/>
+								</mx:GridItem>
+							</mx:GridRow>
+							<mx:GridRow width="100%">
+							</mx:GridRow>
+							<mx:GridRow width="100%">
+							</mx:GridRow>
+							<mx:GridRow height="0" width="100%">
+								<mx:GridItem>
+									<mx:Label text="Country"  width="180"/>
+								</mx:GridItem>
+								<mx:GridItem>
+									<common:JHLabel text="{reservation.guestDetails.personalDetails.country.countryName}"/>
+								</mx:GridItem>
+							</mx:GridRow>
+						</mx:Grid>
+						<mx:Grid>
+							<mx:GridRow width="100%">
+								<mx:GridItem>
+									<mx:Label text="Contact Details"  styleName="labelType1"/>
+								</mx:GridItem>
+								<mx:GridItem width="100%">
+								</mx:GridItem>
+								<mx:GridItem verticalAlign="middle" horizontalAlign="right">
+								</mx:GridItem>
+							</mx:GridRow>
+							<mx:GridRow>
+								<mx:GridItem>
+									<mx:Label text="Confirmed by"  width="180"/>
+								</mx:GridItem>
+								<mx:GridItem>
+									<mx:HBox horizontalGap="5">
+										<common:JHTextInput id="T_voucherConfirmedBy"  minWidth="250" width="80%" editable="true" text="{reservation.confirmedBy}" change="{reservation.confirmedBy=T_voucherConfirmedBy.text}" />
+									</mx:HBox>
+								</mx:GridItem>
+							</mx:GridRow>
+							<mx:GridRow width="100%">
+								<mx:GridItem>
+									<mx:Label text="Email"  width="180"/>
+								</mx:GridItem>
+								<mx:GridItem width="100%">
+									<common:JHTextInput id="T_contact_email" text="{reservation.contactEmail}" change="{reservation.contactEmail=T_contact_email.text}"   editable="true" minWidth="250" width="80%"/>
+								</mx:GridItem>
+								<mx:GridItem verticalAlign="middle" horizontalAlign="right">
+								</mx:GridItem>
+							</mx:GridRow>
+							<mx:GridRow width="100%">
+								<mx:GridItem>
+									<mx:Label text="Mobile"  width="180"/>
+								</mx:GridItem>
+								<mx:GridItem width="100%">
+									<common:JHTextInput id="T_contact_mobile" text="{reservation.contactMobileNo}" change="{reservation.contactMobileNo=T_contact_mobile.text}"   editable="true"  minWidth="250" width="80%"/>
+								</mx:GridItem>
+								<mx:GridItem verticalAlign="middle" horizontalAlign="right">
+								</mx:GridItem>
+							</mx:GridRow>
+						</mx:Grid>
+					</mx:VBox>
+					
+					<mx:VBox width="100%" >
+						<mx:Grid paddingTop="10" width="100%">
+							<mx:GridRow width="100%">
+								<mx:GridItem>
+								</mx:GridItem>
+								<mx:GridItem >
+								</mx:GridItem>
+								<mx:GridItem width="100%">
+								</mx:GridItem>
+							</mx:GridRow>
+						</mx:Grid>
+					</mx:VBox>
+				</mx:VBox>
+				
+				<mx:VBox width="100%"> 
+					<mx:Label text="Notes by the reservation agent" styleName="labelType1"/>
+					<mx:Label height="5" />
+					<common:JHTextArea id="T_remarks" width="100%" height="100%" editable="true" text="{reservation.remarks}" change="{reservation.remarks = T_remarks.text}"/>
+				</mx:VBox>
+			</mx:VBox>
+			<mx:VRule height="100%" width="1" />
+			<mx:VBox width="61%" height="100%" verticalGap="10">
+				<mx:VBox width="100%">
+					<mx:Label text="Booking Details" styleName="labelType1"/>
+					<mx:HRule height="1" width="100%"/>
+					<mx:HBox paddingTop="10">
+						<mx:VBox>
+							
+						<mx:HBox horizontalGap="5">
+							<mx:Label text="CHK-in" width="100"/>
+							<mx:Label text="CHK-out" width="100"/>
+							<mx:Label text="Room Cat." width="120"/>
+							<mx:Label text="Meal" width="60"/>
+							<mx:Label text="SGL" width="50"/>
+							<mx:Label text="DBL" width="50"/>
+							<mx:Label text="TPL" width="50"/>
+							<!--mx:Label text="Adults" width="50"/>
+							<mx:Label text="Child" width="50"/>
+							<mx:Label text="Guide" width="50"/-->
+							<mx:Label text="D/S" width="30"/>
+						</mx:HBox>
+						<mx:VBox width="100%" id="V_dynamic_vbox_for_res">
+							
+						</mx:VBox>
+						<mx:HBox horizontalGap="5">
+							<mx:RadioButtonGroup id="rdg_status"/>
+							<mx:Label text="" width="100"/>
+							<mx:Label text="" width="100"/>
+							<mx:Label text="" width="120"/>
+							<mx:Label text="" width="60"/>
+							<mx:Label text="{reservation.noOfSglRooms}" width="50" textAlign="center"/>
+							<mx:Label text="{reservation.noOfDblRooms}" width="50" textAlign="center"/>
+							<mx:Label text="{reservation.noOfTplRooms}" width="50" textAlign="center"/>
+							<!--mx:Label text="{reservation.noOfAdults}" width="50" textAlign="center"/>
+							<mx:Label text="{reservation.noOfChildren}" width="50" textAlign="center"/>
+							<mx:Label text="{reservation.noOfGuides}" width="50" textAlign="center"/-->
+							
+						</mx:HBox>
+						</mx:VBox>
+						<mx:VBox width="50" height="100%" paddingTop="50" paddingLeft="20" verticalGap="5">
+							<mx:Button id="B_res" 	 	toolTip="" 					skin="{res}" borderColor="#DFDFDF"/>
+					  		<mx:Button id="B_add" 	 	toolTip="ADD new line (Ctrl + n)" 					skin="{add}" borderColor="#DFDFDF"/>
+							<mx:Label height="32" />
+							<mx:Button id="B_del" 	 	toolTip="DELETE selected line (F9)"			skin="{trash}" borderColor="#DFDFDF"/>
+					  	</mx:VBox>
+					</mx:HBox>
+				</mx:VBox>
+				<mx:HBox width="100%">
+					
+					
+				</mx:HBox>
+				<mx:VBox width="100%" height="0">
+					<mx:Label text="Applied Room Rates" fontSize="20"/>
+					<mx:HRule height="1" width="80%"/>
+					<mx:VBox height="100%" horizontalAlign="left" paddingLeft="30">
+						<mx:HBox>
+				  			<mx:Label text="" width="150"/>
+				  			<mx:Label text="OCP" width="60"  textAlign="right"/>
+				  			<mx:Label text="SGL" width="100" textAlign="right"/>
+				  			<mx:Label text="DBL" width="100" textAlign="right"/>
+				  			<mx:Label text="TPL" width="100" textAlign="right"/>	
+						</mx:HBox>
+						<mx:VBox paddingTop="10" id="V_dynamic_rates">
+						
+						</mx:VBox>
+					</mx:VBox>
+				</mx:VBox>
+				
+				<mx:VBox width="100%" height="0">
+					<mx:Label text="Special Discounts Applied" fontSize="20"/>
+					<mx:HRule height="1" width="80%"/>
+					<mx:VBox paddingTop="10" id="V_discounts">
+						
+					</mx:VBox>
+				</mx:VBox>
+				<mx:HBox width="100%" horizontalGap="5">
+					<common:JHCheckBox label="Do you have a promotion code?" id="CHK_promotionCode" selected="{reservation.applyPromotionCode}"/>
+					<common:JHTextInput id="T_promoCode" visible="false" text="{reservation.promotionCode}" change="{reservation.promotionCode = T_promoCode.text}"/>
+					<common:JHButton JLabel="Apply" id="B_promoCode" visible="false"/>
+				</mx:HBox>
+				<mx:VBox borderStyle="solid" paddingLeft="5" paddingRight="5" paddingBottom="5">
+					<mx:HBox width="100%">
+						<common:JHCheckBox label="Guide Room Required?" id="CHK_guide_required" selected="{reservation.guideRequire}"/>
+						<mx:Label text="*Guide rate should be in the same currency &amp; exclusive taxes"  color="#F4290D" visible="false" id="L_guide_rate_desc"/>
+					</mx:HBox>
+					<mx:VBox id="V_guide" height="0">
+						<mx:Grid>
+							<mx:GridRow>
+								<mx:GridItem>
+									<mx:Label text="No Of Guide"  width="164"/>
+									
+								</mx:GridItem>
+								<mx:GridItem>
+									<objects:JwtNumberInput id="T_noOfGuide"  width="145" text="{reservation.guide.noOfGuides.toString()}" change="{reservation.guide.noOfGuides = Number(T_noOfGuide.text)}"/>
+								</mx:GridItem>
+								<mx:GridItem>
+									<mx:Label text="Guide Rate"  width="164"/>
+									
+								</mx:GridItem>
+								<mx:GridItem>
+									<objects:JwtNumberInput id="T_guideRate" width="145" text="{reservation.guide.guideRate.toString()}" change="{reservation.guide.guideRate = Number(T_guideRate.text)}" />
+									
+								</mx:GridItem>
+							</mx:GridRow>
+							<mx:GridRow>
+								<mx:GridItem>
+									<mx:Label text="Guide Meal Basis"  width="164"/>
+								</mx:GridItem>
+								<mx:GridItem>
+									<common:JHComboBox id="CMB_guide_meal" labelField="label" dataProvider="{JWHConstants.roomBasisList}" width="145"/>
+								</mx:GridItem>
+								<mx:GridItem>
+									<mx:Label text="Guide Occupancy Type"  width="164"/>
+									
+								</mx:GridItem>
+								<mx:GridItem>
+									<common:JHComboBox id="CMB_guide_occupancy" labelField="label" dataProvider="{JWHConstants.roomOccupancyList}" width="145"/>
+									
+								</mx:GridItem>
+							</mx:GridRow>
+							<mx:GridRow>
+								<mx:GridItem>
+									<mx:Label text="Guide Room"  width="164"/>
+								</mx:GridItem>
+								<mx:GridItem>
+									<common:JHComboBox id="CMB_guide_room" labelField="roomCategoryName"  width="145"/>
+								</mx:GridItem>
+								<mx:GridItem>
+									
+								</mx:GridItem>
+								<mx:GridItem>
+									
+								</mx:GridItem>
+							</mx:GridRow>
+						</mx:Grid>
+					</mx:VBox>
+				</mx:VBox>
+				<mx:VBox width="751" height="100%">
+					<mx:Label text="Payment Details" styleName="labelType1" color="#0A5D6F"/>
+					<mx:HRule height="1" width="100%"/>
+					<mx:VBox width="100%">
+						<mx:HBox width="100%" horizontalGap="5">
+							<mx:Label text="Room Catagory"  width="160"/>
+							<mx:Label text="Meal plan"  width="80"/>
+							<mx:Label text="Occ."  width="80"/>
+							<mx:Label text="No. of Room Nights"  width="100"/>
+							<mx:Label text="Room Rate"  width="100" textAlign="right"/>
+							<mx:Label text="Total"  width="112" textAlign="right"/>
+							<mx:Label text="Guest/guide"  width="80" textAlign="right"/>
+						</mx:HBox>
+						
+						<mx:VBox width="100%" id="V__pd_dynamicRoomRate" verticalGap="5">
+						</mx:VBox>
+						
+						<mx:HRule width="100%" height="1" />
+						<mx:HBox width="100%" horizontalGap="5">
+							<mx:Label visible="false"  width="160"/>
+							<mx:Label visible="false"  width="80"/>
+							<mx:Label visible="false"  width="80"/>
+							<mx:Label text="{displayFinalRoundedFormattedValue(totalRooms)}"  width="100"/>
+							<mx:Label width="112" textAlign="right"/>
+							<mx:Label text="{displayFinalRoundedFormattedValue(totalNetAmount)}"  width="112" textAlign="right" visible="false"/>
+						</mx:HBox>
+						<mx:HBox width="100%" horizontalGap="5">
+							<mx:Label text="Total Pay ({currencyType})"  width="170" fontSize="20" color="#0072E6"/>
+							<!--mx:Label visible="false"  width="80"/>
+							<mx:Label visible="false"  width="80"/-->
+							<mx:Label visible="false"  width="80"/>
+							<mx:Label text="{displayFinalRoundedFormattedValue(totalDisplayAmount)}"  width="112" fontSize="20" color="#0072E6" textAlign="right"/>
+					</mx:HBox>
+					<mx:HRule width="100%" height="1" />
+					</mx:VBox>
+					
+					<mx:VBox width="100%" id="V_pd_dynamicTax" verticalGap="5">
+					</mx:VBox>
+					
+					<mx:HRule width="100%" height="1" />
+					<mx:HBox width="100%" horizontalGap="5">
+							<mx:Label text="Total Tax"  width="165"/>
+							<!--mx:Label visible="false"  width="80"/>
+							<mx:Label visible="false"  width="80"/-->
+							<mx:Label visible="false"  width="80"/>
+							<mx:Label text="{displayFinalRoundedFormattedValue(totalTaxAmount)}"  width="112" textAlign="right"/>
+							<common:JHButton id="B_editTax" JLabel="Edit Tax" JStyle="jhButtonStyleB2"/>
+					</mx:HBox>
+					<mx:HRule width="100%" height="1" />
+					
+					<mx:Label height="2" />
+					<mx:HRule width="100%" height="1" />
+					<mx:HBox width="100%" horizontalGap="5" verticalAlign="middle">
+							<mx:Label text=""  width="160" color="#0072E6"/>
+							<!--mx:Label visible="false"  width="80"/>
+							<mx:Label visible="false"  width="80"/-->
+							<mx:Label visible="false"  width="100"/>
+							<mx:Label visible="false"  width="100"/>
+							
+					</mx:HBox>
+					
+					<mx:Grid paddingTop="10" width="100%">
+						<mx:GridRow>
+							<mx:GridItem>
+								<mx:Label text="Mode of payment"  width="160"/>
+							</mx:GridItem>
+							<mx:GridItem>
+								<mx:RadioButtonGroup id="radiogroup3"/>
+								<mx:RadioButton label="Credit   " groupName="radiogroup3" id="RD_credit" width="87"/>
+								<mx:RadioButton label="Cash   " groupName="radiogroup3" id="RD_cash" selected="true" width="85"/>
+								<mx:RadioButton label="Agent   " groupName="radiogroup3" id="RD_agent" width="80"/>
+								<mx:RadioButton label="Credit Card   " groupName="radiogroup3" id="RD_creditCard" width="105"/>
+								<mx:RadioButton label="Complimentory" groupName="radiogroup3" id="RD_complementry" width="133"/>
+							</mx:GridItem>
+							<mx:GridItem>
+							</mx:GridItem>
+						</mx:GridRow>
+						<mx:GridRow>
+							<mx:GridItem>
+								<mx:Label text="Booking Status" />
+							</mx:GridItem>
+							<mx:GridItem>
+								<mx:RadioButton label="Confirmed" groupName="rdg_status" id="RD_confirmed" width="87"/>
+								<mx:RadioButton label="Waitlisted" groupName="rdg_status" id="rd_waitlisted" width="85"/>
+								<mx:RadioButton label="Tentative" groupName="rdg_status" id="rd_tentative" width="80"/>
+								<mx:RadioButton label="Cancel" groupName="rdg_status" id="rd_cancel" width="105"/>
+								<mx:RadioButton label="Send for Approval" groupName="rdg_status" id="rd_approval" enabled="false"  width="133"/>
+							</mx:GridItem>
+							<mx:GridItem>
+							</mx:GridItem>
+						</mx:GridRow>
+						
+					</mx:Grid>	
+					<mx:HBox horizontalGap="5" paddingTop="10">
+						<mx:VBox>
+							<common:JHTimeStampBox JDataSet="{reservation.timeStamp}" />
+						</mx:VBox>
+						<mx:VBox verticalGap="5">
+							<mx:HBox horizontalGap="5">
+								<common:JHButton id="B_preferences" JLabel="Bed Preferences" JStyle="jhButtonStyleB2"/>
+								<common:JHButton JLabel="Apply Rate Changes" horizontalAlign="right" JWidth="112" id="B_refresh" JStyle="jhButtonStyleB1"/>
+							</mx:HBox>
+							<mx:HBox horizontalGap="5">
+								<common:JHButton id="B_approval" JLabel="Send for Approval" JStyle="jhButtonStyleB2"/>
+								<common:JHButton id="B_view" JLabel="View All" JStyle="jhButtonStyleB2"/>
+							</mx:HBox>
+							<mx:HBox horizontalGap="5">
+								<common:JHButton id="B_new" JLabel="New" JStyle="jhButtonStyleB2"/>
+								<common:JHButton id="B_save" JLabel="BOOK" JStyle="jhButtonStyleB2"/>
+							</mx:HBox>
+							
+							
+						</mx:VBox>
+					</mx:HBox>
+					<mx:Grid>	
+						<mx:GridRow>
+							<mx:GridItem>
+							</mx:GridItem>
+							<mx:GridItem>
+								<mx:HBox horizontalGap="5">
+								</mx:HBox>
+							</mx:GridItem>
+						</mx:GridRow>
+					</mx:Grid>
+				</mx:VBox>
+				
+			</mx:VBox>
+		</mx:HBox>
+	</mx:VBox>	
+</common:JHCanvas>

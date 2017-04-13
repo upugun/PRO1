@@ -1,0 +1,55 @@
+package net.jwt.value.objects
+{
+	import mx.controls.Label;
+	import mx.controls.TextInput;
+	
+	[RemoteClass(alias="net.jwt.value.objects.HotelRates")]
+	
+	[Bindable]
+	public class HotelRates
+	{
+		public var uuid:String				= "";
+		public var idhotel:String			= "";
+		public var roomcategoryId:String	= "";
+		public var marketId:String			= "";
+		public var currencyId:String		= "";
+		public var periodFrom:String		="";
+		public var periodTo:String			="";
+		
+		public var roomBasisId:String		= "";
+		public var roomOccupationId:String	= "";
+		public var rate:String				= "";
+    	public var enteredbyId:String		= "";
+    	public var authorisedbyId:String	= "";
+    	
+    	public var idhotelRatesIdentity:String= "";	
+    	public var status:int 				= 1;
+
+    	
+    	// VO spefic to Flex
+    	public var dirty:Boolean = false; 
+		public var hotel:Hotel; 			
+		public var roomCatagory:RoomCategoriesOfHotel;
+		public var roomBasis:Basis;
+		public var roomOccupation:OccupencyType;
+		public var rateBox:TextInput;	
+		public var roomsRequiredBox:TextInput;	
+		//public var rateLabel:Label;	
+		public var rateLabel:TextInput;	
+ 		public var hotelRatesIdentity:HotelRatesIdentity;
+    	
+		public function  HotelRates()
+		{
+			roomCatagory		= new RoomCategoriesOfHotel();
+			roomBasis			= new Basis();
+			roomOccupation		= new OccupencyType();
+			rateBox				= new TextInput();
+			roomsRequiredBox	= new TextInput();
+			//rateLabel			= new Label;
+			rateLabel			= new TextInput;
+			hotel				= new Hotel();
+			hotelRatesIdentity  = new HotelRatesIdentity();
+		}
+		
+	}
+}

@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="utf-8"?>
+<common:JHCanvas xmlns:mx="http://www.adobe.com/2006/mxml" title="Agent and Market Mapping" width="100%" height="100%" fontSize="11" xmlns:objects="com.objects.*" xmlns:common="net.jhl.view.common.*">
+	
+	<mx:Script>
+	<![CDATA[
+		import net.jhl.value.objects.AgentMarkets;
+		import net.jhl.value.objects.RoomCategory;
+		import net.jhl.value.objects.RateCode.BaseRate;
+		import mx.collections.ArrayCollection;
+		import net.jwt.Constants;
+		import net.jwt.value.objects.TransportVehicleOwner;
+		import net.jwt.value.objects.Location;
+		import mx.controls.Alert;
+		import mx.binding.utils.BindingUtils;
+		
+		[Embed(source='assets/icons/24x24add.png')]
+     	private static const add:Class;
+     	
+     	[Embed(source='assets/icons/24x24trash.png')]
+     	private static const trash:Class;
+     	
+		[Bindable] public var agentMarket:AgentMarkets = new AgentMarkets();
+		
+	]]>
+</mx:Script>
+
+	<mx:HBox width="100%" height="100%">
+	
+		<mx:VBox width="100%" height="100%" >
+			<mx:VDividedBox height="100%" width="100%">
+				<mx:VBox width="100%" height="100%">  
+				  <mx:VBox width="100%" height="100%" >
+				  
+				  <mx:HBox width="100%" height="111" verticalScrollPolicy="off" horizontalScrollPolicy="off">
+				  	<mx:VBox width="70%" height="100%" >
+						<mx:Grid width="100%" paddingBottom="15" height="50">
+							<mx:GridRow>
+								<mx:GridItem width="131">
+									<mx:Label text="Agent Market"/>
+								</mx:GridItem>
+								<mx:GridItem>
+									<common:JHComboBox id="CMB_market" labelField="description" width="269"></common:JHComboBox>
+								</mx:GridItem>
+								<mx:GridItem>
+									<common:JHButton id="B_save" JLabel="Save" JStyle="jhButtonStyleB1"/>
+								</mx:GridItem >
+								<mx:GridItem>
+									<common:JHButton id="B_new" JLabel="New" JStyle="jhButtonStyleB1"/>
+								</mx:GridItem >
+								<mx:GridItem width="50">
+								</mx:GridItem >
+								<mx:GridItem >
+								</mx:GridItem >
+								<mx:GridItem>
+								</mx:GridItem >
+								<mx:GridItem>
+								</mx:GridItem >
+							</mx:GridRow>
+						</mx:Grid>
+						
+						<mx:HBox width="100%" height="50" horizontalScrollPolicy="off">
+							<mx:Label text="Filer by name" width="139"/>
+							<common:JHTextInput id="T_searchAgent" width="269"/>
+							<mx:Label text=" " width="12"/>
+							<mx:Label text="By Country" width="87"/>
+							<common:JHTextInput id="T_searchCountry" width="202"/>
+							<mx:Label text=" " width="17"/>
+							<common:JHCheckBox id="chk_show_only_selected" label="Show selected only" />
+						</mx:HBox>
+					</mx:VBox>
+					
+					<mx:VBox paddingLeft="10" horizontalAlign="right" width="30%" verticalScrollPolicy="off" horizontalScrollPolicy="off">
+					  	 <mx:VBox paddingLeft="0" id="button_box" paddingBottom="10" verticalScrollPolicy="off" horizontalScrollPolicy="off">
+					  	 </mx:VBox>
+					 </mx:VBox>
+				  </mx:HBox>
+				   
+					
+					<mx:VBox width="100%" height="100%">	
+						<mx:VBox width="100%" horizontalScrollPolicy="off">
+							<mx:Grid width="100%" paddingBottom="15" horizontalScrollPolicy="off">
+								<mx:GridRow width="100%" >
+									<mx:GridItem horizontalScrollPolicy="off" width="100%"> 
+										<mx:Tile id="V_dynamic" verticalScrollPolicy="off" direction="vertical" autoLayout="true" paddingBottom="15">
+											
+										</mx:Tile>
+									</mx:GridItem>
+								</mx:GridRow>
+							</mx:Grid>
+							<mx:VBox width="100%" horizontalAlign="right" paddingRight="0" paddingTop="15" height="50">
+								<common:JHPageManager id="pageManager"/>
+							</mx:VBox>
+						</mx:VBox>
+					</mx:VBox>
+						
+					</mx:VBox>
+				 </mx:VBox> 
+				 <!--<mx:VBox width="0" height="0" paddingTop="15">
+				 	 <mx:DataGrid id="DG_list" width="100%" height="100%">
+				 	 	<mx:columns>
+				 	 		<mx:DataGridColumn headerText="Code" dataField="agentMarketCode"/>
+				 	 		<mx:DataGridColumn headerText="Description" dataField="description"/>
+				 	 	</mx:columns>
+				 	 </mx:DataGrid>
+				 	
+				 </mx:VBox>-->
+			</mx:VDividedBox>
+			
+			
+		</mx:VBox>
+	</mx:HBox>
+</common:JHCanvas>

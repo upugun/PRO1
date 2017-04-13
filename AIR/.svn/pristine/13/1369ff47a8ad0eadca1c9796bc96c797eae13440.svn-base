@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Canvas xmlns:mx="http://www.adobe.com/2006/mxml" width="100%" height="100%" backgroundColor="#3F4A3D">
+<mx:Script>
+	<![CDATA[
+		import net.jwt.value.objects.TourVersion;
+		import net.jwt.value.objects.TechnicalVisitFee;
+		import mx.controls.Alert;
+		import mx.binding.utils.BindingUtils;
+		
+		 private function getCostingNo(item:Object, column:DataGridColumn):String {
+		  return item.tourIdYear+'-'+ item.tourIdSequence;
+		}
+        
+	]]>
+</mx:Script>
+
+		<mx:DataGrid id="DG_List" width="100%" height="100%" 
+					 dragEnabled="true" dragMoveEnabled="false" x="0" y="40">
+			<mx:columns>
+				<mx:DataGridColumn headerText="Costing #" labelFunction="getCostingNo" />
+				<mx:DataGridColumn headerText="label" dataField="label" />
+			</mx:columns>
+		</mx:DataGrid>
+		<mx:TextInput color="#000000" id="T_year" text="2013"  x="55" y="11" width="83"/>
+		<mx:Label text="Year" color="#FFFFFF" x="7" y="12"/>
+		<mx:Label text="Costing No" color="#FFFFFF" x="174" y="12" width="69"/>
+		<mx:TextInput color="#000000" id="T_no"  x="251" y="11" width="102"/>
+</mx:Canvas>

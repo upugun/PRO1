@@ -1,0 +1,188 @@
+<?xml version="1.0" encoding="utf-8"?>
+<common:JHCanvas xmlns:mx="http://www.adobe.com/2006/mxml" title="View All Reservations" width="100%" height="100%" fontSize="11" xmlns:objects="com.objects.*" xmlns:common="net.jhl.view.common.*">
+	
+	<mx:Script>
+	<![CDATA[
+		import mx.controls.dataGridClasses.DataGridColumn;
+		import net.jhl.value.objects.Reservation;
+		import net.jhl.value.objects.AgentDetails;
+		import net.jhl.value.objects.AgentMarkets;
+		import net.jhl.value.objects.RoomCategory;
+		import net.jhl.value.objects.RateCode.BaseRate;
+		import mx.collections.ArrayCollection;
+		import net.jwt.Constants;
+		import net.jwt.value.objects.TransportVehicleOwner;
+		import net.jwt.value.objects.Location;
+		import mx.controls.Alert;
+		import mx.binding.utils.BindingUtils;
+		
+		[Embed(source='assets/icons/24x24add.png')]
+     	private static const add:Class;
+     	
+     	[Embed(source='assets/icons/24x24trash.png')]
+     	private static const trash:Class;
+     	
+		[Bindable] public var agentDetails:AgentDetails = new AgentDetails();
+		
+		 private function getCheckInDate(item:Reservation, column:DataGridColumn):String {
+		 	var str:String = "";
+		 	
+		 	if(item.arrivalDetails!=null)
+		 		str = item.arrivalDetails.checkInDate;
+		 		
+		  return str;
+		}
+		
+		 private function getCheckOutDate(item:Reservation, column:DataGridColumn):String {
+		 	var str:String = "";
+		 	
+		 	if(item.departureDetails!=null)
+		 		str = item.departureDetails.checkOutDate;
+		 		
+		  return str;
+		}
+		
+		private function getReservationNo(item:Reservation, column:DataGridColumn):String {
+		 	var str:String = item.originator+"-"+item.reservationYear+"-"+item.reservationNo;
+		  return str;
+		}
+		
+		private function getPropertyName(item:Reservation, column:DataGridColumn):String {
+		 	var str:String = "";
+		 	
+		 	if(item.property!=null)
+		 		str = item.property.propertyName;
+		 		
+		  return str;
+		}
+		
+		private function getAgentName(item:Reservation, column:DataGridColumn):String {
+		 	var str:String = "";
+		 	
+		 	if(item.agentDetails!=null)
+		 		str = item.agentDetails.agentName;
+		 		
+		  return str;
+		}
+		
+	]]>
+</mx:Script>
+
+	<mx:HBox width="100%" height="100%">
+	
+		<mx:VBox width="100%" height="100%" >
+			<mx:VDividedBox height="100%" width="100%">
+				<mx:HBox width="100%" height="220">  
+				  <mx:VBox width="100%" height="100%">
+					<mx:Grid width="100%">
+						
+						<mx:GridRow>
+							<mx:GridItem width="4" height="100%">
+							</mx:GridItem>
+							<mx:GridItem width="160">
+								<mx:Label text="Property"/>
+							</mx:GridItem>
+							<mx:GridItem>
+								<common:JHComboBox id="CMB_property" labelField="propertyName" minWidth="250" width="80%"></common:JHComboBox>
+							</mx:GridItem>
+							<mx:GridItem>
+							</mx:GridItem >
+							<mx:GridItem>
+							</mx:GridItem >
+						</mx:GridRow>
+						<mx:GridRow>
+							<mx:GridItem width="4" height="100%">
+							</mx:GridItem>
+							<mx:GridItem>
+								<mx:Label text="Reservation no"  width="180"/>
+							</mx:GridItem>
+							<mx:GridItem>
+								<common:JHTextInput id="T_resNoOri"  editable="true" minWidth="250" width="58"/>
+								<mx:Label text="-"/>
+								<common:JHTextInput id="T_resNoYear"  editable="true" minWidth="250" width="57"/>
+								<mx:Label text="-"/>
+								<common:JHTextInput id="T_resNoSeq"  editable="true" minWidth="250" width="60"/>
+							</mx:GridItem >
+						</mx:GridRow>
+						<mx:GridRow>
+							<mx:GridItem width="4" height="100%">
+							</mx:GridItem>
+							<mx:GridItem>
+								<mx:Label text="Check-in Date From"/>
+							</mx:GridItem>
+							<mx:GridItem>
+								<common:JHDateField id="D_from"/>
+								<mx:Label text="To"/>
+								<common:JHDateField id="D_to"/>
+							</mx:GridItem>
+							<mx:GridItem>
+							</mx:GridItem >
+							<mx:GridItem>
+							</mx:GridItem >
+						</mx:GridRow>
+						<mx:GridRow>
+							<mx:GridItem width="4" height="100%">
+							</mx:GridItem>
+							<mx:GridItem>
+								<mx:Label text="Guest/ Group Name"  width="180"/>
+							</mx:GridItem>
+							<mx:GridItem>
+								<common:JHTextInput id="T_guestName"  editable="true" minWidth="250" width="80%"/>
+							</mx:GridItem >
+						</mx:GridRow>
+						<mx:GridRow>
+							<mx:GridItem width="4" height="100%">
+							</mx:GridItem>
+							<mx:GridItem>
+								<mx:Label text="Agent/Operator"  width="180"/>
+							</mx:GridItem >
+							<mx:GridItem>
+								<common:JHTextInput id="T_agent" text="{agentDetails.agentName}"  editable="false" minWidth="250" width="80%"/>
+							</mx:GridItem >
+							<mx:GridItem>
+								<common:JHButton id="B_agent_search" JLabel="Agent" JStyle="jhButtonStyleB1"/>
+							</mx:GridItem >
+						</mx:GridRow>
+						</mx:Grid>
+						<mx:Grid>
+							<mx:GridRow>
+								<mx:GridItem width="4" height="100%">
+								</mx:GridItem>
+								<mx:GridItem>
+								</mx:GridItem>
+								<mx:GridItem>
+									<mx:HBox horizontalGap="5">
+										<common:JHButton id="B_search" JLabel="Search" JStyle="jhButtonStyleB2"/>
+										<common:JHButton id="B_New" JLabel="New" JStyle="jhButtonStyleB2" visible="false"/>
+									</mx:HBox>	
+								</mx:GridItem>
+								<mx:GridItem>
+									
+								</mx:GridItem >
+								<mx:GridItem>
+								</mx:GridItem >
+							</mx:GridRow>
+					</mx:Grid>
+				  </mx:VBox>
+				 </mx:HBox> 
+				 <mx:VBox width="99%" height="40%">
+						<mx:DataGrid id="DG_list" width="100%" height="100%" doubleClickEnabled="true">
+							<mx:columns>
+								<mx:DataGridColumn headerText="Reservation #" labelFunction="getReservationNo"/>
+								<mx:DataGridColumn headerText="Property" labelFunction="getPropertyName"/>
+								<mx:DataGridColumn headerText="Guest/ Group Name" dataField="guestOrGroupName"/>
+								<mx:DataGridColumn headerText="Check-in Date" labelFunction="getCheckInDate"/>
+								<mx:DataGridColumn headerText="Check-out Date" labelFunction="getCheckOutDate"/>
+								<mx:DataGridColumn headerText="Agent/Operator" labelFunction="getAgentName"/>
+								<mx:DataGridColumn headerText="Confirmed by" dataField="confirmedBy"/>
+								<mx:DataGridColumn headerText="Booking Status" dataField="reservationsStatus"/>
+								<mx:DataGridColumn headerText="Destinity #" dataField="desResNo"/>
+							</mx:columns>
+						</mx:DataGrid>
+					</mx:VBox>
+			</mx:VDividedBox>
+			
+			
+		</mx:VBox>
+	</mx:HBox>
+</common:JHCanvas>

@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:VBox xmlns:mx="http://www.adobe.com/2006/mxml" width="100%" height="100%" xmlns:common="net.jhl.view.common.*">
+		<mx:Script>
+			<![CDATA[
+				import net.jhl.value.objects.Guest;
+				
+			]]>
+		</mx:Script>
+		<mx:VBox width="100%" height="100%">
+			<mx:HBox width="100%" horizontalGap="5">
+				<mx:Label text="Search "/>
+				<common:JHTextInput id="T_search" />
+				<mx:Label text="Facility Type"/>
+				<common:JHComboBox id="CMB_type" labelField="description" promtActivate="false"/>
+			</mx:HBox>
+			<mx:VBox>
+				<mx:Tile id="V_dynamic" verticalScrollPolicy="off" direction="vertical" autoLayout="true" width="100%" height="100%" paddingBottom="15">
+										
+				</mx:Tile>
+			</mx:VBox>
+			<mx:HBox width="100%" horizontalGap="5">
+				<common:JHButton JLabel="Select &amp; Close" JWidth="100" id="B_close"/>
+			</mx:HBox>
+		</mx:VBox>
+</mx:VBox>

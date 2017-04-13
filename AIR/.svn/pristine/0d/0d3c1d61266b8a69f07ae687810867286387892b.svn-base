@@ -1,0 +1,32 @@
+package net.jwt.value.objects
+{
+	import net.jhl.value.objects.Property;
+	import net.jhl.value.objects.common.TimeStamp;
+	import net.jhl.view.JWHConstants;
+	
+	[RemoteClass(alias="net.jwt.value.objects.MarketingPaymentLine")]
+	
+	[Bindable]
+	public class MarketingPaymentLine
+	{
+		public var uuid:String 			= "";
+		public var paymentId:String		= "";
+		public var propertyId:String	= "";
+		public var percentage:String	= "";
+		public var amount:String		= "";
+		public var createdBy:String		= "";
+		public var createdOn:String		= "";
+		public var updatedBy:String		= "";
+		public var updatedOn:String		= "";
+		public var status:String		=	JWHConstants.STATUS_LABLE_ACTIVE;
+		
+		public var property:Property;
+		public var timeStamp:TimeStamp;
+		public function MarketingPaymentLine()
+		{
+			property = new Property();
+			timeStamp = new TimeStamp();
+		}
+
+	}
+}

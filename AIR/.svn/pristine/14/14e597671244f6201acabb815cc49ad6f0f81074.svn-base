@@ -1,0 +1,169 @@
+package net.jwt.view.helper
+{
+	import flash.events.KeyboardEvent;
+	import flash.events.MouseEvent;
+	
+	import mx.collections.ArrayCollection;
+	import mx.controls.Alert;
+	import mx.core.UIComponent;
+	import mx.events.CloseEvent;
+	import mx.rpc.events.ResultEvent;
+	
+	import net.jwt.Constants;
+	import net.jwt.event.NotificationArguments;
+	import net.jwt.helper.NotificationMessageFormatter;
+	import net.jwt.value.objects.TransportTerminationHistory;
+	import net.jwt.value.objects.TransportVehicleRequisitions;
+	import net.jwt.view.Mediator;
+	import net.jwt.view.popup.JWTPopUp;
+	
+	public class TransportHelperTermitationMediator extends Mediator
+	{
+		private var _view:TransportHelperTermitationView;
+		
+		private var _app:JWTPopUp;
+		public var _list:ArrayCollection = new ArrayCollection();
+		[Bindable] public var _requisitionObj:TransportVehicleRequisitions 			= new TransportVehicleRequisitions();
+				   public var _vehiclBreakDownObj:TransportTerminationHistory		=	new TransportTerminationHistory();
+		[Bindable] public var args:NotificationArguments;
+		[Bindable] public var list:ArrayCollection;
+		public var isANewMessage:Boolean 	= true;
+		public var isMessageToAll:Boolean 	= false;
+		
+		public function TransportHelperTermitationMediator(view:UIComponent, args:NotificationArguments)
+		{
+			super(view);
+			if(view != null)
+			{
+				_view  = view as TransportHelperTermitationView;
+			}
+			
+			if(args != null)
+				this.args = args;
+				
+			_app = args.viewComponent as JWTPopUp;	
+			
+			if(_app != null)	
+				_loggedInUser	= _app.args.user;
+		}
+		
+		protected override function viewComponentInitialize():void{
+			initializeNotificationRemortingObject();
+			//_view.focusManager.setFocus(_view.T_newMSG);
+			_view.addEventListener(KeyboardEvent.KEY_UP, saveDocument);	
+			_view.B_submit.addEventListener(MouseEvent.MOUSE_UP, save);	
+			_view.B_close.addEventListener(MouseEvent.MOUSE_UP, closeWindow);	
+		}
+		
+		private function setLoggedInUser():void
+		{
+			notificationRO.setLogedInUser(_loggedInUser);
+		}
+		
+		private function selectAndClose():void
+		{
+			if(_list.length > 0)
+				args.argumentObject	=	_list.getItemAt(0);	
+			_app.dispatchEvent(new CloseEvent(CloseEvent.CLOSE));
+			//Alert.show("Double clkick enabled..");
+		}
+		
+		
+		
+			
+		public function vehicleBreakDown(event:MouseEvent):void
+		{
+				
+				vehicleMarkAsBroken();
+				
+		}
+		
+		private function vehicleMarkAsBroken():void{
+			
+				_requisitionObj		=	args.originatorObject as TransportVehicleRequisitions;
+				
+				var _temp:ArrayCollection 	= new ArrayCollection;		
+					_temp.addItem(_requisitionObj.vehicle);
+						
+				initializeTransportVehicleRemortingObject();
+							
+				transportVehicleRO.saveLevel02(_temp);
+		}
+		
+		
+		private function createVehicleBreakDownHistory():void{
+			
+				
+				_vehiclBreakDownObj.recordOwner	=	_requisitionObj.recordOwner;
+				_vehiclBreakDownObj.requisitionId	=	_requisitionObj.uuid;
+				_vehiclBreakDownObj.tourId			=	_requisitionObj.toursVersionId;
+				_vehiclBreakDownObj.updatedBy		=	_loggedInUser.uuid;
+				_vehiclBreakDownObj.vehicleId		=	_requisitionObj.vehicle.uuid;
+				_vehiclBreakDownObj.terminatDate	=	_view.D_date.text;
+				_vehiclBreakDownObj.remarks			=	_view.T_remarks.text;
+				
+				
+				var _temp:ArrayCollection 	= new ArrayCollection;		
+					_temp.addItem(_vehiclBreakDownObj);
+						
+				initializeVehicleBreakDownRemortingObject();
+							
+				vehicleBreakDownRO.create(_temp);
+		}
+		
+		public function saveDocument(event:KeyboardEvent):void
+		{
+			if(event.keyCode == 119)
+				vehicleMarkAsBroken();
+			else if(event.keyCode == 120)
+				Alert.show("TODO:Delete this record");
+			else if(event.keyCode == 112)
+				Alert.show("TODO:Show HELP page");
+				
+		}
+		
+		public function save(event:MouseEvent):void
+		{
+				vehicleMarkAsBroken();
+				
+		}
+		
+		public function closeWindow(event:MouseEvent):void
+		{
+				selectAndClose();
+				
+		}
+		
+		
+		public function saveMessage(_type:String, _status:String, _tourNo:String, _vehicle:String):void
+		{
+				
+				var _reciever:String		=	_requisitionObj.requestedUser.uuid;
+				var message:String			= 	"<TEXTFORMAT><FONT FACE=\"Verdana\" SIZE=\"10\" COLOR=\"#f27405\"><b>"
+												+_loggedInUser.firstName +" : </b></FONT></TEXTFORMAT>"  
+												+ "<TEXTFORMAT><FONT FACE=\"Verdana\" SIZE=\"10\" COLOR=\"#0b333c\">"
+												+_view.T_remarks.text + "</FONT></TEXTFORMAT>" + "\n"
+				var nmf:NotificationMessageFormatter = new NotificationMessageFormatter;
+					nmf.saveMessage(_type, _status, _tourNo, _vehicle, _reciever, _loggedInUser, message);	
+
+				
+			
+		}
+		
+		// Overridden from Mediator class
+		public override function transportVehicleCreateResultsHandler(event:ResultEvent):void {
+			createVehicleBreakDownHistory();
+		}
+		
+		public override function vehicleBreakDownCreateResultsHandler(event:ResultEvent):void {
+			
+				_list		= new ArrayCollection();
+				_list		= event.result as ArrayCollection;
+				
+				//saveMessage(Constants.NOTIFICATION_TYPE_TRANSPORT, Constants.NOTIFICATION_STATUS_BREAKDONW, _requisitionObj.tourNo, _vehiclBreakDownObj.registrationNo)
+				
+			selectAndClose();
+		}
+	
+	}
+}

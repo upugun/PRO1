@@ -1,0 +1,37 @@
+package net.jhl.value.objects.RateCode
+{
+	import mx.collections.ArrayCollection;
+	
+	import net.jhl.value.objects.common.TimeStamp;
+	import net.jhl.view.JWHConstants;
+	
+	[RemoteClass(alias="net.jhl.objects.ratecode.SeasonalBaseRate")]
+	
+	[Bindable]
+	public class SeasonalBaseRate
+	{
+		public var uuid:String				=	"";
+		public var description:String		=	"";
+		public var parentUuid:String		=	"";
+		public var seasonId:String			=	"";
+		public var propertyId:String		=	"";
+		public var code:String				=	"";
+		public var seasonLabel:String		=	"";
+		public var currency:String			=	"";
+		public var codeShortName:String		=	"";
+		public var visible:String			=	"YES";
+		public var status:String			=	JWHConstants.STATUS_LABLE_ACTIVE;
+		public var confirmToVisible:Boolean		=	false;
+		public var timeStamp:TimeStamp;
+		public var roomCatagoryCostRevisedList:ArrayCollection  = new ArrayCollection;
+		public var otherCostRevisedList:ArrayCollection 		= new ArrayCollection;
+		public var baseRate:BaseRate;
+		
+		public function SeasonalBaseRate()
+		{
+			timeStamp = new TimeStamp();
+			baseRate  = new BaseRate();
+		}
+
+	}
+}

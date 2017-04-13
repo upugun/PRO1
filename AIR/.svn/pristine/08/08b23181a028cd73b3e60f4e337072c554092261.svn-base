@@ -1,0 +1,22 @@
+package net.jwt.value.objects.costing
+{
+	import net.jwt.Constants;
+	
+//	[RemoteClass(alias="net.jwt.value.objects.costing.ShoppingCostObject")]
+//	
+//	[Bindable]
+	public class ShoppingCostObject extends CostingObject
+	{
+		public var shoppingUuid:String	= "";
+		public var code:String 			= "";
+		public var description:String 	= "";
+		public var locationId:String 	= "";
+		public var status:int			= 1;
+		
+		public function ShoppingCostObject()
+		{
+			costingItemType = Constants.COSTING_LABEL_SHOPPING;
+		}
+
+	}
+}

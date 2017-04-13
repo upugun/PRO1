@@ -1,0 +1,251 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Panel xmlns:mx="http://www.adobe.com/2006/mxml" title="Vehicle Requisition view" width="100%" height="100%">
+<mx:Script>
+	<![CDATA[
+		import mx.collections.ArrayCollection;
+		import net.jwt.Constants;
+		import mx.controls.advancedDataGridClasses.AdvancedDataGridColumn;
+		import mx.controls.dataGridClasses.DataGridColumn;
+		import net.jwt.value.objects.TransportVehicleRequisitions;
+		import mx.managers.DragManager;
+		import mx.events.DragEvent;
+		
+		[Embed(source='assets/icons/24x24comment.png')]
+     	private static const message:Class;
+     	
+		private function dragAccept(event:DragEvent):void
+		{
+		  //var dropTarget:Canvas = event.currentTarget as Canvas;
+		  //DragManager.acceptDragDrop(dropTarget);
+		}
+		[Bindable] public var requistitions:TransportVehicleRequisitions = new TransportVehicleRequisitions();
+		
+		private function getRequestedUser(item:Object, column:DataGridColumn):String {
+		 	var userName:String = new String();
+		 	if(item.requestedUser != null)
+		 		userName = item.requestedUser.firstName +" "+ item.requestedUser.lastName;
+		  return userName;
+		}
+		
+		private function getRequestedBy(item:Object, column:AdvancedDataGridColumn):String {
+		 	var name:String = new String();
+		 	if(item.requestedUser != null)
+		 		name = item.requestedUser.firstName + " " +item.requestedUser.lastName;
+		  return name;
+		}
+		
+		private function getVehicle(item:Object, column:AdvancedDataGridColumn):String {
+		 	var name:String = new String();
+		 	if(item.vehicle != null)
+		 		name = item.vehicle.registrationNo;
+		  return name;
+		}
+		
+		private function getdriver(item:Object, column:AdvancedDataGridColumn):String {
+		 	var name:String = new String();
+		 	if(item.driver != null)
+		 		name = item.driver.firstName + " " + item.driver.lastName;
+		  return name;
+		}
+		
+		private function getStatus(item:Object, column:AdvancedDataGridColumn):String {
+		 	var _status:String = new String();
+		 	if(item.status == 1)
+		 		_status = "Drafted";
+		 	else if(item.status == 2)
+		 		_status = "Notified";	
+		 	else if(item.status == 3)
+		 		_status = "Confirmed";
+		 	else if(item.status == 4)
+		 		_status = "Terminated";			
+		 		
+		  return _status;
+		}
+		
+		[Bindable]
+		public var requisitionType:ArrayCollection = new ArrayCollection([
+		{ Id:"", data:"All" },
+		{ Id:"Arrival", data:"Arrival" },
+		{ Id:"Departure", data:"Departure" },
+		{ Id:"Transfer", data:"Transfer" } ]);
+		
+		public function styleFunction_summaryRow(data:Object,col:AdvancedDataGridColumn):Object 
+		{ 
+			if (data.nightStops.length<2 && data.requisitionType == Constants.LABLE_REQUISITION_TYPE_ARRIVAL) 
+			{ 
+				return { color:Constants.LABLE_COLOR_REQUISITION_ARRIVAL,textAlign:"center" }; 
+			} 
+			else if (data.requisitionType == Constants.LABLE_REQUISITION_TYPE_DEPARTURE) 
+			{ 
+				return { color:Constants.LABLE_COLOR_REQUISITION_DEPARTURE,textAlign:"center" }; 
+			} 
+			else if (data.requisitionType == Constants.LABLE_REQUISITION_TYPE_TRANSFER) 
+			{ 
+				return { color:Constants.LABLE_COLOR_REQUISITION_TRANSFER,textAlign:"center" }; 
+			}
+			else if (data.nightStops.length>0 && data.requisitionType== Constants.LABLE_REQUISITION_TYPE_ARRIVAL) 
+			{ 
+				return { color:Constants.LABLE_COLOR_REQUISITION_ROUND_TOUR,textAlign:"center" }; 
+			}
+			return {}; 
+		} 
+		
+	]]>
+</mx:Script>
+	<mx:HDividedBox width="100%" height="100%">
+		<mx:VDividedBox width="32%" height="100%">
+			<mx:VBox width="100%" height="50%">
+				<mx:HBox width="100%" height="100%">
+					<mx:VBox width="100%" height="100%" paddingTop="5">
+					<mx:Panel width="100%" height="100%" title="Reuisitions List">
+						<mx:VBox width="100%" height="100%">
+					 		<mx:Grid width="100%">
+						<mx:GridRow width="100%" height="100%">
+							<mx:GridItem>
+							</mx:GridItem>
+							<mx:GridItem>
+								<mx:VBox id="printArea" width="100%" height="100%" />
+							</mx:GridItem>
+							<mx:GridItem width="100%" horizontalAlign="right">
+								<mx:Label id="LBactionAcknow" color="#FAB000"/>
+								<mx:VBox id="test">
+									
+								</mx:VBox>
+							</mx:GridItem>
+						</mx:GridRow>
+						<mx:GridRow width="100%" height="100%">
+							<mx:GridItem>
+							</mx:GridItem>
+							<mx:GridItem>
+								<mx:Label text="Vehicle Type"/>
+							</mx:GridItem>
+							<mx:GridItem >
+								<mx:ComboBox id="C_vehiclelist" color="#0A0909" labelField="description" width="117"></mx:ComboBox>
+							</mx:GridItem>
+						</mx:GridRow>
+						<mx:GridRow width="100%" height="100%">
+							<mx:GridItem>
+							</mx:GridItem>
+							<mx:GridItem>
+								<mx:Label text="Tour No"/>
+							</mx:GridItem>
+							<mx:GridItem >
+								<mx:TextInput color="#0A0909" width="172" id="T_tourNo"/>
+							</mx:GridItem>
+						</mx:GridRow>
+						<mx:GridRow width="100%" height="100%">
+							<mx:GridItem>
+							</mx:GridItem>
+							<mx:GridItem>
+								<mx:Label text="Requisition No" />
+							</mx:GridItem>
+							<mx:GridItem >
+								<mx:TextInput color="#0A0909" id="T_reqNo" width="172"/>
+							</mx:GridItem>
+						</mx:GridRow>
+						<mx:GridRow width="100%" height="100%">
+							<mx:GridItem>
+							</mx:GridItem>
+							<mx:GridItem>
+								<mx:Label text="Date Range"/>
+							</mx:GridItem>
+							<mx:GridItem >
+										<mx:DateField width="90" color="#0A0909" id="Date_from" formatString="YYYY/MM/DD"/>
+										<mx:DateField width="90" color="#1E1C1C" id="Date_to" formatString="YYYY/MM/DD" text="" />
+							</mx:GridItem>
+						</mx:GridRow>
+						<mx:GridRow width="100%" height="100%">
+							<mx:GridItem>
+							</mx:GridItem>
+							<mx:GridItem>
+								<mx:Label text="Status"/>
+							</mx:GridItem>
+							<mx:GridItem >
+								<mx:CheckBox label="Confirmed By Transport" id="CHK_confirmed" selected="true"/>
+								<mx:CheckBox label="Notified to Transport" id="CHK_notify"/>
+								<mx:CheckBox label="Terminated" id="CHK_terminate"/>
+								<mx:CheckBox label="Saved" id="CHK_save"/>
+							</mx:GridItem>
+						</mx:GridRow>
+						<mx:GridRow width="100%" height="100%">
+							<mx:GridItem>
+							</mx:GridItem>
+							<mx:GridItem>
+								<mx:Label text="Market"/>
+							</mx:GridItem>
+							<mx:GridItem >
+								<mx:ComboBox id="C_marketList" color="#0A0909" labelField="description" width="117"></mx:ComboBox>
+							</mx:GridItem>
+						</mx:GridRow>
+						<mx:GridRow width="100%" height="100%">
+							<mx:GridItem>
+							</mx:GridItem>
+							<mx:GridItem>
+								<mx:Label text="Type"/>
+							</mx:GridItem>
+							<mx:GridItem >
+								
+								<mx:ComboBox id="CMB_req_type" labelField="data" color="#010101" fontWeight="normal" width="161" dataProvider="{requisitionType}"></mx:ComboBox>
+							</mx:GridItem>
+						</mx:GridRow>
+						<mx:GridRow width="100%" height="100%">
+							<mx:GridItem>
+							</mx:GridItem>
+							<mx:GridItem>
+							</mx:GridItem>
+							<mx:GridItem >
+								<mx:Button label="Print" id="B_print" width="70"/>
+								<mx:Button label="Airport Rep List" id="B_ARL" width="168" visible="false"/>
+							</mx:GridItem>
+						</mx:GridRow>
+					</mx:Grid>
+					</mx:VBox>
+					
+					<mx:HBox width="100%" height="100%">
+						<mx:VBox width="4" height="100%" >
+						</mx:VBox>
+						<mx:VBox width="100%" height="100%">
+							<mx:AdvancedDataGrid textAlign="left" id="reqList" width="100%" height="100%" styleFunction="styleFunction_summaryRow" 
+										 dragEnabled="true" dragMoveEnabled="false">
+								<mx:columns>
+									<mx:AdvancedDataGridColumn headerText="Req #" dataField="requisitionNo" width="80"/>
+									<mx:AdvancedDataGridColumn headerText="Log #" dataField="logSheetNo" width="80"/>
+									<mx:AdvancedDataGridColumn headerText="Tour No" dataField="tourNo" textAlign="left"/>
+									<mx:AdvancedDataGridColumn headerText="Pax Name" dataField="clientName" textAlign="left"/>
+									<mx:AdvancedDataGridColumn headerText="Report Date" dataField="reportDateTime" textAlign="left"/>
+									<mx:AdvancedDataGridColumn headerText="Report To" dataField="reportTo" textAlign="left"/>
+									<mx:AdvancedDataGridColumn headerText="Tour End on" dataField="pickUpTime" textAlign="left"/>
+									<mx:AdvancedDataGridColumn headerText="Type" dataField="requisitionType" textAlign="left"/>
+									<mx:AdvancedDataGridColumn headerText="Vehicle" labelFunction="getVehicle" textAlign="left"/>
+									<mx:AdvancedDataGridColumn headerText="Driver" labelFunction="getdriver" textAlign="left"/>
+									<mx:AdvancedDataGridColumn headerText="Requested By" labelFunction="getRequestedBy" textAlign="left"/>
+									<mx:AdvancedDataGridColumn headerText="Status" labelFunction="getStatus" textAlign="left"/>
+								</mx:columns>
+							</mx:AdvancedDataGrid>
+							<mx:HBox width="100%">
+								<mx:Grid width="100%">
+									<mx:GridRow width="100%" height="100%">
+										<mx:GridItem>
+											<mx:Label text="Arrival" color="0xf213d5" fontWeight="plain"/>
+										</mx:GridItem>
+										<mx:GridItem>
+											<mx:Label text="Departure" color="0xf56110" fontWeight="plain"/>
+										</mx:GridItem>
+										<mx:GridItem>
+											<mx:Label text="Transfer" color="0x0d228e" fontWeight="plain"/>
+										</mx:GridItem>
+										<mx:GridItem width="100%">
+											<!--mx:Label text="Round Tour" color="0x0b7b08" fontWeight="plain"/-->
+										</mx:GridItem>
+									</mx:GridRow>
+								</mx:Grid>	
+							</mx:HBox>
+						</mx:VBox>
+					</mx:HBox>
+					</mx:Panel>
+					</mx:VBox>
+				</mx:HBox>
+			</mx:VBox>
+		</mx:VDividedBox>
+	</mx:HDividedBox>
+</mx:Panel>

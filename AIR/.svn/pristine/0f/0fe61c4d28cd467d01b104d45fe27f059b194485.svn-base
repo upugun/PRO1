@@ -1,0 +1,236 @@
+     @font-face {
+        src:url("assets/fonts/SourceSansPro-Regular.otf");
+        fontFamily: standardSystemFont;
+     }
+      
+    PieSeries {
+        /* fills: #c6ba37,#8fc637,#37c6c1,#3770c6,#4f1c5e,#221c5e,#963465,#cd337f,#FF5B00,#78592F,#D8A94D,#A4CE4E ; */
+         fills:#9E0142,#D53E4F,#F46D43,#FDAE61,#FEE08B,#FFFFBF,#E6F598,#ABDDA4,#66C2A5,#3288BD,#5E4FA2 ; 
+        /*fills: #40004B, #762A83, #9970AB, #C2A5CF, #E7D4E8, #F7F7F7, #D9F0D3, #A6DBA0, #5AAE61, #1B7837, #00441B;*/ 
+    } 
+    
+    LegendItem {
+            fontWeight: normal;
+            
+    }
+    /**VBox, Hbox **/
+    VDividedBox
+    {
+    	backgroundColor:#F2F2F2; /*#ffffff*/
+    	verticalGap:4;
+    	horizontalGap:4;
+    } 
+    HDividedBox
+    {
+    	backgroundColor:#F2F2F2; /*#F2F2F2;*/
+    	verticalGap:4;
+    	horizontalGap:4;
+    }
+    Panel
+    {
+    	backgroundColor:#FFFFFF;
+    	borderColor:#242424;
+    	color:#FFFFFF; /*F3E9C4*/
+    	/*cornerRadius:3;*/ 
+    	paddingLeft:0; 
+    	paddingLeft:0; 
+    	paddingRight:0; 
+    	paddingBottom:0; 
+    	
+    	borderThicknessLeft:0; 
+    	borderThicknessRight:0; 
+    	borderThicknessBottom:0;
+    	borderThicknessTop:0;
+    	
+    	roundedBottomCorners:false;
+ 		shadowDistance:0; 
+ 		shadowDirection:center;
+ 		fontSize:14;
+ 		headerColors: #777777, #515151;
+ 		titleDisplay:panelTitleDisplayTextColor;
+ 		cornerRadius:0;
+    }
+    
+    .panelTitleDisplayTextColor
+    {
+    	color:#FFFFFF;
+    }
+    
+    VBox
+    {
+    	backgroundColor:#ffffff;
+    	verticalGap:0;
+    	horizontalGap:0;
+    	color:#333333;
+    	font-family:standardSystemFont;
+    } 
+    
+    HBox
+    {
+    	backgroundColor:#ffffff;
+    	verticalGap:0;
+    	horizontalGap:0;
+    	color:#333333;
+    	font-family:standardSystemFont;
+    } 
+     
+    DataGrid, AdvancedDataGrid
+    {
+    	selectionColor:#dedede;
+    	rollOverColor:#e6e6e6;
+    	textRollOverColor:#000000;
+    	textSelectedColor:#1D84B9;
+    	color:#616161;
+    	headerColors:#5F5F5F, #000000;  
+    	backgroundColor:#E0E0E0;
+    	headerStyleName: "mydataGridHeaderStyle";
+    	font-family:standardSystemFont;
+    	fontSize:14;
+    }
+    
+    .mydataGridHeaderStyle 
+    {
+    	  color: #FFFFFF; 
+    	  height:15;
+    	  fontSize:14;
+    	  fontWeight: normal;  
+    	  backgroundColor:#FFFFFF;   
+    	  font-family:standardSystemFont;         
+    } 
+    
+    TextArea
+    {
+    	font-family:standardSystemFont;
+    	backgroundColor:#FFFFFF;
+    	color:#000000;
+    	border:1px solid #ccc;
+    	padding:2px;
+    	fontSize:14;
+    	color:#005e8f;
+    }
+    
+    TextInput
+    {
+    	font-family:standardSystemFont;
+    	cornerRadius:2; 
+    	borderStyle:solid;
+    	fontSize:14;
+    	color:#005e8f;
+    }
+    
+     Label
+    {
+    	fontSize:14;
+    	color:#000000;
+    }
+    Button
+    {
+    	fillAlphas:1.0, 1.0;
+    	fillColors:#9F9B9B, #9F9B9B, #FFFBFB, #A5A1A1; 
+    	color:#FFFFFF;
+    	cornerRadius:3; 
+    }
+    
+    RadioButton
+    {
+    	font-family:standardSystemFont;
+    	fontSize:14;
+    	color:#005e8f;
+    	fillAlphas:1.0, 1.0;
+		fillColors:#FFFBFB, #E3E2E2, #C1C0C0, #DEDADA;
+    }
+    
+    CheckBox
+    {
+    	font-family:standardSystemFont;
+    	fontSize:14;
+    	color:#005e8f;
+    	fillAlphas:1.0, 1.0;
+		fillColors:#FFFBFB, #E3E2E2, #C1C0C0, #DEDADA;
+    }
+    
+    ComboBox
+    {
+    	font-family:standardSystemFont;
+    	fillColors:#FFFFFF, #FFFFFF;
+    	fillAlphas:1.0, 1.0;
+    	cornerRadius:3; 
+    	backgroundColor:#FFFFFF;
+    	borderStyle:solid;
+    	fontSize:14;
+    	fontWeight:normal;
+    	color:#005e8f;
+    	disabledColor:#80a3af;
+    }
+    
+    Tree
+    {
+    	backgroundColor:#FFFFFF;
+    	borderColor:#FFFFFF;
+    	color:#000000;
+		selectionColor:#CECECE; 
+		rollOverColor:#EEEEEE;
+		paddingLeft:0;
+    	paddingRight:0;
+    	fontSize:15;
+    }
+    
+    VScrollBar
+    {
+    	fillColors:#F2F2F2,#FFFFFF; 
+    	borderColor:#FFFFFF;
+    }
+    
+    HScrollBar
+    {
+    	fillColors:#F2F2F2,#FFFFFF; 
+    	borderColor:#FFFFFF;
+    }
+    
+    TabNavigator
+    {
+    	tabStyleName: "customTabNavStyle";
+    	color:#FFFFFF;
+    }
+    
+    .customTabNavStyle 
+    {
+    	  color: #111111; 
+    	  fontWeight: bold;                
+    } 
+    
+    Grid
+    {
+    	fontSize:14;
+    	
+    }
+
+    GridRow
+    {
+    	height:20;
+    }
+    Canvas
+    {
+    	color:#333333;
+    	backgroundColor:#FFFFFF;
+    }
+
+    .myDataGridHeaderStyles
+    {
+    	font-family:standardSystemFont;
+    	fontSize:15;
+    	color: white;
+    	headerColors:#FFFFFF;
+    	rollOverColor:#FFFFFF;
+		textRollOverColor:#FFFFFF;
+    }
+     
+    .jhStatusButtonStyle
+    {
+    	fontSize:14;         
+    }  
+    
+    .jhButtonStyle
+    {
+    	fontSize:14;   
+    }   

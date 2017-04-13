@@ -1,0 +1,78 @@
+package  net.jwt.value.objects
+{
+	import net.jwt.Constants;
+	
+	[RemoteClass(alias="net.jwt.value.objects.HotelReservation")]
+	[Bindable]
+	public class HotelReservation
+	{
+		
+		public var uuid:String			=	"";
+		public var hotelId:String		=	"";
+		public var voucherId:String		=	"";
+		public var hotelName:String		=	"";
+		public var roomCategory:String	=	"";
+		public var basis:String			=	"";
+		public var rate:String			=	"";
+		public var date:String			=	"";
+		public var status:int;
+		public var reservationType:int;
+		
+		public var costingHotelId:String;
+		
+		public var update:int;
+		
+		
+		public var arrivalMeal:String		=	"";
+		public var SGLRate:String			=	"";
+		public var DBLRate:String			=	"";
+		public var TPLRate:String			=	"";
+		public var twin:String				=	"";
+		public var adults:String			=	"";
+		public var child:String				=	"";
+		public var guides:String			=	"";
+		public var tourLeader:String		=	"";
+		public var SGLChild:String			=	"";
+		public var DBLChild:String			=	"";
+		public var TPLChild:String			=	"";
+		public var twinChild:String			=	"";
+		public var other:String				=	"";
+		
+		public var SGLRooms:String			=	"";
+		public var DBLRooms:String			=	"";
+		public var TPLRooms:String			=	"";
+		
+		public var year:String				=	"-99";
+		public var sequence:String			=	"-99";
+		public var type:String				=	"";
+		
+		public var buyCurency:String			=	"";
+		
+		public var sellRateSGL:String			=	"";
+		public var sellCurency:String			=	"";
+		
+		public var sellRateFamily:String		=	"";
+		public var buyRateFamily:String			=	"";
+		public var guideRate:String				=	"";
+		public var familyRooms:String			=	"";
+		
+		public var sellRateDBL:String			=	"";
+		public var sellRateTPL:String			=	"";
+		
+		public var childWithBed:String			=	"";
+		public var childWithoutBed:String		=	"";
+		
+		public var ownership:String				=	Constants.OWNERSHIP_System;
+		
+		public var locationType:String		=	"LOCAL";
+		
+		
+		public function HotelReservation()
+		{
+			
+		}
+		
+		
+
+	}
+}

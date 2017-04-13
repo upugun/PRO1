@@ -1,0 +1,81 @@
+package net.jwt.view.helper
+{
+	import flash.events.Event;
+	import flash.events.MouseEvent;
+	
+	import mx.collections.ArrayCollection;
+	import mx.core.UIComponent;
+	import mx.events.IndexChangedEvent;
+	
+	import net.jwt.event.NotificationArguments;
+	import net.jwt.helper.UtilFunction;
+	import net.jwt.value.objects.Notification;
+	import net.jwt.value.objects.ServerConfig;
+	import net.jwt.value.objects.User;
+	import net.jwt.view.Mediator;
+	import net.jwt.view.popup.JWTPopUp;
+	
+	public class AdminSpecialDeatilsMediator extends Mediator
+	{
+		private var _view:AdminSpecialDeatilsView;
+		private var _app:JWTPopUp;
+		
+		[Bindable] public var _notificationObj:Notification = new Notification();
+		[Bindable]public var _agentList:ArrayCollection;
+		[Bindable]public var args:NotificationArguments = new NotificationArguments();
+						
+		public function AdminSpecialDeatilsMediator(view:UIComponent, args:NotificationArguments)
+		{
+			super(view);
+			if(view != null)
+			{
+				_view  = view as AdminSpecialDeatilsView;
+			}
+			
+			if(args != null)
+				this.args = args;
+				
+			if(args.user != null)	
+				_loggedInUser	= args.user as User;
+			
+			_app = args.viewComponent as JWTPopUp;		
+		}
+		
+		protected override function viewComponentInitialize():void
+		{
+			loadServerConfig();
+			
+			if(_loggedInUser != null)
+				setLoggedInUser();
+				
+			_view.tab_admin.addEventListener(IndexChangedEvent.CHANGE, handleTabIndexChange);	
+			_view.B_showcon.addEventListener(MouseEvent.CLICK, showDbconnections);
+		}
+		
+		
+		private function loadServerConfig():void 
+		{
+			var _con:ServerConfig = UtilFunction.getServerConfigDetails();
+			if(_con != null)
+			{
+			}
+		}
+		
+		private function setLoggedInUser():void
+		{
+		}
+		
+		private function handleTabIndexChange(evt:IndexChangedEvent):void 
+		{
+			trace("Old index: " + evt.oldIndex + ", new index: " + evt.newIndex);
+		}
+		
+		private function showDbconnections(evt:Event):void 
+		{
+			initializesystemObject();
+			systemRO.showDbConnestion();
+		}
+		
+		
+	}
+}

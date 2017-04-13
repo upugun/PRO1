@@ -1,0 +1,313 @@
+package net.jhl.view
+{
+	import mx.collections.ArrayCollection;
+	
+	public class JWHConstants
+	{
+		public static const  STATUS_LABLE_ACTIVE:String					= "ACTIVE";
+		public static const  STATUS_LABLE_INACTIVE:String				= "INACTIVE";
+		public static const  STATUS_LABLE_USED:String					= "USED";
+		
+		
+		public static const  APPROVAL_STATUS_LABLE_PENDING:String		= "PENDING";
+		public static const  APPROVAL_STATUS_LABLE_APPROVED:String		= "APPROVED";
+		public static const  APPROVAL_STATUS_LABLE_REJECTED:String		= "REJECTED";
+		
+		public static const  STATUS_LABLE_VISIBLE:String				= "VISIBLE";
+		public static const  STATUS_LABLE_INVISIBLE:String				= "INVISIBLE";
+		
+		public static const  TILE_TYPE_TRAIN:String						= "Tile type train";
+		public static const  TILE_TYPE_CAR:String						= "Tile type car";
+		public static const  TILE_TYPE_BIKE:String						= "Tile type bike";
+		public static const  TILE_TYPE_MBIKE:String						= "Tile type motor bike";
+		public static const  TILE_TYPE_BUS:String						= "Tile type bus";
+		public static const  TILE_TYPE_SCATE:String						= "Tile type scate";
+		
+		public static const  DATE_FORMAT_FOR_DateField:String			= "YYYY-MM-DD";
+		
+		public static const  ROOM_USEABLE_TYPE_ACTUAL:String			= "ACTUAL";
+		public static const  ROOM_USEABLE_TYPE_GUIDE:String				= "GUIDE";
+		public static const  ROOM_USEABLE_TYPE_DUMMY:String				= "DUMMY";
+		
+		public static const  ROOM_PAX_TYPE_GUEST:String					= "GUEST";
+		public static const  ROOM_PAX_TYPE_GUIDE:String					= "GUIDE";
+		
+		
+		public static const  GUEST_PREFERENCE_Prefered :String						= "PREFERED";
+		public static const  GUEST_PREFERENCE_Allergy:String						= "ALLERGY";
+		
+		public static const  GUEST_PREFERENCE_TYPE_Cuisine:String					= "CUISINE";
+		public static const  GUEST_PREFERENCE_TYPE_Food:String						= "FOOD";
+		public static const  GUEST_PREFERENCE_TYPE_Room:String						= "ROOM";
+		public static const  GUEST_PREFERENCE_TYPE_Beverage:String					= "BEVERAGE";
+		public static const  GUEST_PREFERENCE_TYPE_Wine:String						= "WINE";
+		public static const  GUEST_PREFERENCE_TYPE_Dessert:String					= "DESSERT";
+		public static const  GUEST_PREFERENCE_TYPE_NewsPaper:String					= "NEWSPAPER";
+		public static const  GUEST_PREFERENCE_TYPE_Sport:String						= "SPORT";
+		
+		public static const  OTHER_COST_CODE_TYPE_Breakfast:String					= "BR";
+		public static const  OTHER_COST_CODE_TYPE_Lunch:String						= "LN";
+		public static const  OTHER_COST_CODE_TYPE_Diner:String						= "DN";
+		
+		public static const  MQ_MSG_SEND_OK:String					    			= "MSG_SEND_OK";
+		public static const  MQ_MSG_SEND_FAILED:String				    			= "MSG_SEND_FAILED";
+		public static const  MQ_MSG_CONSUMED_OK:String								= "MSG_CONSUMED_OK";
+		public static const  MQ_MSG_CONSUMED_FAILED:String			    			= "MSG_CONSUMED_FAILED";
+		
+		public static const  RATE_TYPE_FIXED:String									= "FIXED";
+		public static const  RATE_TYPE_PERCENTAGE:String							= "PERCENTAGE";
+		
+		public static const  RATE_ACTION_TYPE_PLUS:String						= "PLUS";
+		public static const  RATE_ACTION_TYPE_MINUS:String						= "MINUS";
+		
+		public static const  DISCOUNT_TIME_Default:String						= "DEFAULT";
+		public static const  DISCOUNT_TIME_UserOverridden:String				= "USER_OVERRIDDEN";
+		
+		public static const  DISCOUNT_EXPIRATION_TYPE_Once:String				= "FIRST_USE";
+		public static const  DISCOUNT_EXPIRATION_TYPE_UntilInactivate:String	= "UNTIL_INACTIVATE";
+		
+		public static const  COMMON_ALERT :String						= "Common Alert message window";
+		
+		public static const  ROOM_OCCUPANCY_TYPE_SGL:String				= "SGL";
+		public static const  ROOM_OCCUPANCY_TYPE_DBL:String				= "DBL";
+		public static const  ROOM_OCCUPANCY_TYPE_TLP:String				= "TPL";
+		
+		public static const  ROOM_BASIS_TYPE_BB:String					= "BB";
+		public static const  ROOM_BASIS_TYPE_HB:String					= "HB";
+		public static const  ROOM_BASIS_TYPE_FB:String					= "FB";
+		public static const  ROOM_BASIS_TYPE_RO:String					= "RO";
+		public static const  ROOM_BASIS_TYPE_AI:String					= "AI";
+		
+		public static const  DISCOUNT_TYPE_SEASON:String				= "DISCOUNT_BY_SEASON";
+		public static const  DISCOUNT_TYPE_CHECK_IN:String				= "DISCOUNT_BY_CHECK_IN";
+		public static const  DISCOUNT_TYPE_BOOKING:String				= "DISCOUNT_BY_BOOKING";
+		public static const  DISCOUNT_TYPE_DMC_MARKET:String			= "DISCOUNT_BY_DMC_MARKET";
+		public static const  DISCOUNT_TYPE_OCCUPANCY:String				= "DISCOUNT_BY_OCCUPANCY";
+		public static const  DISCOUNT_TYPE_EXTRA_PAX_01:String			= "DISCOUNT_BY_EXTRA_PAX_01";
+		public static const  DISCOUNT_TYPE_EXTRA_ITEM_01:String			= "DISCOUNT_BY_EXTRA_ITEM_01";
+		
+		public static const  SUPPLEMENT_TYPE_SEASON:String				= "SUPPLEMENT_BY_SEASON";
+		public static const  SUPPLEMENT_TYPE_CHECK_IN:String			= "SUPPLEMENT_BY_CHECK_IN";
+		public static const  SUPPLEMENT_TYPE_BOOKING:String				= "SUPPLEMENT_BY_BOOKING";
+		public static const  SUPPLEMENT_TYPE_AGENT:String				= "SUPPLEMENT_BY_AGENT";
+		public static const  SUPPLEMENT_TYPE_OCCUPANCY:String			= "SUPPLEMENT_BY_OCCUPANCY";
+		public static const  SUPPLEMENT_TYPE_DMC_MARKET:String			= "SUPPLEMENT_BY_DMC_MARKET";
+		
+		public static const  DISCOUNT_TYPE_SEASON_ORDER:int				= 1;
+		public static const  DISCOUNT_TYPE_CHECK_IN_ORDER:int			= 4;
+		public static const  DISCOUNT_TYPE_BOOKING_ORDER:int			= 5;
+		public static const  DISCOUNT_TYPE_AGENT_ORDER:int				= 3;
+		public static const  DISCOUNT_TYPE_OCCUPANCY_ORDER:int			= 2;
+		
+		public static const  DISCOUNT_SUPPLEMENT_TYPE_DISCOUNT:String	= "DISCOUNT";
+		public static const  DISCOUNT_SUPPLEMENT_TYPE_SUPPLEMENT:String	= "SUPPLEMENT";
+		
+		public static const  DISCOUNT_APPLIED_ON_GrossRate:String		= "GROSS";
+		public static const  DISCOUNT_APPLIED_ON_NetRate:String			= "NET";
+		
+		
+		public static const  DISCOUNT_DAYS_APPLY_TYPE_ALL:String		= "ALL";
+		public static const  DISCOUNT_DAYS_APPLY_TYPE_SELECTED:String	= "SELECTED";
+		
+		public static const  CALCULATION_AMOUNT_TYPE_FIXED:String		= "FIXED";
+		public static const  CALCULATION_AMOUNT_TYPE_PERCENTAGE:String	= "PERCENTAGE";
+		
+		public static const  RESERVATION_PAYMENT_MODE_CREDIT:String			= "CREDIT";
+		public static const  RESERVATION_PAYMENT_MODE_CASH:String			= "CASH";
+		public static const  RESERVATION_PAYMENT_MODE_AGENT:String			= "AGENT";
+		public static const  RESERVATION_PAYMENT_MODE_CREDIT_CARD:String	= "CREDIT_CARD";
+		public static const  RESERVATION_PAYMENT_MODE_COMPLIMENTARY:String	= "COMPLIMENTARY";
+		
+		public static const  RESERVATION_RESERVED_BY_GUEST:String	= "GUEST";
+		public static const  RESERVATION_RESERVED_BY_AGENT:String	= "AGENT";
+		
+		public static const  RESERVATION_BOOKING_STATUS_CONFIRMED:String			= "CONFIRMED";
+		public static const  RESERVATION_BOOKING_STATUS_WAITLISTED:String			= "WAITLISTED";
+		public static const  RESERVATION_BOOKING_STATUS_TENTATIVE:String			= "TENTATIVE";
+		public static const  RESERVATION_BOOKING_STATUS_CANCELED:String				= "CANCELED";
+		public static const  RESERVATION_BOOKING_STATUS_WAITING_APPROVAL:String		= "WAITING_APPROVAL";
+		
+		public static const  CONFIRMATION_DETAIL_ITEM_TYPE_INFORMATION:String		= "INFORMATION";
+		public static const  CONFIRMATION_DETAIL_ITEM_TYPE_CANCELLATION:String		= "CANCELLATION";
+		public static const  CONFIRMATION_DETAIL_ITEM_TYPE_CHILD:String				= "CHILD";
+		
+		public static const  RESERVATION_BOOKING_TYPE_FIT:String		= "FIT";
+		public static const  RESERVATION_BOOKING_TYPE_OTA:String		= "OTA";
+		public static const  RESERVATION_BOOKING_TYPE_OPERATOR:String	= "OPERATOR";
+		
+		public static const  RESERVATION_PAX_TYPE_INDIVIDUAL:String		= "I";
+		public static const  RESERVATION_PAX_TYPE_GROUP:String			= "G";
+		
+		public static const  RESERVATION_GUEST_TYPE_FOREIGN:String		= "F";
+		public static const  RESERVATION_GUEST_TYPE_LOCAL:String		= "L";
+		
+		public static const  TAX_CALCULATION_FIXED:String				= "TAX_CALCULATION_FIXED";
+		public static const  TAX_CALCULATION_PERCENTAGE:String			= "TAX_CALCULATION_PERCENTAGE";
+		
+		public static const  APPLY_STATUS_APPLIED:String				= "APPLIED";
+		public static const  APPLY_STATUS_NOT_APPLIED:String			= "NOT_APPLIED";
+		
+		public static const  AGENT_CATEGORY_TYPE_DMC:String				= "01";
+		public static const  AGENT_MARKET_TYPE_DMC:String				= "DMC";
+		
+		public static const APPLICATION_RESOURCE_LOCATION:String		= "D:/BlazedHS743/tomcat/webapps/samples/JWSDocuments/"
+		public static const APPLICATION_RESOURCE_FOLDER:String			= APPLICATION_RESOURCE_LOCATION + "Resources/";
+		public static const FOLDER_NAME_CONFIRMATION:String 			= "ConfirmationVoucher/";
+		
+		public static const FOLDER_PATH_OF_CONFIRMATION:String 			= APPLICATION_RESOURCE_FOLDER + FOLDER_NAME_CONFIRMATION;
+		
+		public static const DOCUMENT_TYPE_CONFIRMATION:String			= "CONFIRMATION";
+		
+		
+		public static const taxCalculationTypeListList:ArrayCollection = new ArrayCollection([
+		{ label:CALCULATION_AMOUNT_TYPE_PERCENTAGE, uuid:TAX_CALCULATION_PERCENTAGE },
+		{ label:CALCULATION_AMOUNT_TYPE_FIXED, uuid:TAX_CALCULATION_FIXED } ]);
+		
+		public static const confirmationDetailsTypeList:ArrayCollection = new ArrayCollection([
+		{ label:CONFIRMATION_DETAIL_ITEM_TYPE_INFORMATION, uuid:CONFIRMATION_DETAIL_ITEM_TYPE_INFORMATION },
+		{ label:CONFIRMATION_DETAIL_ITEM_TYPE_CANCELLATION, uuid:CONFIRMATION_DETAIL_ITEM_TYPE_CANCELLATION },
+		{ label:CONFIRMATION_DETAIL_ITEM_TYPE_CHILD, uuid:CONFIRMATION_DETAIL_ITEM_TYPE_CHILD } ]);
+		
+		public static const mealTypeList:ArrayCollection = new ArrayCollection([
+		{ label:"-", uuid:"9" },
+		{ label:OTHER_COST_CODE_TYPE_Breakfast, uuid:"0" },
+		{ label:OTHER_COST_CODE_TYPE_Lunch, uuid:"1" },
+		{ label:OTHER_COST_CODE_TYPE_Diner, uuid:"2" } ]);
+		
+		public static const roomOcupancyTypeList:ArrayCollection = new ArrayCollection([
+		{ label:"SGL", uuid:"SGL" },
+		{ label:"DBL", uuid:"DBL" },
+		{ label:"TPL", uuid:"TPL" } ]);
+		
+		public static const rateActionList:ArrayCollection = new ArrayCollection([
+		{ label:"+", id:"PLUS" },
+		{ label:"-", id:"MINUS" } ]);
+		
+ 		public static const rateTypeList:ArrayCollection = new ArrayCollection([
+		{ label:"Fixed", id:"FIXED" },
+		{ label:"%", id:"PERCENTAGE" } ]);
+		
+		public static const guestTitleList:ArrayCollection = new ArrayCollection([
+		{ Id:"Mr.", data:"Mr." },
+		{ Id:"Ms.", data:"Ms." },
+		{ Id:"Dr.", data:"Dr." },
+		{ Id:"Prof.", data:"Prof." },
+		{ Id:"Rev,", data:"Rev." } ]);
+		
+		public static const roomBasisList:ArrayCollection = new ArrayCollection([
+		{ label:"RO", id:"RO" },
+		{ label:"BB", id:"BB" },
+		{ label:"HB", id:"HB" },
+		{ label:"FB", id:"FB" },
+		{ label:"AI", id:"AI" } ]);
+		
+		public static const roomOccupancyList:ArrayCollection = new ArrayCollection([
+		{ label:"SGL", id:"SGL" },
+		{ label:"DBL", id:"DBL" },
+		{ label:"TPL", id:"TPL" } ]);
+		
+		public static const guestTreatmentCategoryList:ArrayCollection = new ArrayCollection([
+		{ label:"ROYAL", id:"ROYAL" },
+		{ label:"VVIP", id:"VVIP" },
+		{ label:"VIP", id:"VIP" },
+		{ label:"GENERAL", id:"GENERAL" } ]);
+		
+		
+		public static const guestPreferenceList:ArrayCollection = new ArrayCollection([
+		{ Id:GUEST_PREFERENCE_Prefered, data:GUEST_PREFERENCE_Prefered },
+		{ Id:GUEST_PREFERENCE_Allergy, data:GUEST_PREFERENCE_Allergy } ]);
+		
+		public static const guestPreferenceTypesList:ArrayCollection = new ArrayCollection([
+		{ Id:GUEST_PREFERENCE_TYPE_Cuisine, data:GUEST_PREFERENCE_TYPE_Cuisine },
+		{ Id:GUEST_PREFERENCE_TYPE_Food, data:GUEST_PREFERENCE_TYPE_Food },
+		{ Id:GUEST_PREFERENCE_TYPE_Room, data:GUEST_PREFERENCE_TYPE_Room },
+		{ Id:GUEST_PREFERENCE_TYPE_Beverage, data:GUEST_PREFERENCE_TYPE_Beverage },
+		{ Id:GUEST_PREFERENCE_TYPE_Wine, data:GUEST_PREFERENCE_TYPE_Wine },
+		{ Id:GUEST_PREFERENCE_TYPE_Dessert, data:GUEST_PREFERENCE_TYPE_Dessert },
+		{ Id:GUEST_PREFERENCE_TYPE_NewsPaper, data:GUEST_PREFERENCE_TYPE_NewsPaper },
+		{ Id:GUEST_PREFERENCE_TYPE_Sport, data:GUEST_PREFERENCE_TYPE_Sport } ]);
+		
+		public function JWHConstants()
+		{
+		}
+
+		public static const  RATE_TYPE_BASE_RATE:String				= "BASE RATE";
+		public static const  RATE_TYPE_SEASONAL_BASE_RATE:String	= "SEASONAL BASE RATE";
+		public static const  RATE_TYPE_RATE_CODE:String				= "RATE CODE";
+		public static const  RATE_TYPE_DISCOUNTS:String				= "DISCOUNTS";
+		public static const  RATE_TYPE_OFFERS:String				= "OFFERS";
+		public static const  RATE_TYPE_PROPERTY:String				= "PROPERTY";
+		public static const  RATE_TYPE_CODE_SPECIFIC:String			= "CODE_SPECIFIC";
+		
+		public static const  PAGE_MANAGER_PAGE_CHANGE_REQUEST_EVENT:String	= "Page manager-page change request event";
+		
+		public static const  METRO_AAPLICATION_TYPE_WINDOWS:String			= "WINDOWS";
+		public static const  METRO_AAPLICATION_TYPE_POPUP:String			= "POPUP";
+		
+		public static const  DISCOUT_APPLY_TO_TYPE_AGENTMARKET:String		= "AGENT_MARKET";
+		public static const  DISCOUT_APPLY_TO_TYPE_AGENTS:String			= "AGENT";
+		public static const  DISCOUT_APPLY_TO_TYPE_DMC_MARKET:String		= "DMC_MARKET";
+		public static const  DISCOUT_APPLY_TO_ALL:String				    = "ALL";
+		public static const  DISCOUT_APPLY_TO_SELECTED:String				= "SELECTED";
+		public static const  DISCOUT_APPLY_TO_NONE:String					= "NONE";
+		
+		public static const  TAX_COST_CODE_TOTAL:String				    	= "TOTAL";
+		
+		public static const  DISCOUNT_CONDITION_VALUE_TYPES_DMC_MARKET:String		= "DMC_MARKET";
+		public static const  DISCOUNT_CONDITION_VALUE_TYPES_SEASON:String			= "SEASON";
+		public static const  DISCOUNT_CONDITION_VALUE_TYPES_FROM_DATE:String		= "FROM_DATE";
+		public static const  DISCOUNT_CONDITION_VALUE_TYPES_TO_DATE:String			= "TO_DATE";
+		public static const  DISCOUNT_CONDITION_VALUE_TYPES_APPLY_DAYS:String		= "APPLICABLE_DAYS";
+		public static const  DISCOUNT_CONDITION_VALUE_TYPES_ROOM_CATEGORY:String	= "ROOM_CATEGORY";
+		public static const  DISCOUNT_CONDITION_VALUE_TYPES_PROMOTION_CODE:String	= "PROMOTION_CODE";
+		public static const  DISCOUNT_CONDITION_VALUE_TYPES_OCCUPANCY_VALUE:String	= "OCCUPANCY_VALUE";
+		public static const  DISCOUNT_CONDITION_VALUE_TYPES_OCCUPANCY_CONDITION:String	= "OCCUPANCY_CONDITION";
+		
+		public static const  DISCOUNT_MAPPING_COMBINATION_TYPE_INVALID:String	= "INVALID";
+		public static const  DISCOUNT_MAPPING_COMBINATION_TYPE_TAG01:String		= "TAG01";
+		public static const  DISCOUNT_MAPPING_COMBINATION_TYPE_TAG02:String		= "TAG02";
+		public static const  DISCOUNT_MAPPING_COMBINATION_TYPE_TAG03:String		= "TAG03";
+		public static const  DISCOUNT_MAPPING_COMBINATION_TYPE_TAG04:String		= "TAG04";
+		public static const  DISCOUNT_MAPPING_COMBINATION_TYPE_TAG05:String		= "TAG05";
+		public static const  DISCOUNT_MAPPING_COMBINATION_TYPE_TAG06:String		= "TAG06";
+		
+		public static const  DMC_ALL_MARKET_CODE:String							= "ALL";
+		
+		public static const USER_SCREEN_RESOLUTION_1280X800:String 			= "1280 X 800";
+		public static const USER_SCREEN_RESOLUTION_1280X1024:String 		= "1280 X 1024";
+		public static const USER_SCREEN_RESOLUTION_1920X1080:String			= "1920 X 1080";
+		public static const USER_SCREEN_RESOLUTION_2260X1600:String 		= "2260 X 1600";
+		public static const USER_SCREEN_RESOLUTION_1366X768:String 			= "1366 X 768";
+		public static const USER_SCREEN_RESOLUTION_1600X900:String 			= "1600 X 900";
+		
+		public static const ROOM_PREERENCES_TwinBed:String 			= "TWB";
+		public static const ROOM_PREERENCES_KingSize:String 		= "KGZ";
+		public static const ROOM_PREERENCES_QueenSize:String 		= "QUZ";
+		
+		// there is a master table for following -- room_preference
+		public static const roomBedPreferences:ArrayCollection = new ArrayCollection([
+		{ uuid:ROOM_PREERENCES_TwinBed,  label:"Twin Bed"  },
+		{ uuid:ROOM_PREERENCES_KingSize, label:"King size Bed" },
+		{ uuid:ROOM_PREERENCES_QueenSize, label:"Queen size Bed" } ]);
+		
+		public static const roomUseableTypeList:ArrayCollection = new ArrayCollection([
+		{ uuid:ROOM_USEABLE_TYPE_ACTUAL,  label:ROOM_USEABLE_TYPE_ACTUAL  },
+		{ uuid:ROOM_USEABLE_TYPE_GUIDE, label:ROOM_USEABLE_TYPE_GUIDE },
+		{ uuid:ROOM_USEABLE_TYPE_DUMMY, label:ROOM_USEABLE_TYPE_DUMMY } ]);
+		
+		public static const mqMessageStatusList:ArrayCollection = new ArrayCollection([
+		{ uuid:MQ_MSG_CONSUMED_FAILED,  label:MQ_MSG_CONSUMED_FAILED  },
+		{ uuid:MQ_MSG_SEND_FAILED,  label:MQ_MSG_SEND_FAILED  },
+		{  uuid:MQ_MSG_CONSUMED_OK,  label:MQ_MSG_CONSUMED_OK  },
+		{ uuid:MQ_MSG_SEND_OK, label:MQ_MSG_SEND_OK } ]);
+		
+		public static const screenResolutionList:ArrayCollection = new ArrayCollection([
+		{ label:USER_SCREEN_RESOLUTION_1280X800,  data:USER_SCREEN_RESOLUTION_1280X800  },
+		{ label:USER_SCREEN_RESOLUTION_1280X1024, data:USER_SCREEN_RESOLUTION_1280X1024 },
+		{ label:USER_SCREEN_RESOLUTION_1366X768, data:USER_SCREEN_RESOLUTION_1366X768 },
+		{ label:USER_SCREEN_RESOLUTION_1600X900, data:USER_SCREEN_RESOLUTION_1600X900 },
+		{ label:USER_SCREEN_RESOLUTION_1920X1080, data:USER_SCREEN_RESOLUTION_1920X1080 },
+		{ label:USER_SCREEN_RESOLUTION_2260X1600, data:USER_SCREEN_RESOLUTION_2260X1600 } ]);
+		
+	}
+}

@@ -1,0 +1,30 @@
+package net.jwt.value.objects
+{
+	import net.jhl.value.objects.common.TimeStamp;
+	import net.jhl.view.JWHConstants;
+	
+	[RemoteClass(alias="net.jwt.value.objects.MarketingAllocateBudgetForCostCategory")]
+	
+	[Bindable]
+	public class MarketingAllocateBudgetForCostCategory
+	{
+		public var uuid:String 			= "";
+		public var costcategoryId:String= "";
+		public var seasonId:String		= "";
+		public var periodFrom:String	= "";
+		public var periodTo:String		= "";
+		public var amount:String		= "";
+		public var status:String		=	JWHConstants.STATUS_LABLE_ACTIVE;
+		
+		public var season:MarketingSeason;
+		public var timeStamp:TimeStamp;
+		
+		public function MarketingAllocateBudgetForCostCategory()
+		{
+			season = new MarketingSeason();
+			timeStamp = new TimeStamp();
+			
+		}
+
+	}
+}

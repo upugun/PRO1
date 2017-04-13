@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:VBox xmlns:mx="http://www.adobe.com/2006/mxml" width="100%" height="100%" xmlns:common="net.jhl.view.common.*" paddingRight="10">
+		<mx:Script>
+			<![CDATA[
+				import net.jhl.value.objects.Guest;
+				
+			]]>
+		</mx:Script>
+	
+		<mx:HBox width="100%"  >
+				<mx:Label text="Applicable discounts/ supplements are listed below. Select to apply." width="100%"/>
+		</mx:HBox>
+		<mx:VBox  width="100%" id="V_dynamic" paddingTop="10">
+		</mx:VBox>
+		<mx:HBox width="100%" horizontalAlign="left" verticalAlign="bottom" horizontalGap="13" paddingTop="10">
+				<common:JHButton JLabel="Select &amp; Close" id="B_close"/>
+		</mx:HBox>
+			
+</mx:VBox>

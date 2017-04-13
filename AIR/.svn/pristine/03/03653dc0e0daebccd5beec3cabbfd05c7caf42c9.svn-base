@@ -1,0 +1,255 @@
+package net.jhl.view
+{
+	import flash.events.Event;
+	import flash.events.KeyboardEvent;
+	import flash.events.MouseEvent;
+	
+	import mx.collections.ArrayCollection;
+	import mx.controls.Alert;
+	import mx.core.UIComponent;
+	import mx.events.ListEvent;
+	import mx.formatters.DateFormatter;
+	import mx.messaging.messages.ErrorMessage;
+	import mx.rpc.events.FaultEvent;
+	import mx.rpc.events.ResultEvent;
+	
+	import net.jhl.value.objects.Property;
+	import net.jhl.view.common.JHRateManagementToolBox;
+	import net.jwt.ApplicationFacade;
+	import net.jwt.Constants;
+	import net.jwt.event.INotificationArguments;
+	import net.jwt.event.NotificationArguments;
+	import net.jwt.value.objects.AccessDetails;
+	import net.jwt.value.objects.Location;
+	import net.jwt.value.objects.User;
+	import net.jwt.view.MainView;
+	import net.jwt.view.Mediator;
+	import net.jwt.view.popup.JWTPopUpCanvas;
+	
+	public class PropertyMediator extends Mediator
+	{
+		private var _view:PropertyView;
+		private var _args:INotificationArguments;
+		//private var _loggedInUser:User;
+		
+		[Bindable] private var _selectedIndex:int = -1;
+		[Bindable] private var _selectedIndexOfCategory:int = -1;
+		[Bindable] public var _obj:User = new User();
+		
+		[Bindable] public var propertyList:ArrayCollection;
+		
+		[Bindable] public var _property:Property = new Property();
+//		[Bindable] public var popup:JWTPopUp;
+		[Bindable] public var args:NotificationArguments = new NotificationArguments();
+
+		public function PropertyMediator(view:UIComponent, args:INotificationArguments)
+		{
+			super(view);
+			if(view != null)
+			{
+				_view  = view as PropertyView ;
+	
+			}
+			
+			if(args != null)
+			{
+				_args = args;
+				_loggedInUser = (_args.viewComponent as MainView).user;
+			}
+		}
+		
+		protected override function viewComponentInitialize():void{
+			
+			setLoggedInUser();
+			loadObjectsList();			
+			_view.addEventListener(KeyboardEvent.KEY_UP, saveDocument);
+			_view.B_save.addEventListener(MouseEvent.CLICK, saveDocumentByButton);
+			_view.DG_List.addEventListener(ListEvent.ITEM_CLICK,showSelectedItem);
+			_view.T_search.addEventListener(KeyboardEvent.KEY_UP, DynamicSearch);
+			_view.RD_code.addEventListener(MouseEvent.CLICK, DynamicSearch);
+			_view.RD_lable.addEventListener(MouseEvent.CLICK, DynamicSearch);
+			_view.B_new.addEventListener(MouseEvent.CLICK, addNew);
+			_view.locationHelp.addEventListener(MouseEvent.MOUSE_UP, openLocationHelp);
+			
+			createButtonBox();
+		}
+		
+		private function createButtonBox():void
+		{
+			for(var i:int = 0; i<_loggedInUser.accessList.length; i++)
+			 {
+			 	var _accessDetail:AccessDetails = _loggedInUser.accessList.getItemAt(i) as AccessDetails;
+			 	if(_accessDetail.roleId == Constants.ROLE_RATE_CODE_RateBox)
+			 	{
+			 		var rateToolBox:JHRateManagementToolBox;
+			 		rateToolBox = new JHRateManagementToolBox;
+					rateToolBox.args 	= _args;
+					rateToolBox.nargs	= args;
+					rateToolBox.facade 	= facade;
+					rateToolBox.view	= _view;
+					rateToolBox.mediator= this;
+					rateToolBox.createMetroIconRateManagementBarBox();
+					_view.button_box.addChild(rateToolBox);
+					break;
+			 	}
+			 }
+			
+		}
+		
+		private function openLocationHelp(event:MouseEvent):void
+		{
+			createPopUpCanvas(HELP_LOCATION, _view, args, "Search and select Location", ApplicationFacade.HELP_LOCATION_SEARCH, true);
+		}
+		
+		private function addNew(e:Event=null):void
+		{
+			_view.property = new Property;
+			_view.B_status.setJLabel(JWHConstants.STATUS_LABLE_ACTIVE);
+		}
+		public function filter():void {
+             
+             
+               propertyList.filterFunction = filterFirst;
+               propertyList.refresh();
+                 
+        }
+            
+            
+         private function filterFirst(item:Object):Boolean
+        {
+            var searchBy:String = "";
+            
+            if(_view.RD_code.selected)
+            	searchBy = "propertyCode";
+            else if(_view.RD_lable.selected)
+            	searchBy = "propertyName";	
+            
+            return item[searchBy].match(new RegExp(_view.T_search.text, 'i'))
+        }
+		
+		private function setLoggedInUser():void
+		{
+			initializePropertyRemortingObject();
+			propertyRO.setLogedInUser(_loggedInUser);
+		}
+		
+		private function resetStatus(event:Event):void
+		{
+			//_view.statusLabel.text = "";
+		}
+		
+		
+		public override function closeCanvasPopup(event:Event):void
+            {
+                popup = null;
+                if(args != null)
+                {
+                	if((event.target as JWTPopUpCanvas).id == HELP_LOCATION)
+                	{
+                		if(args.argumentObject is Location)
+                		{
+                			_view.property.location 	= args.argumentObject as Location;
+                			_view.property.locationId	= _view.property.location.uuid;
+                		}
+                		
+                		
+                	}
+                	
+                }
+            }
+		
+		
+		private function loadObjectsList():void
+		{
+			startBusyCursor();
+			propertyRO.dynamicSearch("","");
+		}
+		
+		private function showSelectedItem(event:ListEvent):void
+		{
+			_view.property = _view.DG_List.selectedItem as Property;
+			
+			_view.B_status.setJLabel(_view.property.status);
+		}
+		
+		
+		public function saveDocument(event:KeyboardEvent):void
+		{
+			if(event.keyCode == 119)
+				saveObject();
+			else if(event.keyCode == 120)
+				Alert.show("TODO:Delete this record");
+			else if(event.keyCode == 112)
+				Alert.show("TODO:Show HELP page");
+				
+		}
+		
+		public function saveDocumentByButton(event:Event):void
+		{
+			saveObject();
+		}
+		public function saveObject():void
+		{
+			
+			startBusyCursor();
+				_view.property.timeStamp.createdById 	= _loggedInUser.uuid;
+				_view.property.timeStamp.createdByName 	= _loggedInUser.userName;
+				
+				_view.property.timeStamp.updatedById 	= _loggedInUser.uuid;
+				_view.property.timeStamp.updatedByName 	= _loggedInUser.userName;	
+				
+				_view.property.status 		  			= _view.B_status.status;	
+					
+				_property = _view.property;
+			
+			var _temp:ArrayCollection = new ArrayCollection;
+				_temp.addItem(_property);
+				propertyRO.create(_temp);
+				
+		}
+		
+		private function CurrentDateTimeString():String
+		{               
+		    var CurrentDateTime:Date 	= new Date();
+		    var CurrentDF:DateFormatter = new DateFormatter();
+		    	CurrentDF.formatString 	= "YYYY/MM/DD HH:NN:SS";
+		    var DateTimeString:String 	= CurrentDF.format(CurrentDateTime);
+		    
+		    return DateTimeString;
+		}
+		
+		private function DynamicSearch(event:Event):void
+		{
+			filter();
+		}
+		
+		public override function marketingPropertyFetchResultsHandler (event:ResultEvent):void
+		{	
+			stoptBusyCursor();
+			propertyList = new ArrayCollection();
+			propertyList = event.result as ArrayCollection;
+			_view.DG_List.dataProvider = propertyList;
+			
+		}
+		
+		public override function marketingPropertyCreateResultsHandler (event:ResultEvent):void
+		{	
+			stoptBusyCursor();
+			loadObjectsList();
+			addNew();
+			activityAknowladgment();
+		}
+		
+		public override function faultHandler (event:FaultEvent):void
+		{	
+			stoptBusyCursor();
+			var error:ErrorMessage	=	event.message as ErrorMessage;
+			handleFaultMessage(error);
+		}
+		
+		private function activityAknowladgment():void
+		{
+			createJHAlert(_view, "Record saved Successfully");
+		}
+	}
+}

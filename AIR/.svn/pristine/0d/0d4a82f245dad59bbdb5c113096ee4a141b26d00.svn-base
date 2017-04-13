@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:VBox xmlns:mx="http://www.adobe.com/2006/mxml" width="100%" height="100%">
+	<mx:VBox width="100%" height="100%" paddingLeft="5" paddingBottom="5" paddingTop="5" paddingRight="5">
+		 <mx:AdvancedDataGrid width="100%" height="100%" id="DG" editable="true">
+	        <mx:groupedColumns>
+	       		<mx:AdvancedDataGridColumn dataField="date" headerText="Date" width="150" editable="false"/>
+	        	<mx:AdvancedDataGridColumn dataField="hotelName" headerText="HOTEL" width="150" editable="false"/>
+	        	<mx:AdvancedDataGridColumn dataField="roomCategory" headerText="Room" width="150" editable="false"/>
+	            <mx:AdvancedDataGridColumnGroup headerText="BUY RATE"> 
+	            	<mx:AdvancedDataGridColumn dataField="buyCurency" headerText="Currency" editorDataField="value">
+	                	<mx:itemEditor>
+								<mx:Component>
+									<mx:ComboBox>
+										 <mx:dataProvider>
+                                                <mx:String>USD</mx:String>
+                                                <mx:String>GBP</mx:String>
+                                                <mx:String>EUR</mx:String>
+                                                <mx:String>LKR</mx:String>
+                                         </mx:dataProvider>
+                                     </mx:ComboBox>    
+								</mx:Component>
+							</mx:itemEditor>
+	                </mx:AdvancedDataGridColumn>   
+	                <mx:AdvancedDataGridColumn dataField="SGLRate" headerText="SGL"/>
+	                <mx:AdvancedDataGridColumn dataField="DBLRate" headerText="DBL"/>
+	                <mx:AdvancedDataGridColumn dataField="TPLRate" headerText="TPL"/>
+	                <mx:AdvancedDataGridColumn dataField="buyRateFamily" headerText="Family"/>
+	                <mx:AdvancedDataGridColumn dataField="guideRate" headerText="Guide"/>
+	            </mx:AdvancedDataGridColumnGroup>   
+	             <mx:AdvancedDataGridColumnGroup headerText="SELL RATE"> 
+	             	<mx:AdvancedDataGridColumn dataField="sellCurency" headerText="Currency" editable="false"/> 
+	             	<mx:AdvancedDataGridColumn dataField="sellRateSGL" headerText="SGL" editable="false"/>   
+	                <mx:AdvancedDataGridColumn dataField="sellRateDBL" headerText="DBL" editable="false"/>
+	                <mx:AdvancedDataGridColumn dataField="sellRateTPL" headerText="TPL" editable="false"/>
+	                <mx:AdvancedDataGridColumn dataField="sellRateFamily" headerText="Family" editable="false"/>
+	            </mx:AdvancedDataGridColumnGroup>  
+	             <mx:AdvancedDataGridColumn dataField="update" headerText="Updated ?" width="10" editable="false"/>
+	        </mx:groupedColumns>
+    </mx:AdvancedDataGrid> 
+    <mx:Button label="Close" id="B_save"/> 
+	</mx:VBox>
+</mx:VBox>

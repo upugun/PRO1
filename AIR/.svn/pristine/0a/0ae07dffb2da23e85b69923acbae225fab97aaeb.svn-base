@@ -1,0 +1,63 @@
+package net.jhl.control.helper
+{
+	import mx.core.UIComponent;
+	
+	import net.jhl.view.helper.HelperAgentMarketMediator;
+	import net.jhl.view.helper.HelperAgentMarketView;
+	import net.jwt.event.NotificationArguments;
+	import net.jwt.view.MainView;
+	import net.jwt.view.popup.JWTPopUp;
+	import net.jwt.view.popup.JWTPopUpCanvas;
+	
+	import org.puremvc.as3.interfaces.INotification;
+	import org.puremvc.as3.patterns.command.SimpleCommand;
+	
+	public class HelperAgentMarketCommand extends SimpleCommand
+	{
+		private var _mediator:HelperAgentMarketMediator;
+		private var _view:HelperAgentMarketView;
+		private var _args:UIComponent;
+		
+		override public function execute(notification:INotification):void
+		{
+			var app:Object;
+			var args:NotificationArguments = notification.getBody() as NotificationArguments;
+			this._view     = new HelperAgentMarketView();
+			
+			var mediator:HelperAgentMarketMediator 	= new HelperAgentMarketMediator(_view,args);
+			this._mediator = new HelperAgentMarketMediator(_view,args);
+			
+			
+			if (null != args){
+				try
+				{
+					
+					if((args.viewComponent as MainView) != null)
+					{
+						app = args.viewComponent as MainView;
+						facade.registerMediator(mediator);
+						app.applicationPanel.removeAllChildren();
+						app.applicationPanel.addChild(_view);
+					}
+					else if((args.viewComponent as JWTPopUp) != null)
+					{
+						app = args.viewComponent as JWTPopUp;
+						facade.registerMediator(mediator);
+						app.addChild(_view);
+					}
+					else if((args.viewComponent as JWTPopUpCanvas) != null)
+					{
+						app = args.viewComponent as JWTPopUpCanvas;
+						facade.registerMediator(mediator);
+						app.canvas_body.addChild(_view);
+					}
+				}catch(e:Error)
+				{}
+			}
+		}
+		public function HelperAgentMarketCommand():void
+		{
+			//Alert.show("DailyGraphPriceBasedMediator command");
+		}
+	}
+}

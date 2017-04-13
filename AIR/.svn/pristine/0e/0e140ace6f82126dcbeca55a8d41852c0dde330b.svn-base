@@ -1,0 +1,102 @@
+package net.jwt.view.helper
+{
+	import flash.events.Event;
+	import flash.events.KeyboardEvent;
+	
+	import mx.collections.ArrayCollection;
+	import mx.core.UIComponent;
+	import mx.events.CloseEvent;
+	import mx.events.ListEvent;
+	import mx.rpc.events.ResultEvent;
+	
+	import net.jwt.event.NotificationArguments;
+	import net.jwt.value.objects.QuerryObject;
+	import net.jwt.value.objects.TransportVehicleOwner;
+	import net.jwt.view.Mediator;
+	import net.jwt.view.popup.JWTPopUp;
+	
+	public class HelperVehicleSuppliersMediator extends Mediator
+	{
+		private var _view:HelperVehicleSuppliersView;
+		
+		private var _app:JWTPopUp;
+		[Bindable] public var args:NotificationArguments;
+		[Bindable] public var _list:ArrayCollection;
+		
+		public function HelperVehicleSuppliersMediator(view:UIComponent, args:NotificationArguments)
+		{
+			super(view);
+			if(view != null)
+			{
+				_view  = view as HelperVehicleSuppliersView;
+			}
+			
+			if(args != null)
+				this.args = args;
+				
+			_app = args.viewComponent as JWTPopUp;	
+		}
+		
+		protected override function viewComponentInitialize():void{
+			loadObjectsList();		
+			_view.DG.doubleClickEnabled = true;
+			_view.DG.addEventListener(ListEvent.ITEM_DOUBLE_CLICK, selectAndClose);
+			_view.T_search.addEventListener(KeyboardEvent.KEY_UP, dynamicSearch);
+		}
+		
+		private function selectAndClose(event:ListEvent):void
+		{
+			var obj:TransportVehicleOwner =  _list.getItemAt(event.rowIndex) as TransportVehicleOwner;
+			args.argumentObject = obj;
+			_app.dispatchEvent(new CloseEvent(CloseEvent.CLOSE));
+		}
+		
+		private function loadObjectsList():void
+		{
+			initializeTransportVehicleOwnerRemortingObject();
+			var q:QuerryObject = new QuerryObject;
+				q.searchCode   = "";
+				q.condition1   = "";
+			
+			transportVehicleOwnerRO.dynamicSearch(q);
+		}
+		
+		private function dynamicSearch(e:Event):void
+		{
+			filter();
+		}
+		
+		public function filter():void {
+             
+             
+               _list.filterFunction = filterFirst;
+               _list.refresh();
+                 
+        }
+            
+            
+         private function filterFirst(item:Object):Boolean
+        {
+            var searchBy:String = "";
+            
+            if(_view.RD_code.selected)
+            	searchBy = "glCode";
+            else if(_view.RD_fname.selected)
+            	searchBy = "ownerName";
+            else if(_view.RD_lname.selected)
+            	searchBy = "surename";
+            
+            
+            return item[searchBy].match(new RegExp(_view.T_search.text, 'i'))
+        }
+		
+		// Overridden from Mediator class
+		public override function transportVehicleOwnerFetchResultsHandler (event:ResultEvent):void
+		{
+			_list = new ArrayCollection();
+			_list = event.result as ArrayCollection;
+			_view.DG.dataProvider = _list;
+		}
+	
+	}
+}

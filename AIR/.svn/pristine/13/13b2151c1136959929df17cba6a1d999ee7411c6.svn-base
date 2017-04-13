@@ -1,0 +1,244 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Panel xmlns:mx="http://www.adobe.com/2006/mxml" title="Itinerary view" 
+		  width="100%" height="100%" >
+	<mx:Script>
+		<![CDATA[
+			import net.jwt.value.objects.ItinaryIncludes;
+			import net.jwt.value.objects.Itinary;
+			import net.jwt.value.objects.ItinaryDay;
+			import mx.controls.Alert;
+			import mx.binding.utils.BindingUtils;
+			import net.jwt.value.objects.Hotel;
+			[Bindable] public var day:ItinaryDay		    = new ItinaryDay();
+			[Bindable] public var itinary:Itinary 			= new Itinary();
+			[Bindable] public var includes:ItinaryIncludes  = new ItinaryIncludes();
+			[Bindable] public var excludes:ItinaryIncludes  = new ItinaryIncludes();
+			
+			
+			[Embed(source='assets/icons/24x24add.png')]
+	     	private static const add:Class;
+	     	
+	     	[Embed(source='assets/icons/24x24trash.png')]
+	     	private static const trash:Class;
+	     	
+	     	[Embed(source='assets/icons/24x24up.png')]
+	     	private static const up:Class;
+	     	
+	     	[Embed(source='assets/icons/24x24down.png')]
+	     	private static const down:Class;
+	     	
+	     	[Embed(source='assets/icons/24x24cut.png')]
+	     	private static const copypaste:Class;
+	        
+	        
+	        [Embed(source='assets/icons/save16x16.png')]
+     		private static const saveIcon:Class;
+		]]>
+	</mx:Script>
+	
+	<mx:HDividedBox width="100%" height="100%">
+		<mx:VBox width="30%" height="100%">
+			<mx:VBox width="50%" height="55">
+				<mx:HBox width="100%" height="50" verticalAlign="middle" horizontalGap="2">
+					<mx:Label text="Select Language" fontWeight="bold"/>
+					<mx:ComboBox width="183" id="CMB_language" labelField="language"></mx:ComboBox>
+					
+				</mx:HBox>
+			</mx:VBox>
+			<mx:HBox width="100%" height="50" verticalAlign="middle" horizontalGap="2">
+				<mx:Label text="Costing No" fontWeight="bold"/>
+				<mx:TextInput width="71" id="T_year"/>
+				<mx:Label text="-"/>
+				<mx:TextInput width="100" id="T_seq"/>
+				<mx:Button label="Get Details" id="B_search"/>
+			</mx:HBox>
+			
+			<mx:VBox width="100%" height="197" verticalAlign="middle">
+				<mx:Grid>
+					<mx:GridRow>
+						<mx:GridItem>
+							<mx:Label text="Costing Name" fontWeight="bold"/>
+						</mx:GridItem>
+						<mx:GridItem>
+							<mx:Label id="T_costing" maxWidth="273"  color="#19D114" fontWeight="bold"/>
+						</mx:GridItem>
+						<mx:GridItem>
+						</mx:GridItem>
+					</mx:GridRow>
+					<mx:GridRow>
+						<mx:GridItem>
+							<mx:Label text="Itinerary Title" fontWeight="bold"/>
+						</mx:GridItem>
+						<mx:GridItem>
+							<mx:TextInput id="T_title" width="273" text="{itinary.title}" change="{itinary.title =T_title.text}"/>
+						</mx:GridItem>
+						<mx:GridItem>
+						</mx:GridItem>
+					</mx:GridRow>
+					<mx:GridRow>
+						<mx:GridItem>
+							<mx:Label text="Itinerary Slogan" fontWeight="bold"/>
+						</mx:GridItem>
+						<mx:GridItem>
+							<mx:TextInput  id="T_slogan" width="273" text="{itinary.slogan}" change="{itinary.slogan =T_slogan.text}"/>
+						</mx:GridItem>
+						<mx:GridItem>
+						</mx:GridItem>
+					</mx:GridRow>
+					<mx:GridRow>
+						<mx:GridItem>
+							<mx:Label text="File Name" fontWeight="bold"/>
+						</mx:GridItem>
+						<mx:GridItem>
+							<mx:TextInput  id="T_fileName" width="273" text="{itinary.fileName}" change="{itinary.fileName =T_fileName.text}"/>
+						</mx:GridItem>
+						<mx:GridItem>
+						</mx:GridItem>
+					</mx:GridRow>
+					<mx:GridRow>
+						<mx:GridItem>
+						</mx:GridItem>
+						<mx:GridItem>
+							<mx:Button label="Save" id="B_save"/>
+							<mx:Button label="Includes &amp; Excludes" id="B_includes"/>
+							<mx:Button label="Generate Itinerary" id="B_generate" visible="false"/>
+							<mx:Button label="Reload" id="B_reload" visible="false"/>
+						</mx:GridItem>
+						<mx:GridItem>
+						</mx:GridItem>
+					</mx:GridRow>
+				</mx:Grid>
+			</mx:VBox>
+			<mx:VBox width="100%" height="100%">
+				<mx:DataGrid width="100%" height="98%" id="DG_daysList" dataProvider="{itinary.daysList}">
+					<mx:columns>
+						<mx:DataGridColumn headerText="Days" dataField="dayHeader"/>
+						<mx:DataGridColumn headerText="Route" dataField="route"/>
+					</mx:columns>
+				</mx:DataGrid>
+				
+			</mx:VBox>
+		</mx:VBox>
+		<mx:VBox width="40%" height="100%" paddingLeft="10" paddingTop="10" verticalGap="10">
+			<mx:HBox width="100%" horizontalGap="10">
+				<mx:Button id="B_save0" toolTip="Save this document (F8)" skin="{saveIcon}" borderColor="#DFDFDF" visible="false"/>
+				<mx:Button id="B_up" 	 	toolTip="Move line UP (Ctrl + up arrow)"					skin="{up}" borderColor="#DFDFDF"/>
+				<mx:Button id="B_down"  	toolTip="Move line DOWN (Ctrl + down arrow)"				skin="{down}" borderColor="#DFDFDF"/>
+				<mx:Button id="B_add" 	 	toolTip="ADD new line (Ctrl + n)" 					skin="{add}" borderColor="#DFDFDF"/>
+				<mx:Button id="B_del" 	 	toolTip="DELETE selected line (F9)"			skin="{trash}" borderColor="#DFDFDF"/>
+				<mx:Button id="B_copyPaste" toolTip="COPY / PASTE the selected line (Ctrl + d)" skin="{copypaste}" borderColor="#DFDFDF" visible="false"/>
+			</mx:HBox>
+			<mx:HBox width="100%">
+				<mx:Label text="Day" width="65"/>
+				<mx:TextInput width="277" id="T_day" text="{day.dayHeader}" editable="true"/>
+				
+			</mx:HBox>
+			<mx:HBox width="100%">
+				<mx:Label text="Route" width="65"/>
+				<mx:TextInput width="277" id="T_route" text="{day.route}" change="{day.route = T_route.text}"/>
+				
+			</mx:HBox>
+			<mx:VBox width="100%">
+				<mx:HBox width="100%">
+					<mx:Label text="Hotel" width="65"/>
+					<mx:TextInput width="277" id="T_hotel" text="{day.hotelDetails.hotelName}" change="{day.hotelDetails.hotelName = T_hotel.text}"/>
+				
+				</mx:HBox>
+				<mx:HBox width="100%">
+					<mx:Label text="Room" width="65"/>
+					<mx:TextInput width="277"  id="T_room" text="{day.hotelDetails.roomCategory}" change="{day.hotelDetails.roomCategory = T_room.text}"/>
+				
+				</mx:HBox>
+				<mx:HBox width="100%">
+					<mx:Label text="Basis" width="65"/>
+					<mx:TextInput width="277" id="T_basis" text="{day.hotelDetails.basis}" change="{day.hotelDetails.basis = T_basis.text}"/>
+				
+				</mx:HBox>
+				<mx:HBox width="100%">
+					<mx:Label text="Web" width="65"/>
+					<mx:TextInput width="277" id="T_web" text="{day.hotelDetails.website}" change="{day.hotelDetails.website = T_web.text}"/>
+				
+				</mx:HBox>
+			</mx:VBox>
+			<mx:VBox width="100%" id="V_box" verticalGap="10">
+				
+			</mx:VBox>
+		</mx:VBox>
+		<!--mx:VDividedBox width="30%" height="100%">
+			<mx:VBox width="100%" height="50%">
+				<mx:HBox width="100%" height="50%">
+					<mx:Grid>
+						<mx:GridRow>
+							<mx:GridItem>
+								<mx:Label text="Price Includes List" fontWeight="bold"/>
+							</mx:GridItem>
+							<mx:GridItem>
+							</mx:GridItem>
+						</mx:GridRow>
+						<mx:GridRow>
+							<mx:GridItem>
+								<mx:Label text="Description"/>
+							</mx:GridItem>
+							<mx:GridItem>
+								<mx:TextInput id="T_includesDescription" width="273" text="{includes.description}" change="{includes.description=T_includesDescription.text}"/>
+							</mx:GridItem>
+						</mx:GridRow>
+						<mx:GridRow>
+							<mx:GridItem>
+							</mx:GridItem>
+							<mx:GridItem>
+								<mx:Button label="Add New" id="B_inclAdd"/>
+							</mx:GridItem>
+						</mx:GridRow>
+					</mx:Grid>
+					
+				</mx:HBox>
+				<mx:HBox width="100%" height="50%">
+					<mx:DataGrid width="100%" height="98%" id="DG_includes" dataProvider="{itinary.includesList}" editable="true">
+						<mx:columns>
+							<mx:DataGridColumn headerText="Description" dataField="description"/>
+						</mx:columns>
+					</mx:DataGrid>
+					
+				</mx:HBox>
+			</mx:VBox>
+			<mx:VBox width="100%" height="50%">
+				<mx:HBox width="100%" height="50%">
+					<mx:Grid>
+						<mx:GridRow>
+							<mx:GridItem>
+								<mx:Label text="Price Excludes List" fontWeight="bold"/>
+							</mx:GridItem>
+							<mx:GridItem>
+							</mx:GridItem>
+						</mx:GridRow>
+						<mx:GridRow>
+							<mx:GridItem>
+								<mx:Label text="Description"/>
+							</mx:GridItem>
+							<mx:GridItem>
+								<mx:TextInput id="T_excludesDescription" width="273" text="{excludes.description}" change="{excludes.description=T_excludesDescription.text}"/>
+							</mx:GridItem>
+						</mx:GridRow>
+						<mx:GridRow>
+							<mx:GridItem>
+							</mx:GridItem>
+							<mx:GridItem>
+								<mx:Button label="Add New" id="B_exclAdd"/>
+							</mx:GridItem>
+						</mx:GridRow>
+					</mx:Grid>
+				</mx:HBox>
+				<mx:HBox width="100%" height="50%">
+					<mx:DataGrid width="100%" height="98%" id="DG_excludes" dataProvider="{itinary.excludesList}" editable="true">
+						<mx:columns>
+							<mx:DataGridColumn headerText="Description" dataField="description"/>
+						</mx:columns>
+					</mx:DataGrid>
+					
+				</mx:HBox>
+			</mx:VBox>
+		</mx:VDividedBox-->
+	</mx:HDividedBox>
+	
+</mx:Panel>

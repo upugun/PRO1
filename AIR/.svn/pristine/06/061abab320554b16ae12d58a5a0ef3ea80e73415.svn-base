@@ -1,0 +1,32 @@
+package net.jhl.value.objects
+{
+	import net.jhl.value.objects.common.TimeStamp;
+	import net.jhl.view.JWHConstants;
+	
+	[RemoteClass(alias="net.jhl.objects.SystemData")]
+	
+	[Bindable]
+	public class SystemData
+	{
+		public var uuid:String 					= "";
+		public var systemName:String 			= "";
+		public var appplicationID:String 		= "";
+		public var appVerion:String 			= "";
+		public var appServerIP:String 			= "";
+		public var appServerLocationName:String = "";
+		public var dbVersion:String 			= "";
+		public var dbServerIP:String 			= "";
+		public var dbServerLocationName:String 	= "";
+		public var adminname:String 			= "";
+		public var adminEmail:String 			= "";
+		public var adminMobile:String 			= "";
+		public var propertyName:String 			= "";
+		public var createdTimeStamp:String 		= "";
+		public var lastUpdateTimeStamp:String	= "";
+		
+		public function SystemData()
+		{
+		}
+
+	}
+}

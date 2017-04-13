@@ -1,0 +1,59 @@
+package net.jwt.control
+{
+	import mx.containers.Canvas;
+	import mx.controls.Alert;
+	import mx.core.UIComponent;
+	
+	import net.jwt.event.NotificationArguments;
+	import net.jwt.view.TourDesignClassicCostingAirTicketMediator;
+	import net.jwt.view.TourDesignClassicCostingAirTicketView;
+	import net.jwt.view.popup.JWTPopUp;
+	
+	import org.puremvc.as3.interfaces.INotification;
+	import org.puremvc.as3.patterns.command.SimpleCommand;
+	
+	public class TourDesignClassicCostingAirTicketCommand extends SimpleCommand
+	{
+		private var _mediator:TourDesignClassicCostingAirTicketMediator;
+		private var _view:TourDesignClassicCostingAirTicketView;
+		private var _args:UIComponent;
+		
+		override public function execute(notification:INotification):void
+		{
+			var args:NotificationArguments = notification.getBody() as NotificationArguments;
+			
+			if (null != args){
+				var app:UIComponent;
+				
+				var view:TourDesignClassicCostingAirTicketView  = new TourDesignClassicCostingAirTicketView;
+					//When mediator is assigned, it start setting up the view and mediator in Meditor.as
+					var mediator:TourDesignClassicCostingAirTicketMediator	= new TourDesignClassicCostingAirTicketMediator(view,args);
+				
+					this._mediator = mediator;
+					this._args     = args as UIComponent;
+					this._view     = view;
+					
+					facade.registerMediator(mediator);  // Need for popup
+					
+				if((args.viewComponent as JWTPopUp) != null)
+				{
+					app = args.viewComponent as JWTPopUp; // Need for popup
+					app.addChild(view);
+				}
+				else if((args.viewComponent as Canvas) != null)	
+				{
+					app = args.viewComponent as Canvas; // Need for Tab navigator
+					app.addChild(view);
+				}
+				else
+				{
+					Alert.show("TourHelperClassicCostingDetailsCommand: No suitable 'args.viewComponent' found to view your request");
+				}
+			}
+		}
+		public function TourDesignClassicCostingAirTicketCommand():void
+		{
+			//Alert.show("DailyGraphPriceBasedMediator command");
+		}
+	}
+}

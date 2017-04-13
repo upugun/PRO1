@@ -1,0 +1,32 @@
+package net.jhl.visual.objects
+{
+	import mx.collections.ArrayCollection;
+	import mx.containers.HBox;
+	
+	public class RoomBasisChildHbox extends HBox
+	{
+		[Bindable]
+		public var sglRate:Number = 0;
+		public var dblRate:Number = 0;
+		public var tplRate:Number = 0;
+		public var sglWOTaxRate:Number = 0;
+		public var dblWOTaxRate:Number = 0;
+		public var tplWOTaxRate:Number = 0;
+		
+		public var roomRate:Number = 0;
+		
+		public var basisId:String 			= "";
+		public var roomCategoryId:String 	= "";
+		public var roomCategory:String 		= "";
+		public var agentMarketId:String 	= "";
+		public var agentMarketName:String 	= "";
+		public var checkInDate:String 		= "";
+		
+		public var roomRateList:ArrayCollection = new ArrayCollection;
+		
+		public function RoomBasisChildHbox()
+		{
+		}
+
+	}
+}

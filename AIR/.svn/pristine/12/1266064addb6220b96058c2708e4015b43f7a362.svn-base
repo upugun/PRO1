@@ -1,0 +1,118 @@
+package net.jwt.view.helper.tourHelper
+{
+	import flash.events.KeyboardEvent;
+	
+	import mx.collections.ArrayCollection;
+	import mx.core.UIComponent;
+	import mx.events.CloseEvent;
+	import mx.events.ListEvent;
+	import mx.rpc.events.ResultEvent;
+	
+	import net.jwt.event.NotificationArguments;
+	import net.jwt.value.objects.QuerryObject;
+	import net.jwt.value.objects.ShoppingMaster;
+	import net.jwt.view.Mediator;
+	import net.jwt.view.popup.JWTPopUp;
+	
+	public class TourHelperShoppingMediator extends Mediator
+	{
+		private var _view:TourHelperShoppingView;
+		
+		private var _app:JWTPopUp;
+		[Bindable] public var args:NotificationArguments;
+		[Bindable] public var _flightDetails:ArrayCollection;
+		[Bindable] public var locationList:ArrayCollection;
+		[Bindable] public var shoppingList:ArrayCollection;
+		
+		public function TourHelperShoppingMediator(view:UIComponent, args:NotificationArguments)
+		{
+			super(view);
+			if(view != null)
+			{
+				_view  = view as TourHelperShoppingView;
+			}
+			
+			if(args != null){
+				this.args = args;
+				_loggedInUser = args.user;
+			}
+				
+			_app = args.viewComponent as JWTPopUp;	
+		}
+		
+		protected override function viewComponentInitialize():void{
+				initializeShoppingRemortingObject();
+				loadShoppingList()
+				_view.T_search.addEventListener(KeyboardEvent.KEY_UP, dynamicSearch);
+				_view.T_searchLocation.addEventListener(KeyboardEvent.KEY_UP, dynamicSearch);
+				_view.DG_shopping.doubleClickEnabled = true;
+				_view.DG_shopping.addEventListener(ListEvent.ITEM_CLICK, selectAndClose);
+				_view.T_search.setFocus();
+		}	
+		
+		private function selectAndClose(event:ListEvent):void
+		{
+			var obj:ShoppingMaster =  shoppingList.getItemAt(event.rowIndex) as ShoppingMaster;
+				args.argumentObject = obj;
+				_app.dispatchEvent(new CloseEvent(CloseEvent.CLOSE));
+		}
+		private function dynamicSearch(event:KeyboardEvent):void
+		{
+			loadShoppingList()
+		}
+		private function resetDynamicSearch(event:Event):void
+		{
+			// Let it search by what in already
+			//_view.TextAagentSearch.text = "";
+			loadShoppingList()
+		}
+		private function loadShoppingList():void
+		{
+			var locationId:String	=	"";
+			
+			if(args.originatorObject!=null){
+				_view.T_searchLocation.text	=	args.originatorObject.locationName;
+				locationId					=	args.originatorObject.locationId;	
+				}
+			var q:QuerryObject	=	new QuerryObject;
+				q.searchCode	=	"dynamicDescription"
+				q.condition1	=	_view.T_search.text;
+				q.condition2	=	locationId;
+				
+			shoppingRO.dynamicSearch(q);
+				
+		}
+		
+		
+//		private function setSelectedItemOfShoppingList():void
+//		{
+//			var _shopingCostObject:ShoppingCostObject = args.originatorObject as ShoppingCostObject;
+//			if(_shopingCostObject != null)
+//			{				
+//				for(var i:int=0; i< shoppingList.length; i++)
+//				{
+//					var _shoping:ShoppingList = shoppingList.getItemAt(i) as ShoppingList;
+//					if(_shoping != null)
+//					{
+//						if(_shoping.uuid == _shopingCostObject.shoppingUuid)
+//						{
+//							_view.DG_shopping.selectedIndex = i;
+//							break;
+//						}
+//					}
+//				}
+//			}
+//		}
+		
+		// Overridden from Mediator class
+		public override function shoppingFetchResultsHandler(event:ResultEvent):void {
+			shoppingList = new ArrayCollection();
+			shoppingList = event.result as ArrayCollection;
+			_view.DG_shopping.dataProvider = shoppingList;
+			
+			//setSelectedItemOfShoppingList();
+		}
+		
+	
+	}
+}

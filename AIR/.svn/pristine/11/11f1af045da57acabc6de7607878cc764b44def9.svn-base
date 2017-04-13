@@ -1,0 +1,128 @@
+package net.jwt.view.helper
+{
+	import flash.events.Event;
+	import flash.events.MouseEvent;
+	import flash.utils.ByteArray;
+	
+	import mx.collections.ArrayCollection;
+	import mx.core.UIComponent;
+	import mx.events.CloseEvent;
+	
+	import net.jwt.Constants;
+	import net.jwt.event.NotificationArguments;
+	import net.jwt.value.objects.HotelReservation;
+	import net.jwt.view.Mediator;
+	import net.jwt.view.popup.JWTPopUp;
+	
+	public class HelperHotelReservationAddNewMediator extends Mediator
+	{
+		private var _view:HelperHotelReservationAddNewView;
+		
+		private var _app:JWTPopUp;
+		[Bindable] public var args:NotificationArguments;
+		[Bindable] public var locationList:ArrayCollection;
+		private var list:ArrayCollection	=	new ArrayCollection;
+		
+		private var _res:HotelReservation	=	new HotelReservation;
+		
+		public function HelperHotelReservationAddNewMediator(view:UIComponent, args:NotificationArguments)
+		{
+			super(view);
+			if(view != null)
+			{
+				_view  = view as HelperHotelReservationAddNewView;
+			}
+			
+			if(args != null)
+				this.args = args;
+				
+			_app = args.viewComponent as JWTPopUp;	
+		}
+		
+		protected override function viewComponentInitialize():void{
+			
+			
+			_view.B_save.addEventListener(MouseEvent.CLICK, selectAndClose);
+			_view.B_add.addEventListener(MouseEvent.CLICK, addToList);
+			
+			
+			loadDataToGrid();
+		}
+		
+		private function addToList(e:Event):void
+		{
+			if(_view.CMB_basis.selectedItem!=null)
+				_view.res.basis = _view.CMB_basis.selectedItem.Id;
+				
+			list.addItem(_view.res)
+			_view.res	=	_res;
+		}
+		
+		private function selectAndClose(event:MouseEvent):void
+		{
+			if(args.originatorObject as HotelReservation)
+				(args.originatorObject as HotelReservation).ownership = Constants.OWNERSHIP_User;
+			
+			var _list:ArrayCollection = list;
+			args.argumentObject = _list;
+			_app.dispatchEvent(new CloseEvent(CloseEvent.CLOSE));
+		}
+		
+		private function loadDataToGrid():void
+		{
+			if(args.originatorObject != null)
+			{
+				if(args.originatorObject as HotelReservation){
+					_res			=	copy(args.originatorObject as HotelReservation);
+					_res.uuid		=	"";
+					_res.ownership	=	Constants.OWNERSHIP_User;
+					_res.update		=	1
+					_view.res		=	copy(_res);
+					_view.CMB_basis.dataProvider	=	getBasisList();
+					_view.CMB_basis.selectedIndex	=	showSelectedComboItem(getBasisList(), _view.res.basis);
+				}
+			}
+				
+			_view.DG_list.dataProvider	=	list;
+		}
+		
+		private function showSelectedComboItem(list:ArrayCollection, condition:String):int
+		{
+			var index:int=0;
+			
+			for(var i:int=0; i<list.length; i++)
+			{
+				if(condition == list.getItemAt(i).Id)
+				{
+					index	=	i;
+					break;
+				}
+			}
+			
+			return index;
+		}
+		
+		 public static function copy(value:HotelReservation):HotelReservation
+	    {
+	        var buffer:ByteArray = new ByteArray();
+	        buffer.writeObject(value);
+	        buffer.position = 0;
+	        var result:HotelReservation = buffer.readObject();
+	        return result;
+	    }
+	    
+	    private function getBasisList():ArrayCollection
+		{
+			var basisList:ArrayCollection = new ArrayCollection([
+				{ Id:"BB", data:0 },
+				{ Id:"HB", data:1 },
+				{ Id:"FB", data:2 },
+				{ Id:"RO", data:3 },
+				{ Id:"AI", data:4 } ]);
+				
+				return basisList
+		}
+		
+	
+	}
+}

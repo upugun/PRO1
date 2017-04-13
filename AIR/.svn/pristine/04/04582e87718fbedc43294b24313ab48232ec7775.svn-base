@@ -1,0 +1,77 @@
+package net.jwt.view.mis
+{
+	import flash.events.Event;
+	import flash.events.MouseEvent;
+	
+	import mx.collections.ArrayCollection;
+	import mx.controls.Alert;
+	import mx.core.UIComponent;
+	import mx.events.CollectionEvent;
+	
+	import net.jwt.Constants;
+	import net.jwt.event.INotificationArguments;
+	import net.jwt.event.NotificationArguments;
+	import net.jwt.view.Mediator;
+	
+	public class CashFlowReportMediator extends Mediator
+	{
+		private var _view:CashFlowReportView;
+		private var _args:INotificationArguments;
+		private var selectedReportCount:int = 0;
+		
+		[Bindable] private var panelList:ArrayCollection = new ArrayCollection;
+		
+		private const CLASS_NAME:String 	= "net.jwt.view.mis.CashFlowReportView.mxml \n" +
+											  "net.jwt.view.mis.CashFlowReportMediator.cs \n" +
+											  "net.jwt.control.CashFlowReportCommand.cs \n" +
+											  "CashFlowReportDAO.java \n" ;
+											  
+		[Bindable] public var args:NotificationArguments = new NotificationArguments();
+		
+		public function CashFlowReportMediator(view:UIComponent, args:INotificationArguments)
+		{
+			super(view);
+			if(view != null)
+			{
+				_view  = view as CashFlowReportView ;
+	
+			}
+			
+			if(args != null)
+			{
+				_args = args;
+				//_loggedInUser = (_args.viewComponent as MainView).user;
+			}
+		}
+		
+		protected override function viewComponentInitialize():void
+		{
+			setLoggedInUser();
+			_view.addEventListener(Constants.JWT_EVENT_DATE_RANGE_CHANGED, handleDateRangeChange);
+			_view.B_hi.addEventListener(MouseEvent.CLICK, sayHi);
+			(_args.argumentObjects as ArrayCollection).addEventListener(CollectionEvent.COLLECTION_CHANGE, handlecollectionChae);
+		}
+		
+		private function setLoggedInUser():void
+		{
+			//userRO.setLogedInUser(_loggedInUser);
+		}
+		
+		private function sayHi(e:Event):void
+		{
+			Alert.show((_args.argumentObjects as ArrayCollection).length.toString());
+		}
+		private function handlecollectionChae(e:Event):void
+		{
+			Alert.show("handlecollectionChae");
+		}
+		
+		
+		private function handleDateRangeChange(event:Event):void
+		{
+			Alert.show("handleDateRangeChange");
+		}
+		
+
+	}
+}

@@ -1,0 +1,1640 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<flexLibProperties version="1">
+  <includeClasses>
+    <classEntry path="net.jhl.control.RoomCatagoryEntryCommand"/>
+    <classEntry path="net.jwt.view.TourClassicDesignItinaryMediator"/>
+    <classEntry path="net.jwt.control.ActivitySuppliersCommand"/>
+    <classEntry path="net.jhl.value.objects.ContactDetails"/>
+    <classEntry path="net.jwt.value.objects.TourMaster"/>
+    <classEntry path="net.jwt.view.components.UIGPrintFooter"/>
+    <classEntry path="net.jwt.control.AccessGroupCommand"/>
+    <classEntry path="net.jhl.value.objects.DesOccupancy"/>
+    <classEntry path="net.jwt.control.GuideRegistrationCommand"/>
+    <classEntry path="net.jwt.view.mis.BubbleChartAnalysisMediator"/>
+    <classEntry path="net.jwt.value.objects.AnnualBudget"/>
+    <classEntry path="net.jwt.view.helper.tourHelper.TourHelperMiscellaneousView"/>
+    <classEntry path="net.jhl.control.AgentMarketCommand"/>
+    <classEntry path="net.jhl.view.GuestProfileView"/>
+    <classEntry path="net.jwt.view.helper.EmailAddressBookMediator"/>
+    <classEntry path="net.jwt.view.RateCode.view.HotelRateCodeMediator"/>
+    <classEntry path="net.jwt.view.AdminUserView"/>
+    <classEntry path="net.jwt.view.helper.HelperSiteDescriptionMediator"/>
+    <classEntry path="net.jwt.control.mis.SaleProfitProfitRatioAnalysisCommand"/>
+    <classEntry path="net.jhl.view.helper.HelperRoomAvailabilityView"/>
+    <classEntry path="net.jhl.value.objects.DailyReportOtherIncome"/>
+    <classEntry path="net.jwt.view.RateCode.view.RatesTreeView"/>
+    <classEntry path="net.jwt.value.objects.costing.ShoppingCostObject"/>
+    <classEntry path="net.jhl.view.GuestProfileMediator"/>
+    <classEntry path="net.jwt.value.objects.Languages"/>
+    <classEntry path="net.jwt.view.helper.tourHelper.TourHelperClassicLocationView"/>
+    <classEntry path="net.jwt.view.MISHotelListingReportMediator"/>
+    <classEntry path="net.jwt.print.TourClassicPaxPrintView"/>
+    <classEntry path="net.jwt.control.TourHelperClassicLoadCostingsCommand"/>
+    <classEntry path="net.jwt.value.objects.Currency"/>
+    <classEntry path="net.jwt.view.TransactionView"/>
+    <classEntry path="net.jwt.view.helper.TransportHelperReallocateVehicleMediator"/>
+    <classEntry path="net.jwt.control.mis.SaleProfitPPPAnalysisCommand"/>
+    <classEntry path="net.jwt.view.MainMediator"/>
+    <classEntry path="net.jwt.value.objects.TourDay"/>
+    <classEntry path="net.jwt.view.TourBookingDetailsMediator"/>
+    <classEntry path="net.jwt.value.objects.Bata"/>
+    <classEntry path="net.jhl.visual.objects.DiscountSupplementsSeasonComboBox"/>
+    <classEntry path="net.jwt.view.helper.HelperSalesReportDetailsMediator"/>
+    <classEntry path="net.jwt.view.AccessGroupView"/>
+    <classEntry path="pwd.jwt.view.HotelsPasswordManagementMediator"/>
+    <classEntry path="net.jhl.view.common.JHRateManagementToolBox"/>
+    <classEntry path="net.jwt.control.LocationDescriptionCommand"/>
+    <classEntry path="net.jwt.control.HelperMarketCommand"/>
+    <classEntry path="net.jwt.value.objects.Basis"/>
+    <classEntry path="net.jwt.control.LoginCommand"/>
+    <classEntry path="net.jwt.view.MISReportFormatView"/>
+    <classEntry path="net.jwt.control.TourDesignClassicCostingHotelOnlyCommand"/>
+    <classEntry path="net.jwt.objects.ItinaryDayVisualObject"/>
+    <classEntry path="net.jwt.view.TourDesignMediator"/>
+    <classEntry path="net.jwt.view.TemplateView"/>
+    <classEntry path="net.jwt.control.TourDesignClassicCostingSupplementCommand"/>
+    <classEntry path="net.jwt.control.EmailComposerCommand"/>
+    <classEntry path="net.jwt.view.HotelReservationView"/>
+    <classEntry path="net.jwt.view.RateCode.view.HotelRateCodeDiscountApplyMediator"/>
+    <classEntry path="net.jwt.view.Marketing.view.MarketingAccountCategoryView"/>
+    <classEntry path="net.jhl.value.objects.RoomCategoryByHotel"/>
+    <classEntry path="net.jwt.view.ItinaryDesignTemplateMediator"/>
+    <classEntry path="net.jwt.print.TourClassicItineraryPrintView"/>
+    <classEntry path="net.jwt.view.mis.MISReportView"/>
+    <classEntry path="net.jhl.view.helper.HelperAgentMarketView"/>
+    <classEntry path="net.jwt.view.mis.CashFlowReportMediator"/>
+    <classEntry path="net.jhl.view.ReservationMediator"/>
+    <classEntry path="net.jwt.view.components.UIGPrintHeader"/>
+    <classEntry path="net.jwt.control.GuestQuestionsCommand"/>
+    <classEntry path="net.jwt.view.mis.MISReportHelper"/>
+    <classEntry path="net.jwt.view.TourAdvanceView"/>
+    <classEntry path="net.jhl.view.helper.HelperAgentSearchView"/>
+    <classEntry path="net.jwt.view.helper.HelperEnquirySourceView"/>
+    <classEntry path="net.jwt.view.HotelReservationMediator"/>
+    <classEntry path="net.jwt.control.TourAdvanceManagerCommand"/>
+    <classEntry path="net.jwt.control.EnquiryManagementMarketBasedCommand"/>
+    <classEntry path="net.jwt.control.TourDesignClassicRidesCommand"/>
+    <classEntry path="net.jhl.value.objects.AgentDetails"/>
+    <classEntry path="net.jwt.view.RateCode.view.HotelRateCodeViewAllReservationsView"/>
+    <classEntry path="net.jwt.renderers.TreecheckboxItemRenderer"/>
+    <classEntry path="net.jwt.value.objects.ShoppingMaster"/>
+    <classEntry path="net.jwt.view.VehicleSuppliersMediator"/>
+    <classEntry path="net.jwt.view.HotelContactDetailsMediator"/>
+    <classEntry path="net.jhl.view.OtherCostEntryMediator"/>
+    <classEntry path="net.jhl.view.DailyReportOtherIncomeView"/>
+    <classEntry path="net.jhl.control.GuestPreferencesCommand"/>
+    <classEntry path="net.jwt.view.helper.HelperImageGalleryMediator"/>
+    <classEntry path="net.jwt.value.objects.ShoppingListDetails"/>
+    <classEntry path="net.jwt.value.objects.QuerryObject"/>
+    <classEntry path="net.jwt.view.TourBookingActivityView"/>
+    <classEntry path="net.jwt.view.mis.PerformanceReportView"/>
+    <classEntry path="net.jwt.view.mis.MISReportMediator"/>
+    <classEntry path="net.jwt.value.objects.costing.CostSheet"/>
+    <classEntry path="net.jwt.control.Command"/>
+    <classEntry path="net.jhl.view.RateCode.SeasonEntryView"/>
+    <classEntry path="net.jhl.control.helper.HelperDiscountChoosableCommand"/>
+    <classEntry path="net.jwt.control.HelperUserCommand"/>
+    <classEntry path="net.jwt.control.HelperHotelVoucherCommand"/>
+    <classEntry path="net.jwt.view.helper.HelperCashierTicketAllocationMediator"/>
+    <classEntry path="net.jwt.value.objects.ReportingGuideLanguages"/>
+    <classEntry path="net.jhl.view.JWHConstants"/>
+    <classEntry path="net.jwt.view.CurrencyRateMediator"/>
+    <classEntry path="net.jwt.control.TransportHelperTermitationCommand"/>
+    <classEntry path="net.jwt.view.popup.JHPopupTitleWindow"/>
+    <classEntry path="net.jwt.value.objects.Files"/>
+    <classEntry path="net.jhl.value.objects.PaymentDetails"/>
+    <classEntry path="net.jwt.value.objects.AddressBookItem"/>
+    <classEntry path="net.jwt.control.AccessAdministratorCommand"/>
+    <classEntry path="net.jwt.value.objects.RateCodeProperty"/>
+    <classEntry path="net.jwt.view.CEOView"/>
+    <classEntry path="net.jhl.view.helper.HelperRoomRateGraphMediator"/>
+    <classEntry path="net.jwt.view.helper.tourHelper.TourHelperActivitiesView"/>
+    <classEntry path="net.jwt.control.AgentApproveCommand"/>
+    <classEntry path="net.jwt.control.HelperCountryCommand"/>
+    <classEntry path="net.jwt.view.StrategicInfoMediator"/>
+    <classEntry path="net.jwt.view.RateCode.view.HotelRateCodeDiscountApplyView"/>
+    <classEntry path="net.jhl.view.DailyReportRoomIncomeMediator"/>
+    <classEntry path="net.jwt.control.HelperNotificationTemplatesCommand"/>
+    <classEntry path="net.jwt.view.helper.HelperAccountsTransactionsMediator"/>
+    <classEntry path="net.jwt.value.objects.DynamicHotel"/>
+    <classEntry path="net.jwt.value.objects.CurrencyMaster"/>
+    <classEntry path="net.jwt.view.Marketing.view.MarketingCostAccountCodeMediator"/>
+    <classEntry path="net.jwt.value.objects.MISHotelListingReport"/>
+    <classEntry path="net.jwt.value.objects.TransactionTypeMaster"/>
+    <classEntry path="net.jwt.value.objects.LanguageSkills"/>
+    <classEntry path="net.jwt.view.helper.AdminSpecialDeatilsMediator"/>
+    <classEntry path="net.jwt.view.helper.tourHelper.TourHelperMembersMediator"/>
+    <classEntry path="net.jwt.control.HelperDocumentListCommand"/>
+    <classEntry path="net.jwt.view.helper.HelperExcursionCategoryMediator"/>
+    <classEntry path="net.jwt.view.GenerateItinaryView"/>
+    <classEntry path="net.jwt.value.objects.TechnicalVisitCategoryMaster"/>
+    <classEntry path="pwd.jwt.control.HotelsPasswordManagementCommand"/>
+    <classEntry path="net.jwt.view.helper.HelperTransactionSearchView"/>
+    <classEntry path="net.jwt.view.TransactionTransferView"/>
+    <classEntry path="net.jwt.view.mis.SalesTourLenPPPAnalysisView"/>
+    <classEntry path="net.jwt.print.TranportMovementDetailPrintView"/>
+    <classEntry path="net.jwt.view.helper.HelperManagerMediator"/>
+    <classEntry path="net.jwt.view.helper.tourHelper.TourHelperHotelView"/>
+    <classEntry path="net.jwt.control.TourHelperClassicHotelCommand"/>
+    <classEntry path="net.jwt.control.TourHelperActivitiesVehicleCommand"/>
+    <classEntry path="net.jwt.view.RateCode.view.HotelRateCodeReservationMediator"/>
+    <classEntry path="net.jwt.view.helper.HelperSalesReportFileScreenView"/>
+    <classEntry path="net.jhl.value.objects.RateCode.SpecialOffers"/>
+    <classEntry path="net.jwt.view.HotelDetailsApproveView"/>
+    <classEntry path="net.jwt.view.mis.PieChartAnalysisView"/>
+    <classEntry path="net.jwt.view.HotelRatesView"/>
+    <classEntry path="net.jwt.view.TransactionGLCodeMediator"/>
+    <classEntry path="net.jwt.view.Marketing.control.MarketingAllocateBudgetForCostAccountsCommand"/>
+    <classEntry path="net.jwt.control.FutureCostingRatesCommand"/>
+    <classEntry path="net.jwt.view.mis.ProfitPPPProfitRationAnalysisView"/>
+    <classEntry path="net.jwt.control.HelperEnquirySourceCommand"/>
+    <classEntry path="net.jwt.print.TransactionAirTicketProvisionView"/>
+    <classEntry path="net.jwt.value.objects.ActivitiesFee"/>
+    <classEntry path="net.jwt.objects.TransactionTicketVisualObject"/>
+    <classEntry path="net.jwt.value.objects.EmailPool"/>
+    <classEntry path="net.jwt.view.helper.tourHelper.TourHelperCostingGuideSupplementMediator"/>
+    <classEntry path="net.jwt.view.helper.tourHelper.TourHelperCurrencySettingView"/>
+    <classEntry path="net.jhl.view.RateCode.RateCodeAppliedAgentMarketView"/>
+    <classEntry path="net.jwt.view.TransportVehicleFuelChartView"/>
+    <classEntry path="net.jhl.value.objects.RateCode.RoomCatagoryCost"/>
+    <classEntry path="net.jwt.value.objects.PaxDetailsDataForClassicCosting"/>
+    <classEntry path="net.jwt.objects.TransactionTransportVisualObject"/>
+    <classEntry path="net.jwt.control.TourHelperEnquirySearchCommand"/>
+    <classEntry path="net.jhl.value.objects.RateCode.OtherCostsMaster"/>
+    <classEntry path="net.jwt.control.HelperConnectionTesterCommand"/>
+    <classEntry path="net.jwt.control.mis.MarketPerformanceAnalysisCommand"/>
+    <classEntry path="net.jwt.view.VehicleRateView"/>
+    <classEntry path="net.jwt.control.ViewModeTourHelperClassicLoadCostingsCommand"/>
+    <classEntry path="net.jhl.visual.objects.DiscountSupplementsSeasonAgentComboBox"/>
+    <classEntry path="net.jwt.view.helper.HelperDocumentListMediator"/>
+    <classEntry path="net.jwt.view.helper.HelperNotificationMediator"/>
+    <classEntry path="net.jhl.value.objects.MetroToolBoxSettings"/>
+    <classEntry path="net.jwt.view.ManageManagerMediator"/>
+    <classEntry path="net.jwt.value.objects.Miscellaneous"/>
+    <classEntry path="com.objects.JWTRectangle"/>
+    <classEntry path="net.jwt.view.TourBookingsTabNavigatorView"/>
+    <classEntry path="net.jwt.control.TourHelperLocationCommand"/>
+    <classEntry path="net.jwt.view.ShoppingListView"/>
+    <classEntry path="net.jwt.view.helper.HelperTimeOutView"/>
+    <classEntry path="net.jwt.view.helper.HelperExcursionCategoryView"/>
+    <classEntry path="net.jwt.value.objects.HotelRatesIdentity"/>
+    <classEntry path="net.jhl.view.RateCode.RateCodeMediator"/>
+    <classEntry path="net.jwt.view.TransactionMediator"/>
+    <classEntry path="net.jwt.view.EnquiryEntryMediator"/>
+    <classEntry path="net.jhl.value.objects.AgentMarkets"/>
+    <classEntry path="net.jwt.view.helper.tourHelper.TourHelperBataMediator"/>
+    <classEntry path="net.jwt.view.LoginMediator"/>
+    <classEntry path="net.jwt.view.mis.SalesTourLenPPPAnalysisMediator"/>
+    <classEntry path="net.jwt.view.TourDesignClassicPaxCalculationMediator"/>
+    <classEntry path="net.jwt.value.objects.EnquiryReporting"/>
+    <classEntry path="net.jwt.control.TourBookingDetailsCommand"/>
+    <classEntry path="net.jhl.view.GuestPreferencesView"/>
+    <classEntry path="net.jwt.value.objects.CostingHotel"/>
+    <classEntry path="net.jwt.control.TransactionGLRelationshipCommand"/>
+    <classEntry path="net.jwt.control.HelperImageGalleryCommand"/>
+    <classEntry path="net.jwt.value.objects.CostingTechnicalVisit"/>
+    <classEntry path="net.jwt.control.HelperNotificationCommand"/>
+    <classEntry path="net.jhl.view.RateCode.RateCodeAppliedAgentMarketMediator"/>
+    <classEntry path="net.jwt.view.LocationMatrixView"/>
+    <classEntry path="net.jwt.value.objects.CostingBata"/>
+    <classEntry path="net.jwt.control.DataminingActivitiesCommand"/>
+    <classEntry path="net.jhl.value.objects.Reservation"/>
+    <classEntry path="net.jwt.view.RateCode.view.HotelRateCodeView"/>
+    <classEntry path="net.jhl.view.helper.HelperDiscountChoosableView"/>
+    <classEntry path="net.jwt.view.helper.HelperNewMessageMediator"/>
+    <classEntry path="net.jwt.view.AccessDetailsOfGroupsMediator"/>
+    <classEntry path="net.jwt.print.AirportRepListPrintView"/>
+    <classEntry path="net.jwt.value.objects.CostingTax"/>
+    <classEntry path="net.jwt.control.AdminUserCommand"/>
+    <classEntry path="net.jwt.view.helper.HelperHotelReservationAddNewMediator"/>
+    <classEntry path="net.jhl.control.RateCode.Win8Command"/>
+    <classEntry path="net.jhl.value.objects.RateCode.RateCode"/>
+    <classEntry path="net.jhl.value.objects.RateCode.Season"/>
+    <classEntry path="net.jwt.view.Marketing.view.MarketingPaymentOrderView"/>
+    <classEntry path="net.jwt.view.Marketing.view.MarketingCreateSeasonMediator"/>
+    <classEntry path="net.jwt.value.objects.TransactionTicketSpecificData"/>
+    <classEntry path="net.jwt.view.ActivitySuppliersView"/>
+    <classEntry path="net.jhl.control.helper.HelperReservationSummaryCommand"/>
+    <classEntry path="net.jwt.view.helper.tourHelper.TourHelperLoadBookingsMediator"/>
+    <classEntry path="net.jwt.control.MainCommand"/>
+    <classEntry path="net.jwt.view.HierachyManagementView"/>
+    <classEntry path="net.jwt.view.helper.tourHelper.TourHelperClassicLocationMediator"/>
+    <classEntry path="net.jhl.control.helper.HelperRoomRateGraphCommand"/>
+    <classEntry path="net.jwt.objects.LocationMatrixLineObject"/>
+    <classEntry path="net.jwt.view.BudgetedTurnOverMediator"/>
+    <classEntry path="net.jwt.view.popup.JHProgressMessage"/>
+    <classEntry path="net.jwt.view.helper.tourHelper.TourHelperMarkUpMediator"/>
+    <classEntry path="net.jwt.view.StrategicInfoView"/>
+    <classEntry path="com.objects.JWTLabel"/>
+    <classEntry path="net.jwt.view.TransactionGLTypeMediator"/>
+    <classEntry path="net.jhl.control.ReservationReadOnlyCommand"/>
+    <classEntry path="net.jwt.view.helper.HelperNoteWritingMediator"/>
+    <classEntry path="net.jwt.value.objects.costing.MemberCostObject"/>
+    <classEntry path="net.jhl.view.RateCode.RatecodeAgentMappingTreeMediator"/>
+    <classEntry path="net.jwt.value.objects.EnquiryUserReport"/>
+    <classEntry path="net.jhl.view.RateCode.Win8Mediator"/>
+    <classEntry path="net.jhl.value.objects.AgentType"/>
+    <classEntry path="net.jwt.value.objects.BudgetedTurnOver"/>
+    <classEntry path="net.jwt.view.TransportPrintableReportsView"/>
+    <classEntry path="net.jwt.value.objects.TransactionGLRelationshipMaster"/>
+    <classEntry path="net.jwt.value.objects.TreeNodeCostDetails"/>
+    <classEntry path="net.jwt.value.objects.CurrencyRate"/>
+    <classEntry path="net.jwt.view.Marketing.control.MarketingAllocateBudgetForPropertyCommand"/>
+    <classEntry path="net.jwt.view.helper.tourHelper.TourHelperBataView"/>
+    <classEntry path="net.jwt.view.helper.tourHelper.TourHelperSupplementaryCostingMediator"/>
+    <classEntry path="net.jwt.control.TourHelperHotelOverrideCommand"/>
+    <classEntry path="net.jwt.view.ReportsActivityView"/>
+    <classEntry path="net.jwt.value.objects.ItinaryLocationDetails"/>
+    <classEntry path="net.jwt.value.objects.CostingHotelDetails"/>
+    <classEntry path="net.jwt.event.NotificationArgumentsError"/>
+    <classEntry path="net.jwt.view.HotelDetailsView"/>
+    <classEntry path="net.jwt.value.objects.RatesTreeNode"/>
+    <classEntry path="net.jwt.value.objects.FileUpload"/>
+    <classEntry path="net.jwt.view.helper.tourHelper.TourHelperFlightDetailsView"/>
+    <classEntry path="net.jwt.control.HierachyManagementCommand"/>
+    <classEntry path="net.jhl.control.AllReservationsCommand"/>
+    <classEntry path="net.jwt.value.objects.BookingDetails"/>
+    <classEntry path="net.jwt.view.mis.MISCompanyProfitabilityReportMediator"/>
+    <classEntry path="net.jwt.view.helper.HelperSalesReportFilterMediator"/>
+    <classEntry path="net.jwt.view.EnquiryManagementReportingMediator"/>
+    <classEntry path="net.jhl.value.objects.RateCode.RateCodeRoomRate"/>
+    <classEntry path="net.jhl.visual.objects.DiscountSupplementsComboBox"/>
+    <classEntry path="net.jwt.view.Marketing.view.MarketingPaymentOrderMediator"/>
+    <classEntry path="net.jwt.value.objects.SalesReport"/>
+    <classEntry path="net.jwt.renderers.TreeCheckBoxRenderer"/>
+    <classEntry path="net.jwt.value.objects.Months"/>
+    <classEntry path="net.jwt.value.objects.FIT"/>
+    <classEntry path="net.jwt.objects.TransactionGLTypeObject"/>
+    <classEntry path="net.jwt.view.WelcomeView"/>
+    <classEntry path="net.jwt.view.ActivityRequisitionsMediator"/>
+    <classEntry path="net.jwt.value.objects.BuggReport"/>
+    <classEntry path="net.jwt.control.HelperHotelReservationAddNewCommand"/>
+    <classEntry path="net.jwt.view.TransportVehicleConfirmedView"/>
+    <classEntry path="net.jwt.view.helper.HelperNotificationTemplatesMediator"/>
+    <classEntry path="net.jwt.view.helper.HelperDocumentListView"/>
+    <classEntry path="net.jwt.view.helper.TransportHelperReallocateVehicleView"/>
+    <classEntry path="net.jwt.view.helper.HelperHotelReservationRatesMediator"/>
+    <classEntry path="net.jwt.view.helper.tourHelper.TourHelperLoationMediator"/>
+    <classEntry path="net.jwt.view.helper.AdminSpecialDeatilsView"/>
+    <classEntry path="net.jwt.value.objects.ActivitySupplierMaster"/>
+    <classEntry path="net.jwt.print.TransactionTransportlProvisionView"/>
+    <classEntry path="net.jhl.view.helper.HelperRoomRateBreakdownMediator"/>
+    <classEntry path="net.jwt.value.objects.TourSegment"/>
+    <classEntry path="net.jwt.view.RateCode.view.HotelRateCodeViewAllReservationsMediator"/>
+    <classEntry path="net.jwt.control.TourHelperCurrencySettingCommand"/>
+    <classEntry path="net.jhl.view.common.JHBooleanButton"/>
+    <classEntry path="net.jhl.control.helper.HelperAgentMarketCommand"/>
+    <classEntry path="net.jwt.view.helper.HelperShoppingCategoryMediator"/>
+    <classEntry path="net.jwt.view.Marketing.control.MarketingCostAccountCodeCommand"/>
+    <classEntry path="net.jwt.value.objects.RateCodeBaseRateAdjuster"/>
+    <classEntry path="net.jwt.view.RateCode.view.HotelRateCodeRateApplyView"/>
+    <classEntry path="net.jwt.view.helper.HelperGetUserInputMediator"/>
+    <classEntry path="net.jhl.view.common.JHTimeStampBox"/>
+    <classEntry path="net.jhl.control.GuestProfileCommand"/>
+    <classEntry path="net.jwt.view.helper.EmailAddressBookView"/>
+    <classEntry path="net.jwt.view.TourDesignerTabNavigatorView"/>
+    <classEntry path="net.jwt.control.ReportTourStatusReportCommand"/>
+    <classEntry path="net.jhl.visual.objects.DiscountLineHbox"/>
+    <classEntry path="net.jhl.value.objects.RateCode.Discounts"/>
+    <classEntry path="net.jwt.value.objects.ApprovalWorkFlow"/>
+    <classEntry path="net.jwt.value.objects.MISChartValueObject"/>
+    <classEntry path="net.jwt.print.TransactionHotelProvisionView"/>
+    <classEntry path="net.jwt.value.objects.costing.CostingObject"/>
+    <classEntry path="net.jwt.view.helper.tourHelper.TourHelperShoppingMediator"/>
+    <classEntry path="net.jwt.value.objects.RateCodeApplyDiscount"/>
+    <classEntry path="net.jwt.view.GuideRegistrationMediator"/>
+    <classEntry path="net.jhl.control.CalculatorCommand"/>
+    <classEntry path="com.objects.JWTLinearAxis"/>
+    <classEntry path="net.jwt.control.DevelopmentTestCommand"/>
+    <classEntry path="net.jwt.view.helper.HelperSalesReportFileScreenMediator"/>
+    <classEntry path="net.jwt.value.objects.HotelPayment"/>
+    <classEntry path="net.jwt.view.TourBookingDetailsView"/>
+    <classEntry path="net.jwt.value.objects.costing.BataObject"/>
+    <classEntry path="net.jhl.visual.objects.RoomCategoryCostHBox"/>
+    <classEntry path="net.jwt.value.objects.EnquiryManagementType"/>
+    <classEntry path="net.jwt.view.ViewModeTourDesignerTabNavigatorView"/>
+    <classEntry path="net.jhl.view.common.JHCircularButton"/>
+    <classEntry path="net.jwt.view.logic.TourTreeLogic"/>
+    <classEntry path="net.jhl.view.common.JHHbox"/>
+    <classEntry path="net.jwt.view.TouristArrivalView"/>
+    <classEntry path="net.jhl.control.SeasonEntryCommand"/>
+    <classEntry path="net.jwt.control.HelperVehicleSuppliersCommand"/>
+    <classEntry path="net.jhl.view.helper.HelperMenuPanelMediator"/>
+    <classEntry path="net.jhl.value.objects.Enquiry"/>
+    <classEntry path="net.jwt.value.objects.DetailCostObject"/>
+    <classEntry path="net.jwt.view.helper.HelperShoppingCategoryView"/>
+    <classEntry path="net.jwt.value.objects.TourFolder"/>
+    <classEntry path="net.jhl.control.DailyReportRoomIncomeCommand"/>
+    <classEntry path="net.jwt.control.HelperCashierTicketAllocationCommand"/>
+    <classEntry path="net.jwt.view.helper.tourHelper.TourHelperClassicLoadCostingsMediator"/>
+    <classEntry path="net.jwt.value.objects.Excursion"/>
+    <classEntry path="net.jwt.objects.ActivitiesMatrixLineObject"/>
+    <classEntry path="net.jhl.view.RateCode.RateCodeSpecialOffersMediator"/>
+    <classEntry path="net.jwt.view.mis.PPPVsTourLengthVsSaleAnalysisMediator"/>
+    <classEntry path="net.jwt.view.TourBookingMealReservationView"/>
+    <classEntry path="net.jwt.view.mis.SaleProfitProfitRatioAnalysisView"/>
+    <classEntry path="net.jwt.control.TourBookingsCostingCommand"/>
+    <classEntry path="net.jwt.view.TourDesignClassicCostingAirTicketView"/>
+    <classEntry path="net.jwt.control.ReceiptEntryCommand"/>
+    <classEntry path="net.jwt.control.AgentCommand"/>
+    <classEntry path="net.jwt.value.objects.costing.PaxCostDetails"/>
+    <classEntry path="net.jwt.view.helper.TransportHelperVehicleMasterView"/>
+    <classEntry path="net.jhl.control.ReservationCommand"/>
+    <classEntry path="net.jwt.view.helper.HelperEnquiryTypeMediator"/>
+    <classEntry path="net.jwt.print.LogSheetPrintView"/>
+    <classEntry path="net.jwt.view.helper.tourHelper.TourHelperTransportRequisitionMediator"/>
+    <classEntry path="net.jwt.view.helper.HelperManagerView"/>
+    <classEntry path="net.jwt.value.objects.TransactionReceiptSpecificData"/>
+    <classEntry path="net.jhl.control.RoomFacilityMasterCommand"/>
+    <classEntry path="net.jwt.control.VehicleSuppliersCommand"/>
+    <classEntry path="net.jwt.value.objects.TicketIssueActual"/>
+    <classEntry path="net.jwt.control.TransportVehicleRequisitionsCommand"/>
+    <classEntry path="net.jwt.value.objects.Messages"/>
+    <classEntry path="net.jwt.value.objects.PaxDetailsObject"/>
+    <classEntry path="net.jwt.control.MISCompanyProfitabilityReportCommand"/>
+    <classEntry path="net.jwt.view.MarketManagementView"/>
+    <classEntry path="net.jhl.value.objects.DmcMarket"/>
+    <classEntry path="net.jwt.view.CashierTourAdvanceView"/>
+    <classEntry path="net.jwt.value.objects.CostingCurrencySettings"/>
+    <classEntry path="net.jwt.view.RateCode.control.HotelRateCodeViewAllReservationsCommand"/>
+    <classEntry path="net.jwt.view.helper.tourHelper.TourHelperClassicHotelMediator"/>
+    <classEntry path="net.jwt.print.TransactionPettyCashProvisionView"/>
+    <classEntry path="net.jhl.value.objects.RoomRateQueryObject"/>
+    <classEntry path="net.jwt.value.objects.RoomCategoriesOfHotel"/>
+    <classEntry path="net.jwt.print.GuideDetailsPrintView"/>
+    <classEntry path="net.jwt.view.TourBookingClientDetailsMediator"/>
+    <classEntry path="net.jhl.visual.objects.RoomAvailabilityHBox"/>
+    <classEntry path="net.jwt.view.TransactionTypeMediator"/>
+    <classEntry path="net.jwt.value.objects.TicketMaster"/>
+    <classEntry path="net.jwt.value.objects.ActivityRequisitions"/>
+    <classEntry path="net.jwt.value.objects.CommonTreeNode"/>
+    <classEntry path="net.jwt.view.ExcursionsMatrixView"/>
+    <classEntry path="net.jwt.control.TransportHelperVehicleMasterCommand"/>
+    <classEntry path="net.jwt.control.TransportDriverRatingCommand"/>
+    <classEntry path="net.jwt.value.objects.RoomCategories"/>
+    <classEntry path="net.jwt.view.HotelContactDetailsView"/>
+    <classEntry path="net.jwt.view.TourBookingClientDetailsView"/>
+    <classEntry path="net.jwt.control.HelperEnquiryTypeCommand"/>
+    <classEntry path="net.jhl.view.helper.HelperRoomFacilitySelectView"/>
+    <classEntry path="net.jhl.value.objects.RateCodeToolBoxSettings"/>
+    <classEntry path="net.jhl.control.helper.HelperMenuPanelCommand"/>
+    <classEntry path="net.jwt.renderers.TreeCheckListData"/>
+    <classEntry path="net.jhl.view.RateCode.RatecodeTreeView"/>
+    <classEntry path="net.jhl.view.metro.MetroTile"/>
+    <classEntry path="net.jwt.view.LogOffView"/>
+    <classEntry path="net.jwt.control.ManageManagerCommand"/>
+    <classEntry path="net.jwt.value.objects.ReportActivityList"/>
+    <classEntry path="net.jwt.value.objects.costing.ActivityCostObject"/>
+    <classEntry path="net.jhl.view.PropertyRoomMappingView"/>
+    <classEntry path="net.jwt.value.objects.Markup"/>
+    <classEntry path="net.jwt.value.objects.Country"/>
+    <classEntry path="net.jwt.view.VehicleSuppliersView"/>
+    <classEntry path="net.jwt.control.HelperGetUserInputCommand"/>
+    <classEntry path="net.jwt.control.VehicleRegistrationCommand"/>
+    <classEntry path="net.jwt.view.Marketing.view.MarketingAllocateBudgetForCostAccountsMediator"/>
+    <classEntry path="net.jhl.view.helper.HelperRoomRateBreakdownView"/>
+    <classEntry path="net.jwt.view.MISHotelListingReportView"/>
+    <classEntry path="net.jwt.control.HelperItinenaryIncludesCommand"/>
+    <classEntry path="net.jwt.control.HelperHotelReservationRatesCommand"/>
+    <classEntry path="net.jwt.view.ActivitiesMediator"/>
+    <classEntry path="net.jhl.visual.objects.DiscountSupplementsOccupancyBox"/>
+    <classEntry path="net.jwt.view.mis.ProfitPPPProfitRationAnalysisMediator"/>
+    <classEntry path="net.jhl.control.DailyReportOtherIncomeCommand"/>
+    <classEntry path="net.jwt.control.TourHelperBookingComplementaryRequestCommand"/>
+    <classEntry path="net.jwt.control.HelperSalesReportFileScreenCommand"/>
+    <classEntry path="net.jhl.view.CalculatorMediator"/>
+    <classEntry path="com.objects.JWTVbox"/>
+    <classEntry path="net.jwt.control.HelperXYZValuesCommand"/>
+    <classEntry path="net.jwt.print.FormPrintView"/>
+    <classEntry path="net.jhl.visual.objects.RoomBasisCostHBox"/>
+    <classEntry path="net.jwt.control.CurrencyRateCommand"/>
+    <classEntry path="net.jhl.view.common.JHCanvas"/>
+    <classEntry path="net.jwt.value.objects.CostingFlight"/>
+    <classEntry path="net.jwt.helper.GeneralHelper"/>
+    <classEntry path="net.jwt.view.ActivitiesView"/>
+    <classEntry path="net.jhl.view.RateCode.RateCodeSpecialOffersView"/>
+    <classEntry path="net.jwt.view.helper.tourHelper.ViewModeTourHelperClassicLoadCostingsView"/>
+    <classEntry path="net.jwt.view.VehicleRegistrationView"/>
+    <classEntry path="net.jwt.view.FutureCostingRatesMediator"/>
+    <classEntry path="net.jwt.value.objects.costing.CurrencySettingsCostObject"/>
+    <classEntry path="net.jwt.view.ReportsActivityMediator"/>
+    <classEntry path="net.jwt.view.Marketing.control.MarketingAllocatePercentageForPropertyCommand"/>
+    <classEntry path="net.jhl.view.RoomRateComparisonView"/>
+    <classEntry path="net.jhl.control.RoomRateComparisonCommand"/>
+    <classEntry path="net.jwt.value.objects.costing.MarkupObject"/>
+    <classEntry path="net.jwt.value.objects.UserLocalData"/>
+    <classEntry path="net.jwt.view.TransportVehicleFuelChartMediator"/>
+    <classEntry path="net.jwt.view.RateCode.view.HotelRateCodeRateApplyMediator"/>
+    <classEntry path="net.jwt.view.GuestQuestionsView"/>
+    <classEntry path="net.jwt.value.objects.BookingLine"/>
+    <classEntry path="net.jwt.value.objects.AuditInvoiceTrail"/>
+    <classEntry path="net.jwt.value.objects.RateCodeGroup"/>
+    <classEntry path="net.jwt.value.objects.MarketingSeason"/>
+    <classEntry path="net.jwt.value.objects.ExcelCell"/>
+    <classEntry path="net.jwt.view.helper.HelperCreateTransactionTypeView"/>
+    <classEntry path="net.jwt.view.popup.JWTPopUp"/>
+    <classEntry path="net.jwt.view.helper.tourHelper.ViewModeTourHelperClassicLoadCostingsMediator"/>
+    <classEntry path="net.jwt.event.NotificationArguments"/>
+    <classEntry path="net.jwt.view.TransactionGLRelationshipView"/>
+    <classEntry path="net.jwt.validation.JwtTextValidator"/>
+    <classEntry path="com.objects.ImageHbox"/>
+    <classEntry path="net.jwt.view.helper.tourHelper.TourHelperMembersView"/>
+    <classEntry path="net.jwt.view.helper.HelperCreateTransactionTypeMediator"/>
+    <classEntry path="net.jwt.view.MainView"/>
+    <classEntry path="net.jwt.value.objects.RateCodeReservationDetails"/>
+    <classEntry path="net.jhl.constants.GeneralMessages"/>
+    <classEntry path="net.jwt.control.TourHelperFileUploadCommand"/>
+    <classEntry path="net.jwt.value.objects.CostingMember"/>
+    <classEntry path="net.jhl.value.objects.RoomFacilitiesByProperty"/>
+    <classEntry path="net.jwt.value.objects.TransactionGLTypeMaster"/>
+    <classEntry path="net.jwt.control.LocationMatrixCommand"/>
+    <classEntry path="net.jwt.value.objects.RoomCategory"/>
+    <classEntry path="net.jwt.value.objects.RateCodeAgent"/>
+    <classEntry path="net.jhl.value.objects.RoomRateLineChartReport"/>
+    <classEntry path="net.jhl.value.objects.RateCode.RoomRateBreakdown"/>
+    <classEntry path="net.jwt.view.ExcelDeatilsMapperView"/>
+    <classEntry path="net.jwt.value.objects.Links"/>
+    <classEntry path="net.jwt.value.objects.HotelOnlyCalculation"/>
+    <classEntry path="net.jwt.control.TourHelperBataCommand"/>
+    <classEntry path="net.jwt.view.AgentView"/>
+    <classEntry path="net.jwt.value.objects.GuideAccommodation"/>
+    <classEntry path="net.jwt.view.helper.HelperEnquiryTypeView"/>
+    <classEntry path="net.jwt.view.helper.tourHelper.TourHelperSupplementaryCostingView"/>
+    <classEntry path="net.jwt.control.UserActivityCommand"/>
+    <classEntry path="net.jwt.control.TourDesignClassicCostingAirTicketCommand"/>
+    <classEntry path="net.jwt.value.objects.EnquiryManagementSource"/>
+    <classEntry path="net.jwt.view.components.UIGPrintTemplate"/>
+    <classEntry path="net.jwt.view.helper.tourHelper.TourHelperClassicHotelView"/>
+    <classEntry path="net.jwt.view.TourClassicDesignItinaryView"/>
+    <classEntry path="net.jhl.view.RoomRateExportMediator"/>
+    <classEntry path="net.jwt.objects.ExcursionsMatrixLineObject"/>
+    <classEntry path="net.jwt.control.MISReportFormatCommand"/>
+    <classEntry path="net.jhl.view.GuestPreferencesMediator"/>
+    <classEntry path="net.jhl.view.RateCode.RateCodeDiscountView"/>
+    <classEntry path="net.jwt.view.TransactionGLCodeView"/>
+    <classEntry path="net.jwt.view.mis.SaleProfitPPPAnalysisMediator"/>
+    <classEntry path="net.jwt.print.NightStopLine"/>
+    <classEntry path="net.jwt.value.objects.costing.SegmentObject"/>
+    <classEntry path="net.jhl.view.AllReservationsView"/>
+    <classEntry path="net.jwt.control.mis.SalesTourLenPPPAnalysisCommand"/>
+    <classEntry path="net.jwt.view.EnquiryManagementMarketBasedReportingView"/>
+    <classEntry path="net.jwt.value.objects.ActivitiesVehicle"/>
+    <classEntry path="net.jwt.view.Marketing.control.MarketingAllocateBudgetForCostCategoriesCommand"/>
+    <classEntry path="net.jhl.view.helper.HelperRoomFacilitySelectMediator"/>
+    <classEntry path="net.jwt.view.components.TourClassicItinaryLineComponenet"/>
+    <classEntry path="net.jwt.value.objects.RateCodeBaseRate"/>
+    <classEntry path="net.jwt.view.helper.TransportHelperDriverOrGuideView"/>
+    <classEntry path="net.jwt.view.ManageManagerView"/>
+    <classEntry path="net.jwt.value.objects.HotelRateCategory"/>
+    <classEntry path="net.jwt.control.TourClassicDesignItinaryCommand"/>
+    <classEntry path="net.jwt.print.JWTLabelForNightStopLine"/>
+    <classEntry path="net.jhl.view.TaxManagementView"/>
+    <classEntry path="net.jwt.view.helper.HelperDepartmentMediator"/>
+    <classEntry path="net.jhl.view.RoomCatagoryEntryView"/>
+    <classEntry path="net.jwt.control.HelperAgentSearchCommand"/>
+    <classEntry path="net.jwt.value.objects.ReportShoppingList"/>
+    <classEntry path="net.jwt.view.CashierTourAdvanceMediator"/>
+    <classEntry path="net.jwt.value.objects.CostingSupplement"/>
+    <classEntry path="net.jwt.view.ExcursionsMatrixMediator"/>
+    <classEntry path="net.jwt.control.EmailClientCommand"/>
+    <classEntry path="net.jwt.control.TransportPrintableReportsCommand"/>
+    <classEntry path="net.jwt.renderers.CheckBoxExtendedIcon"/>
+    <classEntry path="net.jwt.value.objects.RoleMaster"/>
+    <classEntry path="net.jwt.value.objects.EnquiryManagement"/>
+    <classEntry path="net.jwt.value.objects.User"/>
+    <classEntry path="net.jhl.view.helper.HelperReservationSummaryMediator"/>
+    <classEntry path="net.jwt.view.RateCode.view.HotelRateCodeDiscountView"/>
+    <classEntry path="net.jwt.control.TourDesignerTabNavigatorCommand"/>
+    <classEntry path="net.jwt.view.Marketing.view.MarketingCostAccountCodeView"/>
+    <classEntry path="net.jhl.view.CalculatorView"/>
+    <classEntry path="net.jwt.view.AccessAdministratorMediator"/>
+    <classEntry path="net.jwt.view.helper.SpecialNote1View"/>
+    <classEntry path="net.jwt.view.UserProfileMediator"/>
+    <classEntry path="net.jwt.control.TourHelperHotelCommand"/>
+    <classEntry path="net.jwt.view.mis.MarketPerformanceAnalysisView"/>
+    <classEntry path="com.objects.JWTCostingItem"/>
+    <classEntry path="net.jwt.view.helper.tourHelper.TourHelperHotelDetailsView"/>
+    <classEntry path="net.jwt.view.LocationDescriptionView"/>
+    <classEntry path="net.jwt.view.RateCode.control.HotelRateCodeDiscountApplyCommand"/>
+    <classEntry path="net.jhl.view.TaxManagementMediator"/>
+    <classEntry path="net.jwt.view.AccessGroupMediator"/>
+    <classEntry path="net.jwt.value.objects.FinancialYear"/>
+    <classEntry path="net.jwt.view.logic.CostingLogic"/>
+    <classEntry path="net.jhl.view.common.JHSwitch"/>
+    <classEntry path="net.jwt.view.helper.tourHelper.TourHelperVehicleTypeView"/>
+    <classEntry path="net.jwt.view.helper.tourHelper.TourHelperFlightDetailsMediator"/>
+    <classEntry path="net.jwt.control.TourDesignClassicCostingTourLeaderSettingsCommand"/>
+    <classEntry path="net.jhl.value.objects.DailyReportOtherIncomeLines"/>
+    <classEntry path="net.jhl.view.PropertyRoomMappingMediator"/>
+    <classEntry path="net.jwt.view.helper.TransportHelperTermitationView"/>
+    <classEntry path="net.jwt.value.objects.TransportVehicleFuelChartItinerary"/>
+    <classEntry path="net.jhl.view.RateCode.RateCodeDiscountMediator"/>
+    <classEntry path="net.jwt.view.Marketing.view.MarketingCreateSeasonView"/>
+    <classEntry path="net.jwt.view.helper.HelperHotelVoucherMediator"/>
+    <classEntry path="net.jwt.value.objects.MarketingAllocateBudgetForProperties"/>
+    <classEntry path="net.jwt.view.StatisticsView"/>
+    <classEntry path="net.jwt.view.MenuPanelView"/>
+    <classEntry path="net.jwt.view.ReceiptEntryMediator"/>
+    <classEntry path="net.jwt.view.TemplateMediator"/>
+    <classEntry path="net.jwt.view.helper.HelperNotificationView"/>
+    <classEntry path="net.jhl.control.RateCode.RateCodeAppliedAgentMarketCommand"/>
+    <classEntry path="net.jwt.value.objects.RateCodeReservation"/>
+    <classEntry path="net.jwt.value.objects.Manager"/>
+    <classEntry path="net.jwt.control.EnquiryManagementReportingCommand"/>
+    <classEntry path="net.jwt.value.objects.TransportDriverRating"/>
+    <classEntry path="net.jhl.visual.objects.ReservationLineHBox"/>
+    <classEntry path="net.jwt.view.UserProfileView"/>
+    <classEntry path="com.objects.JWTDrawingToolBox"/>
+    <classEntry path="net.jwt.view.helper.tourHelper.TourHelperMiscellaneousMediator"/>
+    <classEntry path="net.jwt.view.TourBookingsTransportMediator"/>
+    <classEntry path="net.jwt.view.helper.tourHelper.TourHelperMarkUpView"/>
+    <classEntry path="net.jwt.view.helper.tourHelper.TourHelperActivitiesVehicleMediator"/>
+    <classEntry path="net.jwt.view.helper.HelperEnquiryFitSearchMediator"/>
+    <classEntry path="net.jhl.view.common.JHButton"/>
+    <classEntry path="net.jhl.view.RateCode.RatecodeTreeMediator"/>
+    <classEntry path="net.jwt.value.objects.SalesReportCommon"/>
+    <classEntry path="net.jwt.control.ItinaryDesignTemplateCommand"/>
+    <classEntry path="pwd.jwt.value.objects.PasswordObject"/>
+    <classEntry path="net.jwt.control.TourBookingsTabNavigatorCommand"/>
+    <classEntry path="net.jhl.view.helper.HelperDMCMarketView"/>
+    <classEntry path="net.jhl.view.AllReservationsMediator"/>
+    <classEntry path="net.jhl.view.helper.HelperAgentMarketMediator"/>
+    <classEntry path="net.jwt.control.ApprovalWorkFlowCommand"/>
+    <classEntry path="net.jwt.view.components.UIGPrinting"/>
+    <classEntry path="net.jwt.control.HelperPDFLoaderCommand"/>
+    <classEntry path="net.jwt.view.helper.HelperCountryMediator"/>
+    <classEntry path="net.jwt.view.DailyGraphPriceBasedView"/>
+    <classEntry path="net.jhl.visual.objects.CommonCheckBox"/>
+    <classEntry path="net.jwt.control.DownloadCostingSheetCommand"/>
+    <classEntry path="net.jwt.view.TourDesignClassicCostingMiscellaneousView"/>
+    <classEntry path="net.jwt.control.HelperManagerCommand"/>
+    <classEntry path="net.jhl.view.logic.DSCalculation"/>
+    <classEntry path="net.jwt.value.objects.VehicleType"/>
+    <classEntry path="net.jhl.visual.objects.DailyReportItemHBox"/>
+    <classEntry path="com.objects.XVBox"/>
+    <classEntry path="net.jwt.value.objects.TransactionDetails"/>
+    <classEntry path="net.jwt.control.MenuPanelCommand"/>
+    <classEntry path="net.jwt.value.objects.ReturnObject"/>
+    <classEntry path="net.jhl.view.logic.RoomRateCalculation"/>
+    <classEntry path="net.jwt.view.helper.tourHelper.TourHelperLocationView"/>
+    <classEntry path="net.jwt.view.helper.tourHelper.TourHelperFileUploadView"/>
+    <classEntry path="net.jwt.value.objects.costing.LocationCostObject"/>
+    <classEntry path="net.jwt.view.TourBookingsCostingView"/>
+    <classEntry path="com.objects.JwtNumberInput"/>
+    <classEntry path="net.jwt.view.helper.HelperHotelReservationAddNewView"/>
+    <classEntry path="net.jhl.value.objects.common.TimeStamp"/>
+    <classEntry path="net.jwt.objects.TransactionMiscellaneousVisualObject"/>
+    <classEntry path="net.jhl.view.helper.HelperRoomAvailabilityMediator"/>
+    <classEntry path="com.objects.JwtDateField"/>
+    <classEntry path="net.jwt.view.helper.HelperSalesReportDetailsView"/>
+    <classEntry path="net.jwt.value.objects.TransportVehicleFuelChart"/>
+    <classEntry path="net.jwt.view.TourDesignClassicCostingHotelOnlyMediator"/>
+    <classEntry path="net.jwt.view.EmailClientMediator"/>
+    <classEntry path="net.jwt.view.RateCode.view.HotelRateCodeFindRatesView"/>
+    <classEntry path="net.jwt.view.reports.DataminingActivitiesView"/>
+    <classEntry path="net.jwt.view.helper.HelperCreateGLTypeView"/>
+    <classEntry path="net.jhl.view.PropertyMasterDetailsEntryView"/>
+    <classEntry path="net.jwt.value.objects.CostingDetails"/>
+    <classEntry path="net.jwt.value.objects.Members"/>
+    <classEntry path="net.jwt.value.objects.AccessGroupDetails"/>
+    <classEntry path="net.jwt.helper.JWTTreeDescription"/>
+    <classEntry path="net.jwt.value.objects.RateCodeApplyRate"/>
+    <classEntry path="net.jhl.value.objects.RateCode.AppliedAgentMarkets"/>
+    <classEntry path="net.jwt.control.HelperCreateGLTypeCommand"/>
+    <classEntry path="net.jwt.value.objects.MealRates"/>
+    <classEntry path="net.jwt.view.helper.tourHelper.TourHelperLoadBookingsView"/>
+    <classEntry path="net.jwt.view.helper.tourHelper.TourHelperBookingComplementaryRequestMediator"/>
+    <classEntry path="net.jwt.value.objects.Reporting"/>
+    <classEntry path="net.jhl.view.ReservationView"/>
+    <classEntry path="net.jwt.objects.TourAdvanceLineObject"/>
+    <classEntry path="net.jhl.view.helper.HelperShowAllRatesMediator"/>
+    <classEntry path="net.jwt.view.mis.CashFlowReportView"/>
+    <classEntry path="net.jwt.value.objects.Market"/>
+    <classEntry path="net.jhl.value.objects.ReservationDiscounts"/>
+    <classEntry path="net.jwt.objects.RateCodeReservationDetailsVisualObject"/>
+    <classEntry path="com.objects.JWTUIComponenet"/>
+    <classEntry path="net.jwt.print.TranportMomentsPrintView"/>
+    <classEntry path="net.jwt.view.helper.HelperAngelsMessageView"/>
+    <classEntry path="net.jwt.view.ReportTourStatusReportView"/>
+    <classEntry path="net.jwt.print.NightStops"/>
+    <classEntry path="net.jwt.view.UserActivityView"/>
+    <classEntry path="net.jhl.view.GuestMoreDetailsMediator"/>
+    <classEntry path="net.jwt.view.AgentApproveView"/>
+    <classEntry path="net.jwt.value.objects.costing.MiscellaneousCostObject"/>
+    <classEntry path="net.jwt.value.objects.TouristArrival"/>
+    <classEntry path="com.objects.RouteType"/>
+    <classEntry path="net.jhl.view.PropertyView"/>
+    <classEntry path="net.jwt.view.mis.SaleProfitProfitRatioAnalysisMediator"/>
+    <classEntry path="net.jwt.print.EnquiryGraphReportPrintView"/>
+    <classEntry path="net.jwt.view.helper.TransportHelperVehicleMasterMediator"/>
+    <classEntry path="net.jwt.value.objects.AccessDetails"/>
+    <classEntry path="net.jhl.control.PropertyRoomMappingCommand"/>
+    <classEntry path="net.jwt.view.TransportVehicleConfirmedMediator"/>
+    <classEntry path="net.jwt.value.objects.TransportNightStops"/>
+    <classEntry path="net.jwt.value.objects.EnquiryManagementCategory"/>
+    <classEntry path="net.jwt.value.objects.Notification"/>
+    <classEntry path="net.jwt.view.TransportDriverRatingView"/>
+    <classEntry path="net.jwt.value.objects.CostingLocation"/>
+    <classEntry path="net.jwt.view.helper.HelperUserView"/>
+    <classEntry path="net.jhl.value.objects.DesDBProperties"/>
+    <classEntry path="net.jwt.view.helper.HelperSiteDescriptionView"/>
+    <classEntry path="net.jwt.control.ReportsShoppingListCommand"/>
+    <classEntry path="net.jhl.control.helper.HelperGuestDetailsCommand"/>
+    <classEntry path="net.jwt.view.Marketing.view.MarketingAllocateBudgetForPropertyMediator"/>
+    <classEntry path="net.jhl.view.RateCode.BaseRateView"/>
+    <classEntry path="net.jwt.view.mis.PerformanceReportMediator"/>
+    <classEntry path="net.jwt.control.ShoppingMasterCommand"/>
+    <classEntry path="com.objects.JWTLine"/>
+    <classEntry path="net.jwt.view.AdministratorView"/>
+    <classEntry path="net.jwt.control.ExcursionsMatrixCommand"/>
+    <classEntry path="net.jhl.view.helper.HelperGuestDetailsView"/>
+    <classEntry path="net.jwt.view.ShoppingListMediator"/>
+    <classEntry path="net.jwt.objects.TransactionHotelVisualObject"/>
+    <classEntry path="net.jwt.value.objects.MarketingAllocateBudgetForCostCategory"/>
+    <classEntry path="net.jwt.view.TourDesignClassicCostingSupplementMediator"/>
+    <classEntry path="net.jhl.visual.objects.AgentMarketCheckBox"/>
+    <classEntry path="com.objects.JWTImage"/>
+    <classEntry path="net.jwt.value.objects.costing.ActivityObject"/>
+    <classEntry path="net.jwt.control.TourHelperMemberCommand"/>
+    <classEntry path="net.jwt.value.objects.InvoiceLine"/>
+    <classEntry path="net.jhl.value.objects.DailyReportItem"/>
+    <classEntry path="net.jwt.objects.TourAdvanceLineVisualObject"/>
+    <classEntry path="net.jwt.view.helper.HelperEnquiryAgentSearchView"/>
+    <classEntry path="net.jwt.value.objects.CostingMiscellaneous"/>
+    <classEntry path="net.jwt.control.MISHotelListingReportCommand"/>
+    <classEntry path="net.jwt.view.Marketing.view.MarketingAllocateBudgetForCostAccountsView"/>
+    <classEntry path="net.jwt.value.objects.Invoice"/>
+    <classEntry path="net.jwt.view.FITMediator"/>
+    <classEntry path="net.jwt.value.objects.TaxDetails"/>
+    <classEntry path="net.jwt.control.TransportHelperReallocateVehicleCommand"/>
+    <classEntry path="net.jwt.view.helper.HelperHotelVoucherView"/>
+    <classEntry path="net.jwt.value.objects.costing.HotelCostObject"/>
+    <classEntry path="net.jwt.value.objects.TransactionTransportSpecificData"/>
+    <classEntry path="net.jwt.control.EnquiryManagementUsersReportingCommand"/>
+    <classEntry path="net.jwt.value.objects.PaxObject"/>
+    <classEntry path="net.jwt.control.TransactionGLTypeCommand"/>
+    <classEntry path="net.jwt.control.HotelContactDetailsCommand"/>
+    <classEntry path="net.jwt.control.AccessDetailsOfGroupsCommand"/>
+    <classEntry path="net.jhl.visual.objects.DiscountSupplementsTextInput"/>
+    <classEntry path="net.jhl.view.helper.HelperRoomRateGraphView"/>
+    <classEntry path="net.jwt.view.AccessAdministratorView"/>
+    <classEntry path="net.jwt.view.Marketing.view.MarketingAllocateBudgetForPropertyView"/>
+    <classEntry path="net.jwt.value.objects.ShoppingCategory"/>
+    <classEntry path="net.jwt.value.objects.ItinaryHotelDetails"/>
+    <classEntry path="net.jwt.view.TransportAllRequisitionsView"/>
+    <classEntry path="net.jwt.control.TourBookingsTransportCommand"/>
+    <classEntry path="net.jwt.view.TourAdvanceManagerMediator"/>
+    <classEntry path="net.jwt.view.VehicleRegistrationMediator"/>
+    <classEntry path="net.jwt.view.Marketing.view.MarketingAllocatePercentageForPropertyMediator"/>
+    <classEntry path="net.jhl.value.objects.RoomCategory"/>
+    <classEntry path="net.jwt.control.mis.PerformanceReportCommand"/>
+    <classEntry path="net.jwt.control.TransactionTransferCommand"/>
+    <classEntry path="net.jwt.view.helper.tourHelper.TourHelperActivitiesMediator"/>
+    <classEntry path="com.objects.JWTHyperLinkText"/>
+    <classEntry path="net.jwt.view.helper.tourHelper.TourHelperHotelMediator"/>
+    <classEntry path="net.jwt.control.TourDesignClassicPaxCalculationCommand"/>
+    <classEntry path="net.jwt.view.RateCode.control.HotelRateCodeRateApplyCommand"/>
+    <classEntry path="net.jwt.view.StatisticsMediator"/>
+    <classEntry path="net.jwt.control.ViewModeTourDesignerTabNavigatorCommand"/>
+    <classEntry path="net.jwt.view.TourBookingsTabNavigatorMediator"/>
+    <classEntry path="net.jwt.view.RateCode.view.HotelRateCodeReservationView"/>
+    <classEntry path="net.jwt.view.TransportVehicleRequisitionsMediator"/>
+    <classEntry path="net.jwt.view.WelcomeMediator"/>
+    <classEntry path="net.jwt.control.BudgetedTurnOverCommand"/>
+    <classEntry path="com.objects.skins.CustomContainerBorderSkin"/>
+    <classEntry path="pwd.jwt.view.HotelsPasswordManagementView"/>
+    <classEntry path="net.jhl.visual.objects.RoomCategoryCheckBox"/>
+    <classEntry path="net.jwt.objects.ReceiptGLTypeVisualObject"/>
+    <classEntry path="net.jhl.view.GuestMoreDetailsView"/>
+    <classEntry path="net.jwt.view.TransportVehicleRequisitionsSearchByVehicleView"/>
+    <classEntry path="net.jwt.view.DailyGraphQtyBasedView"/>
+    <classEntry path="net.jwt.value.objects.CostingShoping"/>
+    <classEntry path="net.jwt.value.objects.OccupencyType"/>
+    <classEntry path="net.jwt.control.ReportInvoiceReportCommand"/>
+    <classEntry path="net.jwt.view.helper.HelperHotelReservationRatesView"/>
+    <classEntry path="net.jwt.objects.ToursBookingLineObject"/>
+    <classEntry path="net.jwt.control.CashFlowReportCommand"/>
+    <classEntry path="net.jwt.view.helper.HelperItinenaryIncludesMediator"/>
+    <classEntry path="com.objects.JwtTimer"/>
+    <classEntry path="net.jwt.value.objects.SupportingObject"/>
+    <classEntry path="net.jwt.value.objects.ServerConfig"/>
+    <classEntry path="net.jwt.value.objects.CostingMarkup"/>
+    <classEntry path="net.jwt.view.TourDesignClassicCostingDetailsView"/>
+    <classEntry path="net.jwt.view.helper.tourHelper.TourHelperBookingComplementaryRequestView"/>
+    <classEntry path="net.jwt.view.helper.HelperNotificationTemplatesView"/>
+    <classEntry path="net.jwt.view.Marketing.control.MarketingCreateSeasonCommand"/>
+    <classEntry path="net.jwt.control.ShoppingListCommand"/>
+    <classEntry path="net.jwt.view.helper.tourHelper.TourHelperHotelOverrideView"/>
+    <classEntry path="net.jwt.view.helper.HelperTransactionSearchMediator"/>
+    <classEntry path="net.jwt.value.objects.LocationDetails"/>
+    <classEntry path="net.jwt.value.objects.HotelRates"/>
+    <classEntry path="net.jwt.control.TourHelperHotelDetailsCommand"/>
+    <classEntry path="net.jwt.view.TourDesignClassicCostingTourLeaderSettingsView"/>
+    <classEntry path="net.jwt.view.LocationMatrixMediator"/>
+    <classEntry path="net.jwt.value.objects.AccessGroupMaster"/>
+    <classEntry path="net.jwt.view.mis.SaleProfitPPPAnalysisView"/>
+    <classEntry path="net.jwt.view.ExcursionMediator"/>
+    <classEntry path="net.jhl.value.objects.CheckOutDetails"/>
+    <classEntry path="net.jwt.view.popup.JWTPopUpCanvas"/>
+    <classEntry path="net.jwt.view.helper.HelperBalanceSheetMediator"/>
+    <classEntry path="net.jhl.view.metro.MetroDetailsText"/>
+    <classEntry path="net.jwt.view.helper.HelperDepartmentView"/>
+    <classEntry path="net.jwt.view.TourDesignerTabNavigatorMediator"/>
+    <classEntry path="net.jwt.value.objects.TourAdvance"/>
+    <classEntry path="net.jhl.view.helper.HelperDMCMarketMediator"/>
+    <classEntry path="net.jhl.value.objects.RateCode.RatecodeTreeNode"/>
+    <classEntry path="net.jwt.control.TourHelperShoppingCommand"/>
+    <classEntry path="net.jwt.view.RateCode.objects.Basis"/>
+    <classEntry path="net.jhl.control.TaxManagementCommand"/>
+    <classEntry path="net.jwt.view.CurrencyRateView"/>
+    <classEntry path="net.jhl.view.common.JHTextInput"/>
+    <classEntry path="net.jwt.view.DownloadCostingSheetView"/>
+    <classEntry path="net.jwt.control.WelcomeCommand"/>
+    <classEntry path="net.jwt.view.helper.tourHelper.TourHelperFileUploadMediator"/>
+    <classEntry path="net.jwt.view.EnquiryManagementReportingView"/>
+    <classEntry path="net.jwt.view.helper.HelperCurrencyConversionView"/>
+    <classEntry path="net.jhl.control.helper.HelperShowAllRatesCommand"/>
+    <classEntry path="net.jwt.view.helper.tourHelper.TourHelperHotelOverrideMediator"/>
+    <classEntry path="net.jhl.value.objects.RateCode.OtherCosts"/>
+    <classEntry path="net.jhl.control.RateCode.RateCodeDiscountCommand"/>
+    <classEntry path="net.jwt.view.helper.HelperBalanceSheetView"/>
+    <classEntry path="net.jwt.helper.UtilFunction"/>
+    <classEntry path="net.jwt.control.TourHelperVehicleTypeCommand"/>
+    <classEntry path="net.jwt.view.helper.HelperXYZValuesMediator"/>
+    <classEntry path="net.jhl.visual.objects.DiscountChoosableLineHbox"/>
+    <classEntry path="net.jhl.value.objects.Guest"/>
+    <classEntry path="net.jwt.view.RateCode.control.HotelRateCodeFindRatesCommand"/>
+    <classEntry path="net.jwt.control.HelperCurrencyConversionCommand"/>
+    <classEntry path="net.jwt.view.helper.HelperLocationView"/>
+    <classEntry path="net.jwt.value.objects.TransactionGLCodeMaster"/>
+    <classEntry path="net.jwt.value.objects.MarketingPaymentLine"/>
+    <classEntry path="net.jwt.control.TransportAllRequisitionsCommand"/>
+    <classEntry path="net.jwt.view.TourDesignClassicRidesView"/>
+    <classEntry path="net.jwt.control.HelperDepartmentCommand"/>
+    <classEntry path="net.jwt.view.ReportsSalesReportView"/>
+    <classEntry path="net.jwt.view.MISReportFormatMediator"/>
+    <classEntry path="net.jhl.value.objects.DiscountsAndSupplementMapping"/>
+    <classEntry path="net.jwt.view.ReportTourStatusReportMediator"/>
+    <classEntry path="net.jwt.value.objects.CostingTourLeader"/>
+    <classEntry path="net.jwt.view.helper.HelperAccountsTransactionsView"/>
+    <classEntry path="net.jwt.value.objects.TicketIssueAllocated"/>
+    <classEntry path="net.jwt.control.TourDesignClassicCostingMiscellaneousCommand"/>
+    <classEntry path="net.jwt.control.EnquiryEntryCommand"/>
+    <classEntry path="net.jhl.value.objects.PersonalDetails"/>
+    <classEntry path="net.jhl.view.common.JHLabel"/>
+    <classEntry path="net.jwt.view.helper.HelperFileUploadMediator"/>
+    <classEntry path="net.jwt.value.objects.ToursClassicItinararySavingObjects"/>
+    <classEntry path="net.jwt.control.LogOffCommand"/>
+    <classEntry path="net.jhl.view.GuestProfileTabNavigatorMediator"/>
+    <classEntry path="net.jwt.view.helper.tourHelper.TourHelperShoppingView"/>
+    <classEntry path="net.jwt.value.objects.CurrencySettings"/>
+    <classEntry path="net.jwt.view.TransportDriverRatingMediator"/>
+    <classEntry path="net.jwt.view.ExcursionView"/>
+    <classEntry path="net.jwt.value.objects.Mail"/>
+    <classEntry path="net.jwt.view.helper.EmailComposerView"/>
+    <classEntry path="net.jwt.control.HelperLocationCommand"/>
+    <classEntry path="net.jwt.view.UserActivityMediator"/>
+    <classEntry path="net.jwt.control.StartupCommand"/>
+    <classEntry path="net.jwt.view.helper.HelperEnquirySourceMediator"/>
+    <classEntry path="net.jhl.value.objects.ReservationByRoomDetails"/>
+    <classEntry path="net.jwt.objects.ImageGalleryVisualObject"/>
+    <classEntry path="net.jwt.control.EmailAddressBookCommand"/>
+    <classEntry path="net.jhl.value.objects.CheckInDetails"/>
+    <classEntry path="net.jwt.view.helper.HelperGetUserInputView"/>
+    <classEntry path="net.jwt.control.HelperExcursionCategoryCommand"/>
+    <classEntry path="net.jwt.view.LoginView"/>
+    <classEntry path="net.jwt.value.objects.LocationMatrix"/>
+    <classEntry path="net.jwt.control.HelperBalanceSheetCommand"/>
+    <classEntry path="net.jhl.control.RateCode.RatecodeAgentMappingTreeCommand"/>
+    <classEntry path="net.jwt.view.HotelDetailsMediator"/>
+    <classEntry path="net.jhl.value.objects.RateCode.DiscountConditions"/>
+    <classEntry path="net.jwt.view.helper.tourHelper.TourHelperEnquirySearchMediator"/>
+    <classEntry path="net.jwt.control.TransportHelperDriverOrGuideCommand"/>
+    <classEntry path="net.jwt.view.helper.tourHelper.TourHelperEnquirySearchView"/>
+    <classEntry path="net.jwt.helper.CurrencyHelper"/>
+    <classEntry path="net.jhl.view.helper.HelperShowAllRatesView"/>
+    <classEntry path="net.jwt.value.objects.HotelCancelation"/>
+    <classEntry path="net.jwt.control.TourHelperClassicLocationCommand"/>
+    <classEntry path="net.jhl.view.helper.HelperReservationSummaryView"/>
+    <classEntry path="net.jwt.control.HelperRoomCatageryCommand"/>
+    <classEntry path="net.jwt.JWSErrorMessages"/>
+    <classEntry path="net.jwt.view.popup.JWTExternalWindow"/>
+    <classEntry path="com.objects.JWTImageButton"/>
+    <classEntry path="net.jwt.view.ReportInvoiceReportMediator"/>
+    <classEntry path="net.jwt.print.FormPrintHeader"/>
+    <classEntry path="net.jwt.control.TourHelperTransportRequisitionCommand"/>
+    <classEntry path="com.objects.JWTdrawing"/>
+    <classEntry path="net.jwt.value.objects.Location"/>
+    <classEntry path="net.jhl.view.common.JHRateCodeEditor"/>
+    <classEntry path="net.jwt.view.helper.HelperVehicleSuppliersView"/>
+    <classEntry path="net.jwt.view.helper.TransportHelperDriverOrGuideMediator"/>
+    <classEntry path="net.jwt.view.GuestQuestionsMediator"/>
+    <classEntry path="net.jhl.control.AgentProfileCommand"/>
+    <classEntry path="net.jwt.renderers.CheckBoxExtended"/>
+    <classEntry path="net.jwt.view.MarketManagementMediator"/>
+    <classEntry path="net.jwt.view.TouristArrivalMediator"/>
+    <classEntry path="net.jwt.value.objects.AccessDetailsOfGroups"/>
+    <classEntry path="net.jwt.control.TourBookingMealReservationCommand"/>
+    <classEntry path="net.jwt.control.TourHelperCostingGuideSupplementCommand"/>
+    <classEntry path="net.jwt.view.TransportPrintableReportsMediator"/>
+    <classEntry path="net.jwt.objects.ToursClassicItinararyLineObject"/>
+    <classEntry path="net.jwt.control.StretegicInfoCommand"/>
+    <classEntry path="net.jhl.value.objects.MealDetails"/>
+    <classEntry path="net.jhl.control.PropertyCommand"/>
+    <classEntry path="net.jwt.value.objects.RateCodeDiscount"/>
+    <classEntry path="net.jwt.view.ShoppingMasterView"/>
+    <classEntry path="net.jwt.value.objects.MarketingPayment"/>
+    <classEntry path="net.jwt.value.objects.MISChartValueItems"/>
+    <classEntry path="net.jhl.view.RateCode.SeasonalBaseRateView"/>
+    <classEntry path="net.jwt.view.LocationDescriptionMediator"/>
+    <classEntry path="net.jhl.control.RateCode.BaseRateCommand"/>
+    <classEntry path="net.jwt.print.FormPrintFooter"/>
+    <classEntry path="net.jwt.view.helper.HelperAgentSearchView"/>
+    <classEntry path="net.jwt.view.TransactionTypeView"/>
+    <classEntry path="net.jwt.control.HelperAngelsMessageCommand"/>
+    <classEntry path="net.jhl.value.objects.RoomFacilitiesMaster"/>
+    <classEntry path="net.jwt.value.objects.RateCodeBaseRateApply"/>
+    <classEntry path="net.jwt.view.ActivityRequisitionsView"/>
+    <classEntry path="net.jhl.view.helper.HelperDiscountChoosableMediator"/>
+    <classEntry path="net.jwt.control.FITCommand"/>
+    <classEntry path="net.jwt.control.HelperImageLoaderCommand"/>
+    <classEntry path="net.jwt.view.TransportAllRequisitionsMediator"/>
+    <classEntry path="net.jwt.view.helper.HelperPDFView"/>
+    <classEntry path="net.jwt.view.helper.tourHelper.TourHelperActivitiesVehicleView"/>
+    <classEntry path="net.jwt.view.helper.HelperNoteWritingView"/>
+    <classEntry path="net.jwt.view.TourDesignClassicCostingAirTicketMediator"/>
+    <classEntry path="net.jwt.control.mis.BubbleChartAnalysisCommand"/>
+    <classEntry path="net.jwt.control.TourDesignClassicCostingDetailsCommand"/>
+    <classEntry path="net.jwt.control.ReportsSalesReportCommand"/>
+    <classEntry path="net.jwt.view.AdministratorMediator"/>
+    <classEntry path="net.jwt.value.objects.CostingAirTicket"/>
+    <classEntry path="net.jwt.view.TourBookingActivityMediator"/>
+    <classEntry path="net.jwt.control.ActivitiesCommand"/>
+    <classEntry path="net.jwt.view.helper.HelperFileUploadView"/>
+    <classEntry path="net.jwt.view.TransportVehicleRequisitionsSearchByVehicleMediator"/>
+    <classEntry path="net.jwt.view.DevelopmentTestMediator"/>
+    <classEntry path="net.jwt.value.objects.costing.TechnicalVisitCostObject"/>
+    <classEntry path="net.jhl.view.common.JHPageManager"/>
+    <classEntry path="com.objects.JwtTextInput"/>
+    <classEntry path="net.jwt.view.TourAdvanceManagerView"/>
+    <classEntry path="net.jwt.view.helper.HelperMarketMediator"/>
+    <classEntry path="net.jwt.view.FITView"/>
+    <classEntry path="net.jwt.value.objects.ExchangeRates"/>
+    <classEntry path="com.objects.EmailAttachmentIcon"/>
+    <classEntry path="net.jhl.view.AgentProfileView"/>
+    <classEntry path="net.jwt.view.EmailClientView"/>
+    <classEntry path="net.jwt.control.StatisticsCommand"/>
+    <classEntry path="net.jwt.view.AdminUserMediator"/>
+    <classEntry path="net.jwt.view.DailyGraphPriceBasedMediator"/>
+    <classEntry path="net.jwt.control.TourHelperMiscellaneousCommand"/>
+    <classEntry path="net.jhl.view.RateCode.RatecodeAgentMappingTreeView"/>
+    <classEntry path="net.jwt.view.TourDesignClassicRidesMediator"/>
+    <classEntry path="net.jwt.objects.ToursClassicHotelOnlyLineObject"/>
+    <classEntry path="net.jwt.control.GenerateItinaryCommand"/>
+    <classEntry path="net.jhl.control.RateCode.RatecodeTreeCommand"/>
+    <classEntry path="net.jwt.value.objects.TransportTerminationHistory"/>
+    <classEntry path="net.jhl.view.common.JHCheckBox"/>
+    <classEntry path="net.jwt.control.TourHelperLoadBookingsCommand"/>
+    <classEntry path="com.objects.JWTCheckBox"/>
+    <classEntry path="net.jwt.view.helper.HelperImageLoaderView"/>
+    <classEntry path="net.jwt.view.mis.MISCompanyProfitabilityReportView"/>
+    <classEntry path="net.jwt.control.SpecialNote1Command"/>
+    <classEntry path="net.jhl.control.SystemPropertiesCommand"/>
+    <classEntry path="net.jwt.control.HelperEnquiryFitSearchCommand"/>
+    <classEntry path="net.jwt.view.TourBookingsTransportView"/>
+    <classEntry path="net.jwt.view.BuggReportMediator"/>
+    <classEntry path="net.jwt.print.CostDetailsPrintView"/>
+    <classEntry path="net.jwt.view.helper.HelperItinenaryIncludesView"/>
+    <classEntry path="net.jwt.view.Marketing.Object.AllocateBudgetForCostAccountVisualObject"/>
+    <classEntry path="net.jhl.value.objects.RateCode.SeasonalBaseRate"/>
+    <classEntry path="net.jhl.value.objects.SystemData"/>
+    <classEntry path="net.jwt.renderers.TreeCheckBox"/>
+    <classEntry path="net.jwt.value.objects.ContactDetails"/>
+    <classEntry path="net.jwt.view.RateCode.control.HotelRateCodeReservationCommand"/>
+    <classEntry path="net.jhl.view.SystemPropertiesMediator"/>
+    <classEntry path="net.jwt.control.HelperNewMessageCommand"/>
+    <classEntry path="net.jhl.view.RateCode.RateCodeView"/>
+    <classEntry path="net.jwt.control.TourHelperSupplementaryCostingCommand"/>
+    <classEntry path="net.jwt.value.objects.TransactionMiscellaneousSpecificData"/>
+    <classEntry path="net.jwt.control.TourHelperMarkUpCommand"/>
+    <classEntry path="net.jwt.value.objects.costing.VehicleCostObject"/>
+    <classEntry path="net.jhl.view.GuestProfileTabNavigatorView"/>
+    <classEntry path="net.jhl.visual.objects.RoomBasisChildHbox"/>
+    <classEntry path="net.jwt.value.objects.TourComplementaryRequest"/>
+    <classEntry path="net.jwt.control.HelperSiteDescriptionCommand"/>
+    <classEntry path="net.jhl.control.GuestProfileTabNavigatorCommand"/>
+    <classEntry path="net.jwt.view.helper.HelperNewMessageView"/>
+    <classEntry path="net.jwt.view.Marketing.view.MarketingAllocateBudgetForCostCategoriesView"/>
+    <classEntry path="net.jwt.control.UserProfileCommand"/>
+    <classEntry path="net.jwt.control.BuggReportCommand"/>
+    <classEntry path="net.jhl.view.AgentMarketMappingMediator"/>
+    <classEntry path="net.jhl.control.RateCode.SeasonalBaseRateCommand"/>
+    <classEntry path="net.jwt.view.helper.HelperRoomCatageryMediator"/>
+    <classEntry path="net.jhl.control.OtherCostEntryCommand"/>
+    <classEntry path="net.jhl.control.helper.HelperRoomRateBreakdownCommand"/>
+    <classEntry path="net.jwt.view.BudgetedTurnOverView"/>
+    <classEntry path="net.jwt.view.DownloadCostingSheetMediator"/>
+    <classEntry path="net.jwt.value.objects.RateCode"/>
+    <classEntry path="net.jwt.control.HelperCreateTransactionTypeCommand"/>
+    <classEntry path="net.jwt.print.HotelVoucherPrintView"/>
+    <classEntry path="net.jwt.view.ItinaryDesignTemplateView"/>
+    <classEntry path="com.objects.JWTCodisysBox"/>
+    <classEntry path="net.jwt.view.TourBookingsCostingMediator"/>
+    <classEntry path="net.jwt.control.ActivityRequisitionsCommand"/>
+    <classEntry path="net.jhl.value.objects.common.Tax"/>
+    <classEntry path="net.jhl.view.AgentMarketView"/>
+    <classEntry path="net.jwt.view.TourDesignClassicCostingHotelOnlyView"/>
+    <classEntry path="net.jwt.view.helper.HelperImageGalleryView"/>
+    <classEntry path="net.jwt.control.HotelDetailsApproveCommand"/>
+    <classEntry path="net.jwt.value.objects.TransportVehicleRequisitions"/>
+    <classEntry path="net.jwt.value.objects.TransportLogSheet"/>
+    <classEntry path="net.jwt.view.helper.tourHelper.TourHelperTransportRequisitionView"/>
+    <classEntry path="net.jwt.view.ViewModeTourDesignerTabNavigatorMediator"/>
+    <classEntry path="net.jwt.control.TourBookingClientDetailsCommand"/>
+    <classEntry path="net.jwt.control.TouristArrivalCommand"/>
+    <classEntry path="net.jwt.view.helper.HelperCashierTicketAllocationView"/>
+    <classEntry path="net.jhl.view.common.JHStatusButton"/>
+    <classEntry path="net.jwt.view.helper.HelperSalesReportFilterView"/>
+    <classEntry path="net.jwt.control.mis.PieChartAnalysisCommand"/>
+    <classEntry path="net.jwt.control.TransactionGLCodeCommand"/>
+    <classEntry path="net.jwt.view.TourDesignClassicPaxCalculationView"/>
+    <classEntry path="net.jwt.view.reports.DataminingActivitiesMediator"/>
+    <classEntry path="net.jwt.value.objects.Agent"/>
+    <classEntry path="net.jwt.view.helper.HelperPDFMediator"/>
+    <classEntry path="net.jhl.view.common.JHRateCodeButton"/>
+    <classEntry path="net.jwt.view.TourDesignClassicCostingTourLeaderSettingsMediator"/>
+    <classEntry path="net.jwt.view.mis.PieChartAnalysisMediator"/>
+    <classEntry path="net.jwt.control.mis.ProfitPPPProfitRationAnalysisCommand"/>
+    <classEntry path="net.jwt.value.objects.Transaction"/>
+    <classEntry path="net.jwt.view.RateCode.view.RateCodeManagerView"/>
+    <classEntry path="net.jwt.print.TransactionActivitylProvisionView"/>
+    <classEntry path="net.jwt.view.popup.JHAlert"/>
+    <classEntry path="net.jwt.view.TourDesignView"/>
+    <classEntry path="net.jwt.control.HelperShoppingCategoryCommand"/>
+    <classEntry path="net.jwt.control.HelperSalesReportFilterCommand"/>
+    <classEntry path="net.jhl.control.AgentMarketMappingCommand"/>
+    <classEntry path="net.jwt.control.DailyGraphPriceBasedCommand"/>
+    <classEntry path="net.jwt.view.helper.EmailComposerMediator"/>
+    <classEntry path="net.jwt.view.EnquiryManagementUsersReportingView"/>
+    <classEntry path="net.jwt.control.TransportVehicleRequisitionsSearchByVehicleCommand"/>
+    <classEntry path="net.jwt.view.mis.PPPVsTourLengthVsSaleAnalysisView"/>
+    <classEntry path="net.jhl.visual.objects.AgentCheckBox"/>
+    <classEntry path="net.jwt.control.HelperFileUploadCommand"/>
+    <classEntry path="net.jwt.print.GuidesOnLanguagesPrintView"/>
+    <classEntry path="net.jwt.view.Mediator"/>
+    <classEntry path="net.jhl.view.AgentProfileMediator"/>
+    <classEntry path="net.jhl.view.helper.HelperAgentSearchMediator"/>
+    <classEntry path="net.jwt.view.Marketing.view.MarketingAccountCategoryMediator"/>
+    <classEntry path="net.jwt.view.helper.TreeSearch"/>
+    <classEntry path="net.jwt.view.UserHierachyComponent"/>
+    <classEntry path="net.jwt.view.GuideRegistrationView"/>
+    <classEntry path="net.jhl.view.SystemPropertiesView"/>
+    <classEntry path="net.jwt.control.TourAdvanceCommand"/>
+    <classEntry path="net.jhl.value.objects.RoomRateExportLine"/>
+    <classEntry path="net.jwt.value.objects.MarketingCostCategory"/>
+    <classEntry path="net.jwt.view.helper.HelperAngelsMessageMediator"/>
+    <classEntry path="net.jwt.view.ReportsShoppingListView"/>
+    <classEntry path="net.jwt.view.Marketing.control.MarketingPaymentOrderCommand"/>
+    <classEntry path="net.jhl.view.RateCode.SeasonEntryMediator"/>
+    <classEntry path="net.jwt.value.objects.EmailAttachment"/>
+    <classEntry path="net.jwt.value.objects.Itinary"/>
+    <classEntry path="net.jwt.value.objects.TourAdvanceLine"/>
+    <classEntry path="net.jwt.value.objects.CostingActivity"/>
+    <classEntry path="net.jwt.view.helper.tourHelper.TourHelperTechnicalVisitView"/>
+    <classEntry path="net.jwt.control.ExcursionCommand"/>
+    <classEntry path="net.jwt.view.helper.HelperEnquiryAgentSearchMediator"/>
+    <classEntry path="net.jwt.control.MarketManagementCommand"/>
+    <classEntry path="net.jwt.print.CostDetailsPrintHeader"/>
+    <classEntry path="net.jwt.value.objects.TotalCostDetailObject"/>
+    <classEntry path="net.jwt.control.HelperEnquiryAgentSearchCommand"/>
+    <classEntry path="net.jwt.value.objects.ImageGallery"/>
+    <classEntry path="net.jhl.view.RoomRateExportView"/>
+    <classEntry path="net.jwt.view.TourDesignClassicCostingMiscellaneousMediator"/>
+    <classEntry path="net.jwt.value.objects.ShoppingList"/>
+    <classEntry path="net.jwt.view.EnquiryManagementUsersReportingMediator"/>
+    <classEntry path="net.jwt.value.objects.Department"/>
+    <classEntry path="net.jwt.view.helper.HelperXYZValuesView"/>
+    <classEntry path="net.jwt.view.HierachyManagementMediator"/>
+    <classEntry path="net.jhl.visual.objects.ReservationTaxLineHBox"/>
+    <classEntry path="net.jwt.view.helper.HelperRoomCatageryView"/>
+    <classEntry path="net.jwt.control.CashierTourAdvanceCommand"/>
+    <classEntry path="net.jhl.view.common.JHAttachmentIcon"/>
+    <classEntry path="net.jwt.value.objects.Login"/>
+    <classEntry path="net.jhl.control.helper.HelperDMCMarketCommand"/>
+    <classEntry path="net.jhl.control.helper.HelperRoomFacilitySelectCommand"/>
+    <classEntry path="net.jwt.control.ReportsActivityCommand"/>
+    <classEntry path="net.jwt.view.mis.MarketPerformanceAnalysisMediator"/>
+    <classEntry path="net.jwt.value.objects.ItinaryIncludes"/>
+    <classEntry path="net.jwt.view.ExcelDeatilsMapperMediator"/>
+    <classEntry path="net.jwt.view.helper.HelperTimeOutMediator"/>
+    <classEntry path="net.jhl.visual.objects.ReservationPaymentDetailsLineHBox"/>
+    <classEntry path="net.jwt.control.HelperPDFCommand"/>
+    <classEntry path="net.jwt.view.HotelDetailsApproveMediator"/>
+    <classEntry path="net.jwt.value.objects.TourVersion"/>
+    <classEntry path="net.jhl.view.common.JHTitleWindow"/>
+    <classEntry path="net.jwt.view.TransactionGLRelationshipMediator"/>
+    <classEntry path="net.jwt.view.helper.tourHelper.TourHelperVehicleTypeMediator"/>
+    <classEntry path="net.jwt.view.helper.HelperEnquiryFitSearchView"/>
+    <classEntry path="net.jhl.view.metro.MetrolTileStyle"/>
+    <classEntry path="net.jwt.value.objects.ItinaryDay"/>
+    <classEntry path="net.jwt.view.helper.HelperCreateGLTypeMediator"/>
+    <classEntry path="net.jwt.view.ReceiptEntryView"/>
+    <classEntry path="net.jwt.view.RateCode.view.HotelRateCodeFindRatesMediator"/>
+    <classEntry path="net.jwt.view.BuggReportView"/>
+    <classEntry path="net.jwt.view.helper.HelperImageLoaderMediator"/>
+    <classEntry path="net.jwt.view.helper.HelperPDFLoaderView"/>
+    <classEntry path="net.jwt.value.objects.TechnicalVisitFee"/>
+    <classEntry path="net.jwt.value.objects.SalesReportHelperObject"/>
+    <classEntry path="net.jwt.view.helper.HelperCountryView"/>
+    <classEntry path="net.jwt.value.objects.TechnicalVisitMaster"/>
+    <classEntry path="net.jhl.view.DailyReportOtherIncomeMediator"/>
+    <classEntry path="net.jwt.view.helper.HelperCurrencyConversionMediator"/>
+    <classEntry path="net.jwt.control.TourBookingActivityCommand"/>
+    <classEntry path="net.jwt.control.HotelRatesCommand"/>
+    <classEntry path="net.jhl.view.OtherCostEntryView"/>
+    <classEntry path="net.jwt.view.TransactionTransferMediator"/>
+    <classEntry path="com.objects.JWTPanel"/>
+    <classEntry path="net.jwt.view.ActivitySuppliersMediator"/>
+    <classEntry path="net.jwt.control.RatesTreeCommand"/>
+    <classEntry path="net.jwt.view.RateCode.view.RatesTreeMediator"/>
+    <classEntry path="net.jwt.view.helper.tourHelper.TourHelperCurrencySettingMediator"/>
+    <classEntry path="net.jwt.control.HelperTransactionSearchCommand"/>
+    <classEntry path="net.jhl.view.RoomRateComparisonMediator"/>
+    <classEntry path="net.jwt.value.objects.FlightDetails"/>
+    <classEntry path="net.jhl.value.objects.ReservationDetails"/>
+    <classEntry path="net.jhl.control.GuestMoreDetailsCommand"/>
+    <classEntry path="net.jhl.view.common.JHTextArea"/>
+    <classEntry path="net.jwt.value.objects.MarketingCostAccount"/>
+    <classEntry path="net.jwt.view.helper.tourHelper.TourHelperTechnicalVisitMediator"/>
+    <classEntry path="net.jwt.view.TourAdvanceMediator"/>
+    <classEntry path="net.jwt.value.objects.HotelVoucher"/>
+    <classEntry path="net.jwt.value.objects.costing.FlightCostObject"/>
+    <classEntry path="net.jwt.view.helper.tourHelper.TourHelperCostingGuideSupplementView"/>
+    <classEntry path="net.jwt.view.TourDesignClassicCostingSupplementView"/>
+    <classEntry path="net.jhl.value.objects.RateCode.BaseRate"/>
+    <classEntry path="net.jhl.control.RateCode.RateCodeSpecialOffersCommand"/>
+    <classEntry path="net.jhl.control.RateCode.RateCodeCommand"/>
+    <classEntry path="net.jwt.control.TourHelperFlightDetailsCommand"/>
+    <classEntry path="net.jwt.control.TransactionTypeCommand"/>
+    <classEntry path="net.jhl.visual.objects.OtherCostHBox"/>
+    <classEntry path="net.jwt.helper.NotificationMessageFormatter"/>
+    <classEntry path="net.jwt.view.helper.HelperConnectionTesterMediator"/>
+    <classEntry path="net.jwt.control.TransportVehicleConfirmedCommand"/>
+    <classEntry path="net.jwt.value.objects.RateCodeReservationRate"/>
+    <classEntry path="net.jhl.view.RateCode.RateCodeGenerateVisualBox"/>
+    <classEntry path="net.jwt.view.helper.tourHelper.TourHelperHotelDetailsMediator"/>
+    <classEntry path="net.jwt.value.objects.GuestQuestions"/>
+    <classEntry path="com.objects.JwtTextArea"/>
+    <classEntry path="net.jwt.view.helper.HelperVehicleSuppliersMediator"/>
+    <classEntry path="net.jwt.view.helper.TransportHelperTermitationMediator"/>
+    <classEntry path="net.jwt.control.HotelDetailsCommand"/>
+    <classEntry path="net.jwt.control.ExcelDeatilsMapperCommand"/>
+    <classEntry path="net.jwt.control.TourHelperTechnicalVisitCommand"/>
+    <classEntry path="net.jwt.objects.ToursClassicAirTicketLineObject"/>
+    <classEntry path="net.jwt.view.helper.HelperConnectionTesterView"/>
+    <classEntry path="net.jhl.control.helper.HelperRoomAvailabilityCommand"/>
+    <classEntry path="net.jwt.value.objects.TransactionHotelSpecificData"/>
+    <classEntry path="net.jwt.ApplicationFacade"/>
+    <classEntry path="net.jwt.value.objects.Activities"/>
+    <classEntry path="net.jhl.view.helper.HelperMenuPanelView"/>
+    <classEntry path="net.jhl.view.ReservationReadOnlyMediator"/>
+    <classEntry path="net.jwt.control.TemplateCommand"/>
+    <classEntry path="net.jhl.control.helper.HelperAgentSearchCommand"/>
+    <classEntry path="net.jwt.view.popup.JHErrorAlert"/>
+    <classEntry path="net.jhl.view.RoomFacilityMasterView"/>
+    <classEntry path="net.jhl.value.objects.RateCode.Condition"/>
+    <classEntry path="net.jwt.view.DevelopmentTestView"/>
+    <classEntry path="net.jwt.control.AdministratorCommand"/>
+    <classEntry path="net.jwt.control.HelperNoteWritingCommand"/>
+    <classEntry path="net.jwt.view.mis.BubbleChartAnalysisView"/>
+    <classEntry path="com.objects.JWTVehicleTextInput"/>
+    <classEntry path="net.jhl.value.objects.ReservationPaymentDetails"/>
+    <classEntry path="net.jwt.view.helper.HelperPDFLoaderMediator"/>
+    <classEntry path="net.jwt.view.Marketing.Object.AllocateBudgetForPropertyVisualObject"/>
+    <classEntry path="net.jhl.view.common.JHVisibleButton"/>
+    <classEntry path="net.jwt.control.HelperSalesReportDetailsCommand"/>
+    <classEntry path="net.jwt.view.Marketing.control.MarketingAccountCategoryCommand"/>
+    <classEntry path="net.jhl.value.objects.MQDetails"/>
+    <classEntry path="net.jwt.view.helper.HelperUserMediator"/>
+    <classEntry path="net.jwt.Constants"/>
+    <classEntry path="net.jwt.control.HotelReservationCommand"/>
+    <classEntry path="net.jwt.view.Marketing.view.MarketingAllocateBudgetForCostCategoriesMediator"/>
+    <classEntry path="net.jhl.view.DailyReportRoomIncomeView"/>
+    <classEntry path="net.jwt.view.AgentMediator"/>
+    <classEntry path="net.jwt.view.TourBookingMealReservationMediator"/>
+    <classEntry path="net.jwt.control.AdminSpecialDeatilsCommand"/>
+    <classEntry path="net.jwt.value.objects.Roles"/>
+    <classEntry path="net.jwt.control.HelperTimeOutCommand"/>
+    <classEntry path="net.jwt.view.helper.HelperMarketView"/>
+    <classEntry path="net.jwt.control.TransportVehicleFuelChartCommand"/>
+    <classEntry path="net.jwt.value.objects.TransportVehicleOwner"/>
+    <classEntry path="net.jhl.visual.objects.DiscountSupplementsDateRange"/>
+    <classEntry path="net.jwt.view.EnquiryEntryView"/>
+    <classEntry path="net.jwt.view.TransportVehicleRequisitionsView"/>
+    <classEntry path="net.jwt.control.TransactionCommand"/>
+    <classEntry path="net.jwt.view.ShoppingMasterMediator"/>
+    <classEntry path="net.jwt.view.helper.HelperLocationMediator"/>
+    <classEntry path="net.jwt.control.mis.PPPVsTourLengthVsSaleAnalysisCommand"/>
+    <classEntry path="net.jhl.view.common.JHComboBox"/>
+    <classEntry path="net.jwt.value.objects.Notes"/>
+    <classEntry path="net.jwt.view.ReportsSalesReportMediator"/>
+    <classEntry path="net.jwt.value.objects.TransportDriverGuideMaster"/>
+    <classEntry path="net.jwt.view.ReportInvoiceReportView"/>
+    <classEntry path="net.jhl.control.RoomRateExportCommand"/>
+    <classEntry path="net.jwt.view.helper.HelperAgentSearchMediator"/>
+    <classEntry path="net.jwt.view.MenuPanelMediator"/>
+    <classEntry path="net.jwt.view.helper.SpecialNote1Mediator"/>
+    <classEntry path="net.jwt.view.AgentApproveMediator"/>
+    <classEntry path="net.jwt.view.helper.tourHelper.TourHelperWinProgressView"/>
+    <classEntry path="net.jhl.view.RateCode.Win8View"/>
+    <classEntry path="net.jwt.view.logic.TransportBL"/>
+    <classEntry path="net.jwt.control.VehicleRateCommand"/>
+    <classEntry path="net.jhl.view.RateCode.SeasonalBaseRateMediator"/>
+    <classEntry path="net.jwt.view.GenerateItinaryMediator"/>
+    <classEntry path="net.jwt.view.EnquiryManagementReportingChartView"/>
+    <classEntry path="net.jhl.value.objects.GuestPreference"/>
+    <classEntry path="net.jwt.view.FutureCostingRatesView"/>
+    <classEntry path="net.jhl.view.metro.ImageResources"/>
+    <classEntry path="net.jwt.view.ApprovalWorkFlowView"/>
+    <classEntry path="net.jhl.view.PropertyMediator"/>
+    <classEntry path="net.jwt.view.TransactionGLTypeView"/>
+    <classEntry path="net.jwt.view.Marketing.view.MarketingAllocatePercentageForPropertyView"/>
+    <classEntry path="net.jhl.value.objects.RateCode.Commission"/>
+    <classEntry path="com.objects.JWTBubbleChart"/>
+    <classEntry path="net.jwt.control.MISReportCommand"/>
+    <classEntry path="net.jwt.view.LogOffMediator"/>
+    <classEntry path="net.jwt.view.helper.tourHelper.TourHelperClassicLoadCostingsView"/>
+    <classEntry path="com.objects.JWTPieChart"/>
+    <classEntry path="net.jwt.control.HelperAccountsTransactionsCommand"/>
+    <classEntry path="net.jwt.value.objects.CostingItinerarySettings"/>
+    <classEntry path="net.jhl.view.ReservationReadOnlyView"/>
+    <classEntry path="net.jwt.view.AccessDetailsOfGroupsView"/>
+    <classEntry path="net.jwt.view.ReportsShoppingListMediator"/>
+    <classEntry path="net.jhl.view.helper.HelperGuestDetailsMediator"/>
+    <classEntry path="net.jhl.view.AgentMarketMappingView"/>
+    <classEntry path="net.jwt.value.objects.TransportVehicleMaster"/>
+    <classEntry path="net.jwt.value.objects.PaxMaster"/>
+    <classEntry path="net.jwt.event.INotificationArguments"/>
+    <classEntry path="net.jwt.control.TourHelperActivitiesCommand"/>
+    <classEntry path="net.jwt.value.objects.Hotel"/>
+    <classEntry path="net.jwt.value.objects.CostingAirTicketCalculation"/>
+    <classEntry path="net.jwt.value.objects.ColumnChartReport"/>
+    <classEntry path="net.jwt.view.EnquiryManagementMarketBasedReportingMediator"/>
+    <classEntry path="net.jwt.print.AirportRepListSegmentPrintView"/>
+    <classEntry path="net.jwt.value.objects.CostingVehicle"/>
+    <classEntry path="net.jwt.value.objects.HotelReservation"/>
+    <classEntry path="net.jhl.view.RateCode.BaseRateMediator"/>
+    <classEntry path="net.jwt.view.RateCode.control.HotelRateCodeCommand"/>
+    <classEntry path="com.objects.JWTCircle"/>
+    <classEntry path="net.jhl.view.common.JHDateField"/>
+    <classEntry path="net.jwt.view.VehicleRateMediator"/>
+    <classEntry path="net.jhl.value.objects.Otium"/>
+    <classEntry path="net.jhl.view.RoomCatagoryEntryMediator"/>
+    <classEntry path="net.jhl.view.RoomFacilityMasterMediator"/>
+    <classEntry path="net.jwt.value.objects.MarketingAllocateBudgetForCostAccount"/>
+    <classEntry path="net.jhl.view.AgentMarketMediator"/>
+    <classEntry path="net.jwt.view.ApprovalWorkflowMediator"/>
+    <classEntry path="net.jwt.control.TourDesignCommand"/>
+    <classEntry path="net.jwt.view.TourDesignClassicCostingDetailsMediator"/>
+    <classEntry path="net.jwt.view.HotelRatesMediator"/>
+  </includeClasses>
+  <includeResources>
+    <resourceEntry destPath="net/jwt/objects/assets/icons/24x24info.png" sourcePath="net/jwt/objects/assets/icons/24x24info.png"/>
+    <resourceEntry destPath="net/jwt/view/RateCode/view/assets/icons/13-x13-Hotel-voucher-new.png" sourcePath="net/jwt/view/RateCode/view/assets/icons/13-x13-Hotel-voucher-new.png"/>
+    <resourceEntry destPath="net/jhl/view/metro/assets/icons/teacup_60x60.png" sourcePath="net/jhl/view/metro/assets/icons/teacup_60x60.png"/>
+    <resourceEntry destPath="net/jhl/view/RateCode/assets/icons/tree_offer_25x25_v2.png" sourcePath="net/jhl/view/RateCode/assets/icons/tree_offer_25x25_v2.png"/>
+    <resourceEntry destPath="net/jwt/view/assets/icons/24x24down.png" sourcePath="net/jwt/view/assets/icons/24x24down.png"/>
+    <resourceEntry destPath="net/jwt/view/assets/icons/RecycleBin_Empty.png" sourcePath="net/jwt/view/assets/icons/RecycleBin_Empty.png"/>
+    <resourceEntry destPath="net/jwt/view/assets/icons/16x16up.png" sourcePath="net/jwt/view/assets/icons/16x16up.png"/>
+    <resourceEntry destPath="net/jwt/view/assets/icons/accounts16x16.png" sourcePath="net/jwt/view/assets/icons/accounts16x16.png"/>
+    <resourceEntry destPath="net/jhl/view/RateCode/assets/icons/guest_icons_5.png" sourcePath="net/jhl/view/RateCode/assets/icons/guest_icons_5.png"/>
+    <resourceEntry destPath="net/jhl/view/assets/icons/24x24res.png" sourcePath="net/jhl/view/assets/icons/24x24res.png"/>
+    <resourceEntry destPath="net/jwt/view/assets/icons/32x32calendar.png" sourcePath="net/jwt/view/assets/icons/32x32calendar.png"/>
+    <resourceEntry destPath="net/jwt/view/assets/icons/24x24lock.png" sourcePath="net/jwt/view/assets/icons/24x24lock.png"/>
+    <resourceEntry destPath="net/jwt/view/assets/icons/tours/locations.png" sourcePath="net/jwt/view/assets/icons/tours/locations.png"/>
+    <resourceEntry destPath="net/jhl/view/metro/assets/fonts/SourceSansPro-Regular.otf" sourcePath="net/jhl/view/metro/assets/fonts/SourceSansPro-Regular.otf"/>
+    <resourceEntry destPath="net/jwt/view/assets/icons/24x24emailnew.png" sourcePath="net/jwt/view/assets/icons/24x24emailnew.png"/>
+    <resourceEntry destPath="net/jhl/view/metro/assets/icons/find_120x120.png" sourcePath="net/jhl/view/metro/assets/icons/find_120x120.png"/>
+    <resourceEntry destPath="net/jwt/view/RateCode/view/assets/icons/16x16id_card.png" sourcePath="net/jwt/view/RateCode/view/assets/icons/16x16id_card.png"/>
+    <resourceEntry destPath="net/jwt/view/assets/icons/24x24dailyrates.png" sourcePath="net/jwt/view/assets/icons/24x24dailyrates.png"/>
+    <resourceEntry destPath="net/jhl/view/metro/assets/icons/people_120x120.png" sourcePath="net/jhl/view/metro/assets/icons/people_120x120.png"/>
+    <resourceEntry destPath="net/jhl/view/metro/assets/icons/tree_240x240.png" sourcePath="net/jhl/view/metro/assets/icons/tree_240x240.png"/>
+    <resourceEntry destPath="net/jwt/view/assets/icons/24x24unlock.png" sourcePath="net/jwt/view/assets/icons/24x24unlock.png"/>
+    <resourceEntry destPath="net/jwt/view/assets/icons/add16x16.png" sourcePath="net/jwt/view/assets/icons/add16x16.png"/>
+    <resourceEntry destPath="net/jwt/view/assets/icons/whale.png" sourcePath="net/jwt/view/assets/icons/whale.png"/>
+    <resourceEntry destPath="net/jwt/view/RateCode/view/assets/icons/12x12-Booking-BILLED.png" sourcePath="net/jwt/view/RateCode/view/assets/icons/12x12-Booking-BILLED.png"/>
+    <resourceEntry destPath="net/jhl/view/metro/assets/icons/rider_60x60.png" sourcePath="net/jhl/view/metro/assets/icons/rider_60x60.png"/>
+    <resourceEntry destPath="net/jwt/view/assets/fonts/Lato-Thin.ttf" sourcePath="net/jwt/view/assets/fonts/Lato-Thin.ttf"/>
+    <resourceEntry destPath="net/jhl/view/metro/assets/fonts/Lato-Thin.ttf" sourcePath="net/jhl/view/metro/assets/fonts/Lato-Thin.ttf"/>
+    <resourceEntry destPath="net/jwt/view/helper/tourHelper/assets/icons/16x16Costing-linked.png" sourcePath="net/jwt/view/helper/tourHelper/assets/icons/16x16Costing-linked.png"/>
+    <resourceEntry destPath="net/jwt/view/assets/icons/app-icon.png" sourcePath="net/jwt/view/assets/icons/app-icon.png"/>
+    <resourceEntry destPath="net/jwt/view/assets/icons/icontexto-webdev-cancel-032x032.png" sourcePath="net/jwt/view/assets/icons/icontexto-webdev-cancel-032x032.png"/>
+    <resourceEntry destPath="net/jhl/view/RateCode/assets/icons/tree_rc_25x25_v2.png" sourcePath="net/jhl/view/RateCode/assets/icons/tree_rc_25x25_v2.png"/>
+    <resourceEntry destPath="net/jhl/view/metro/assets/icons/rider_240x240.png" sourcePath="net/jhl/view/metro/assets/icons/rider_240x240.png"/>
+    <resourceEntry destPath="net/jwt/view/assets/icons/chat.png" sourcePath="net/jwt/view/assets/icons/chat.png"/>
+    <resourceEntry destPath="net/jwt/view/helper/assets/icons/24x24comment.png" sourcePath="net/jwt/view/helper/assets/icons/24x24comment.png"/>
+    <resourceEntry destPath="net/jwt/view/assets/icons/icontexto-webdev-user-032x032.png" sourcePath="net/jwt/view/assets/icons/icontexto-webdev-user-032x032.png"/>
+    <resourceEntry destPath="net/jwt/view/helper/assets/icons/travel_palv_2_16x16.png" sourcePath="net/jwt/view/helper/assets/icons/travel_palv_2_16x16.png"/>
+    <resourceEntry destPath="net/jwt/view/assets/icons/16x16lock.png" sourcePath="net/jwt/view/assets/icons/16x16lock.png"/>
+    <resourceEntry destPath="net/jwt/view/assets/icons/16x16chess-release.png" sourcePath="net/jwt/view/assets/icons/16x16chess-release.png"/>
+    <resourceEntry destPath="net/jhl/view/metro/assets/icons/teacup_240x240.png" sourcePath="net/jhl/view/metro/assets/icons/teacup_240x240.png"/>
+    <resourceEntry destPath="net/jwt/view/helper/assets/icons/travelplan16x16.png" sourcePath="net/jwt/view/helper/assets/icons/travelplan16x16.png"/>
+    <resourceEntry destPath="net/jwt/view/assets/icons/excel24x24.png" sourcePath="net/jwt/view/assets/icons/excel24x24.png"/>
+    <resourceEntry destPath="net/jwt/styles/greensparow.css" sourcePath="net/jwt/styles/greensparow.css"/>
+    <resourceEntry destPath="net/jwt/view/assets/icons/16x16id_card.png" sourcePath="net/jwt/view/assets/icons/16x16id_card.png"/>
+    <resourceEntry destPath="net/jwt/view/RateCode/view/assets/icons/16x16tag.png" sourcePath="net/jwt/view/RateCode/view/assets/icons/16x16tag.png"/>
+    <resourceEntry destPath="net/jhl/view/metro/assets/icons/map_120x120.png" sourcePath="net/jhl/view/metro/assets/icons/map_120x120.png"/>
+    <resourceEntry destPath="net/jwt/view/assets/logo/app_icon.png" sourcePath="net/jwt/view/assets/logo/app_icon.png"/>
+    <resourceEntry destPath="net/jhl/view/metro/assets/icons/menu_60x60.png" sourcePath="net/jhl/view/metro/assets/icons/menu_60x60.png"/>
+    <resourceEntry destPath="net/jhl/view/metro/assets/icons/staah_60x60.png" sourcePath="net/jhl/view/metro/assets/icons/staah_60x60.png"/>
+    <resourceEntry destPath="net/jwt/view/helper/assets/icons/print-16x16.png" sourcePath="net/jwt/view/helper/assets/icons/print-16x16.png"/>
+    <resourceEntry destPath="net/jwt/view/helper/assets/icons/image24x24.png" sourcePath="net/jwt/view/helper/assets/icons/image24x24.png"/>
+    <resourceEntry destPath="net/jwt/view/helper/assets/icons/excel24x24.png" sourcePath="net/jwt/view/helper/assets/icons/excel24x24.png"/>
+    <resourceEntry destPath="net/jwt/view/RateCode/view/assets/icons/16x16home.png" sourcePath="net/jwt/view/RateCode/view/assets/icons/16x16home.png"/>
+    <resourceEntry destPath="net/jwt/view/assets/icons/icontexto-webdev-arrow-up-032x032.png" sourcePath="net/jwt/view/assets/icons/icontexto-webdev-arrow-up-032x032.png"/>
+    <resourceEntry destPath="net/jwt/view/assets/icons/icontexto-webdev-remove-032x032.png" sourcePath="net/jwt/view/assets/icons/icontexto-webdev-remove-032x032.png"/>
+    <resourceEntry destPath="net/jwt/view/assets/icons/32x32camera.png" sourcePath="net/jwt/view/assets/icons/32x32camera.png"/>
+    <resourceEntry destPath="net/jhl/view/metro/assets/icons/people_240x240.png" sourcePath="net/jhl/view/metro/assets/icons/people_240x240.png"/>
+    <resourceEntry destPath="net/jhl/view/metro/assets/icons/jetwing_220x220.png" sourcePath="net/jhl/view/metro/assets/icons/jetwing_220x220.png"/>
+    <resourceEntry destPath="net/jwt/view/assets/icons/tours/Miscellaneous.png" sourcePath="net/jwt/view/assets/icons/tours/Miscellaneous.png"/>
+    <resourceEntry destPath="net/jwt/view/assets/images/Shiromal.jpg" sourcePath="net/jwt/view/assets/images/Shiromal.jpg"/>
+    <resourceEntry destPath="net/jwt/view/helper/tourHelper/assets/icons/13 x13-Hotel-voucher-amended-latest.png" sourcePath="net/jwt/view/helper/tourHelper/assets/icons/13 x13-Hotel-voucher-amended-latest.png"/>
+    <resourceEntry destPath="net/jwt/view/assets/icons/24x24emailold.png" sourcePath="net/jwt/view/assets/icons/24x24emailold.png"/>
+    <resourceEntry destPath="net/jhl/view/RateCode/assets/icons/24x24trash.png" sourcePath="net/jhl/view/RateCode/assets/icons/24x24trash.png"/>
+    <resourceEntry destPath="net/jwt/view/helper/tourHelper/assets/icons/16x16folder.png" sourcePath="net/jwt/view/helper/tourHelper/assets/icons/16x16folder.png"/>
+    <resourceEntry destPath="net/jwt/view/assets/icons/tours/hotel.png" sourcePath="net/jwt/view/assets/icons/tours/hotel.png"/>
+    <resourceEntry destPath="net/jwt/view/assets/icons/filefolder24x24.png" sourcePath="net/jwt/view/assets/icons/filefolder24x24.png"/>
+    <resourceEntry destPath="net/jwt/view/assets/icons/24x24design.png" sourcePath="net/jwt/view/assets/icons/24x24design.png"/>
+    <resourceEntry destPath="net/jwt/view/assets/fonts/SourceSansPro-Regular.otf" sourcePath="net/jwt/view/assets/fonts/SourceSansPro-Regular.otf"/>
+    <resourceEntry destPath="com/objects/assets/icons/rulers24x24.png" sourcePath="com/objects/assets/icons/rulers24x24.png"/>
+    <resourceEntry destPath="net/jwt/view/helper/tourHelper/assets/icons/13-x14-Booking-paid.png" sourcePath="net/jwt/view/helper/tourHelper/assets/icons/13-x14-Booking-paid.png"/>
+    <resourceEntry destPath="net/jwt/view/helper/tourHelper/assets/icons/12x12-Booking-OPEN.png" sourcePath="net/jwt/view/helper/tourHelper/assets/icons/12x12-Booking-OPEN.png"/>
+    <resourceEntry destPath="net/jwt/view/assets/icons/icon32.png" sourcePath="net/jwt/view/assets/icons/icon32.png"/>
+    <resourceEntry destPath="net/jwt/view/assets/icons/48x48logo.png" sourcePath="net/jwt/view/assets/icons/48x48logo.png"/>
+    <resourceEntry destPath="net/jwt/view/assets/icons/tours/safary.png" sourcePath="net/jwt/view/assets/icons/tours/safary.png"/>
+    <resourceEntry destPath="net/jwt/view/assets/icons/32x32find.png" sourcePath="net/jwt/view/assets/icons/32x32find.png"/>
+    <resourceEntry destPath="net/jwt/objects/assets/icons/24x24calendar.png" sourcePath="net/jwt/objects/assets/icons/24x24calendar.png"/>
+    <resourceEntry destPath="net/jwt/view/RateCode/view/assets/icons/13 x13-Hotel-voucher-amended-latest.png" sourcePath="net/jwt/view/RateCode/view/assets/icons/13 x13-Hotel-voucher-amended-latest.png"/>
+    <resourceEntry destPath="net/jwt/view/assets/icons/icontexto-webdev-site-map-016x016.png" sourcePath="net/jwt/view/assets/icons/icontexto-webdev-site-map-016x016.png"/>
+    <resourceEntry destPath="net/jwt/view/assets/icons/dailyrates.png" sourcePath="net/jwt/view/assets/icons/dailyrates.png"/>
+    <resourceEntry destPath="net/jwt/view/RateCode/view/assets/icons/16x16chess.png" sourcePath="net/jwt/view/RateCode/view/assets/icons/16x16chess.png"/>
+    <resourceEntry destPath="net/jwt/view/helper/assets/icons/addressbook_32x32.png" sourcePath="net/jwt/view/helper/assets/icons/addressbook_32x32.png"/>
+    <resourceEntry destPath="net/jwt/view/assets/icons/24x24trash.png" sourcePath="net/jwt/view/assets/icons/24x24trash.png"/>
+    <resourceEntry destPath="net/jwt/view/assets/icons/alert.png" sourcePath="net/jwt/view/assets/icons/alert.png"/>
+    <resourceEntry destPath="net/jwt/view/assets/icons/tours/Thumbs.db" sourcePath="net/jwt/view/assets/icons/tours/Thumbs.db"/>
+    <resourceEntry destPath="net/jwt/view/helper/assets/icons/bugs16x16.png" sourcePath="net/jwt/view/helper/assets/icons/bugs16x16.png"/>
+    <resourceEntry destPath="net/jwt/view/assets/icons/16x16emailnew.png" sourcePath="net/jwt/view/assets/icons/16x16emailnew.png"/>
+    <resourceEntry destPath="net/jhl/view/RateCode/assets/icons/tree_br_25x25.png" sourcePath="net/jhl/view/RateCode/assets/icons/tree_br_25x25.png"/>
+    <resourceEntry destPath="net/jwt/view/assets/icons/camera24x24.png" sourcePath="net/jwt/view/assets/icons/camera24x24.png"/>
+    <resourceEntry destPath="net/jhl/view/metro/assets/icons/teacup_120x120.png" sourcePath="net/jhl/view/metro/assets/icons/teacup_120x120.png"/>
+    <resourceEntry destPath="net/jwt/view/assets/icons/24x24paxcount.png" sourcePath="net/jwt/view/assets/icons/24x24paxcount.png"/>
+    <resourceEntry destPath="net/jwt/view/helper/assets/images/sample_passport_photo.jpg" sourcePath="net/jwt/view/helper/assets/images/sample_passport_photo.jpg"/>
+    <resourceEntry destPath="net/jwt/view/helper/assets/icons/person_24x24.png" sourcePath="net/jwt/view/helper/assets/icons/person_24x24.png"/>
+    <resourceEntry destPath="net/jhl/view/metro/assets/icons/sbr_60x60.png" sourcePath="net/jhl/view/metro/assets/icons/sbr_60x60.png"/>
+    <resourceEntry destPath="net/jhl/view/RateCode/assets/icons/tree_rc_25x25.png" sourcePath="net/jhl/view/RateCode/assets/icons/tree_rc_25x25.png"/>
+    <resourceEntry destPath="net/jhl/view/RateCode/assets/icons/tree_dis_25x25.png" sourcePath="net/jhl/view/RateCode/assets/icons/tree_dis_25x25.png"/>
+    <resourceEntry destPath="net/jwt/view/helper/tourHelper/assets/icons/search.png" sourcePath="net/jwt/view/helper/tourHelper/assets/icons/search.png"/>
+    <resourceEntry destPath="net/jwt/view/assets/icons/icontexto-webdev-site-map-032x032.png" sourcePath="net/jwt/view/assets/icons/icontexto-webdev-site-map-032x032.png"/>
+    <resourceEntry destPath="net/jwt/view/assets/icons/24x24_pie_chart.png" sourcePath="net/jwt/view/assets/icons/24x24_pie_chart.png"/>
+    <resourceEntry destPath="net/jwt/view/assets/icons/32x32pdf.png" sourcePath="net/jwt/view/assets/icons/32x32pdf.png"/>
+    <resourceEntry destPath="net/jwt/view/RateCode/view/assets/icons/16x16chess-cancel.png" sourcePath="net/jwt/view/RateCode/view/assets/icons/16x16chess-cancel.png"/>
+    <resourceEntry destPath="net/jhl/view/assets/icons/24x24add.png" sourcePath="net/jhl/view/assets/icons/24x24add.png"/>
+    <resourceEntry destPath="net/jwt/view/assets/icons/delete16x16.png" sourcePath="net/jwt/view/assets/icons/delete16x16.png"/>
+    <resourceEntry destPath="net/jhl/view/RateCode/assets/fonts/SourceSansPro-Light.otf" sourcePath="net/jhl/view/RateCode/assets/fonts/SourceSansPro-Light.otf"/>
+    <resourceEntry destPath="net/jwt/view/helper/tourHelper/assets/icons/16x16home.png" sourcePath="net/jwt/view/helper/tourHelper/assets/icons/16x16home.png"/>
+    <resourceEntry destPath="net/jwt/view/assets/icons/24x24_search.png" sourcePath="net/jwt/view/assets/icons/24x24_search.png"/>
+    <resourceEntry destPath="net/jhl/view/metro/assets/icons/map_60x60.png" sourcePath="net/jhl/view/metro/assets/icons/map_60x60.png"/>
+    <resourceEntry destPath="net/jwt/view/assets/icons/tours/cars.png" sourcePath="net/jwt/view/assets/icons/tours/cars.png"/>
+    <resourceEntry destPath="net/jwt/view/components/assets/logo/voucherFooter.png" sourcePath="net/jwt/view/components/assets/logo/voucherFooter.png"/>
+    <resourceEntry destPath="net/jhl/view/RateCode/assets/icons/tree_sbr_25x25.png" sourcePath="net/jhl/view/RateCode/assets/icons/tree_sbr_25x25.png"/>
+    <resourceEntry destPath="net/jhl/view/metro/assets/icons/powerbutton.png" sourcePath="net/jhl/view/metro/assets/icons/powerbutton.png"/>
+    <resourceEntry destPath="net/jhl/view/metro/assets/icons/dis_60x60.png" sourcePath="net/jhl/view/metro/assets/icons/dis_60x60.png"/>
+    <resourceEntry destPath="net/jwt/view/components/assets/logo/voucherHeader.png" sourcePath="net/jwt/view/components/assets/logo/voucherHeader.png"/>
+    <resourceEntry destPath="net/jwt/view/mis/assets/icons/camera24x24.png" sourcePath="net/jwt/view/mis/assets/icons/camera24x24.png"/>
+    <resourceEntry destPath="net/jwt/view/assets/icons/24x24news.png" sourcePath="net/jwt/view/assets/icons/24x24news.png"/>
+    <resourceEntry destPath="net/jwt/view/assets/icons/tours/flights.png" sourcePath="net/jwt/view/assets/icons/tours/flights.png"/>
+    <resourceEntry destPath="net/jwt/view/RateCode/view/assets/icons/16x16Costing-linked.png" sourcePath="net/jwt/view/RateCode/view/assets/icons/16x16Costing-linked.png"/>
+    <resourceEntry destPath="net/jwt/view/assets/icons/logout.png" sourcePath="net/jwt/view/assets/icons/logout.png"/>
+    <resourceEntry destPath="net/jwt/view/helper/tourHelper/assets/icons/16x16yellowstar.png" sourcePath="net/jwt/view/helper/tourHelper/assets/icons/16x16yellowstar.png"/>
+    <resourceEntry destPath="com/objects/assets/icons/colorpicker24x24.png" sourcePath="com/objects/assets/icons/colorpicker24x24.png"/>
+    <resourceEntry destPath="net/jwt/view/helper/tourHelper/assets/icons/16x16id_card.png" sourcePath="net/jwt/view/helper/tourHelper/assets/icons/16x16id_card.png"/>
+    <resourceEntry destPath="net/jwt/view/assets/icons/16x16_document.png" sourcePath="net/jwt/view/assets/icons/16x16_document.png"/>
+    <resourceEntry destPath="net/jwt/view/assets/icons/icontexto-webdev-add-032x032.png" sourcePath="net/jwt/view/assets/icons/icontexto-webdev-add-032x032.png"/>
+    <resourceEntry destPath="com/objects/assets/icons/circle24x24.png" sourcePath="com/objects/assets/icons/circle24x24.png"/>
+    <resourceEntry destPath="net/jwt/view/assets/icons/32x32paxveiw.png" sourcePath="net/jwt/view/assets/icons/32x32paxveiw.png"/>
+    <resourceEntry destPath="net/jhl/view/metro/assets/icons/find_240x240.png" sourcePath="net/jhl/view/metro/assets/icons/find_240x240.png"/>
+    <resourceEntry destPath="net/jwt/view/helper/assets/icons/department_24x24.png" sourcePath="net/jwt/view/helper/assets/icons/department_24x24.png"/>
+    <resourceEntry destPath="net/jwt/view/assets/icons/travel_palv_2_16x16.png" sourcePath="net/jwt/view/assets/icons/travel_palv_2_16x16.png"/>
+    <resourceEntry destPath="net/jwt/view/assets/icons/icontexto-webdev-alert-016x016.png" sourcePath="net/jwt/view/assets/icons/icontexto-webdev-alert-016x016.png"/>
+    <resourceEntry destPath="net/jwt/view/assets/icons/16x16home.png" sourcePath="net/jwt/view/assets/icons/16x16home.png"/>
+    <resourceEntry destPath="net/jwt/view/assets/icons/pdf24x24.png" sourcePath="net/jwt/view/assets/icons/pdf24x24.png"/>
+    <resourceEntry destPath="net/jwt/view/helper/tourHelper/assets/icons/13-x13-Hotel-voucher-cancel.png" sourcePath="net/jwt/view/helper/tourHelper/assets/icons/13-x13-Hotel-voucher-cancel.png"/>
+    <resourceEntry destPath="net/jwt/view/assets/icons/msgnew1.png" sourcePath="net/jwt/view/assets/icons/msgnew1.png"/>
+    <resourceEntry destPath="net/jwt/view/assets/icons/icontexto-webdev-alert-032x032.png" sourcePath="net/jwt/view/assets/icons/icontexto-webdev-alert-032x032.png"/>
+    <resourceEntry destPath="net/jwt/view/assets/icons/16x16Sailing_Ship.png" sourcePath="net/jwt/view/assets/icons/16x16Sailing_Ship.png"/>
+    <resourceEntry destPath="net/jwt/view/assets/icons/icontexto-webdev-print-032x032.png" sourcePath="net/jwt/view/assets/icons/icontexto-webdev-print-032x032.png"/>
+    <resourceEntry destPath="net/jwt/view/helper/assets/icons/transport16x16.png" sourcePath="net/jwt/view/helper/assets/icons/transport16x16.png"/>
+    <resourceEntry destPath="net/jwt/view/assets/icons/16x16greenstar.png" sourcePath="net/jwt/view/assets/icons/16x16greenstar.png"/>
+    <resourceEntry destPath="net/jwt/view/helper/assets/icons/rulers24x24.png" sourcePath="net/jwt/view/helper/assets/icons/rulers24x24.png"/>
+    <resourceEntry destPath="net/jwt/view/assets/icons/icon_a.JPG" sourcePath="net/jwt/view/assets/icons/icon_a.JPG"/>
+    <resourceEntry destPath="net/jhl/view/metro/assets/icons/map_240x240.png" sourcePath="net/jhl/view/metro/assets/icons/map_240x240.png"/>
+    <resourceEntry destPath="net/jhl/view/RateCode/assets/fonts/Lato-Thin.ttf" sourcePath="net/jhl/view/RateCode/assets/fonts/Lato-Thin.ttf"/>
+    <resourceEntry destPath="net/jhl/view/metro/assets/icons/weather_120x120.png" sourcePath="net/jhl/view/metro/assets/icons/weather_120x120.png"/>
+    <resourceEntry destPath="net/jhl/view/metro/assets/icons/guest_icon_3_120x120.png" sourcePath="net/jhl/view/metro/assets/icons/guest_icon_3_120x120.png"/>
+    <resourceEntry destPath="net/jwt/view/helper/assets/icons/costing_16x16.png" sourcePath="net/jwt/view/helper/assets/icons/costing_16x16.png"/>
+    <resourceEntry destPath="net/jwt/view/assets/icons/24x24attachment.png" sourcePath="net/jwt/view/assets/icons/24x24attachment.png"/>
+    <resourceEntry destPath="net/jwt/view/assets/fonts/SourceSansPro-Light.otf" sourcePath="net/jwt/view/assets/fonts/SourceSansPro-Light.otf"/>
+    <resourceEntry destPath="net/jhl/view/metro/assets/icons/jc2.png" sourcePath="net/jhl/view/metro/assets/icons/jc2.png"/>
+    <resourceEntry destPath="net/jhl/view/metro/assets/icons/ofr_60x60.png" sourcePath="net/jhl/view/metro/assets/icons/ofr_60x60.png"/>
+    <resourceEntry destPath="net/jhl/view/RateCode/assets/icons/24x24add.png" sourcePath="net/jhl/view/RateCode/assets/icons/24x24add.png"/>
+    <resourceEntry destPath="net/jwt/view/assets/icons/tours/shopping.png" sourcePath="net/jwt/view/assets/icons/tours/shopping.png"/>
+    <resourceEntry destPath="net/jwt/view/assets/images/no-icon.jpg" sourcePath="net/jwt/view/assets/images/no-icon.jpg"/>
+    <resourceEntry destPath="net/jwt/view/assets/icons/13 x13-Hotel-voucher-amended-latest.png" sourcePath="net/jwt/view/assets/icons/13 x13-Hotel-voucher-amended-latest.png"/>
+    <resourceEntry destPath="net/jwt/view/assets/icons/app_icon.png" sourcePath="net/jwt/view/assets/icons/app_icon.png"/>
+    <resourceEntry destPath="net/jwt/view/RateCode/view/assets/icons/13-x14-Booking-open.png" sourcePath="net/jwt/view/RateCode/view/assets/icons/13-x14-Booking-open.png"/>
+    <resourceEntry destPath="net/jwt/view/assets/icons/16x16access.png" sourcePath="net/jwt/view/assets/icons/16x16access.png"/>
+    <resourceEntry destPath="net/jhl/view/metro/assets/icons/infor_120x120.png" sourcePath="net/jhl/view/metro/assets/icons/infor_120x120.png"/>
+    <resourceEntry destPath="net/jhl/view/metro/assets/fonts/SourceSansPro-Light.otf" sourcePath="net/jhl/view/metro/assets/fonts/SourceSansPro-Light.otf"/>
+    <resourceEntry destPath="net/jhl/view/RateCode/assets/icons/tree_offer_25x25.png" sourcePath="net/jhl/view/RateCode/assets/icons/tree_offer_25x25.png"/>
+    <resourceEntry destPath="net/jwt/view/assets/icons/24x24find.png" sourcePath="net/jwt/view/assets/icons/24x24find.png"/>
+    <resourceEntry destPath="net/jhl/view/RateCode/assets/icons/tree_hotel_25x25.png" sourcePath="net/jhl/view/RateCode/assets/icons/tree_hotel_25x25.png"/>
+    <resourceEntry destPath="net/jwt/view/assets/icons/16x16redstar.png" sourcePath="net/jwt/view/assets/icons/16x16redstar.png"/>
+    <resourceEntry destPath="net/jhl/view/metro/assets/fonts/Lato-Regular.ttf" sourcePath="net/jhl/view/metro/assets/fonts/Lato-Regular.ttf"/>
+    <resourceEntry destPath="net/jwt/view/assets/fonts/SourceSansPro-Black.otf" sourcePath="net/jwt/view/assets/fonts/SourceSansPro-Black.otf"/>
+    <resourceEntry destPath="net/jwt/view/assets/icons/24x24cut.png" sourcePath="net/jwt/view/assets/icons/24x24cut.png"/>
+    <resourceEntry destPath="net/jwt/view/RateCode/view/assets/icons/16x23-folder.png" sourcePath="net/jwt/view/RateCode/view/assets/icons/16x23-folder.png"/>
+    <resourceEntry destPath="net/jwt/view/helper/assets/icons/department_16x16.png" sourcePath="net/jwt/view/helper/assets/icons/department_16x16.png"/>
+    <resourceEntry destPath="net/jwt/view/assets/icons/13-x13-Hotel-voucher-amende-old.png" sourcePath="net/jwt/view/assets/icons/13-x13-Hotel-voucher-amende-old.png"/>
+    <resourceEntry destPath="net/jhl/view/RateCode/assets/icons/guest_icon_1.jpg" sourcePath="net/jhl/view/RateCode/assets/icons/guest_icon_1.jpg"/>
+    <resourceEntry destPath="net/jwt/view/assets/icons/16x16info.png" sourcePath="net/jwt/view/assets/icons/16x16info.png"/>
+    <resourceEntry destPath="net/jwt/view/assets/icons/tours/markup.png" sourcePath="net/jwt/view/assets/icons/tours/markup.png"/>
+    <resourceEntry destPath="net/jwt/view/RateCode/view/assets/icons/16x16games.png" sourcePath="net/jwt/view/RateCode/view/assets/icons/16x16games.png"/>
+    <resourceEntry destPath="net/jwt/view/assets/icons/word24x24.png" sourcePath="net/jwt/view/assets/icons/word24x24.png"/>
+    <resourceEntry destPath="net/jwt/view/assets/icons/16x16costing.png" sourcePath="net/jwt/view/assets/icons/16x16costing.png"/>
+    <resourceEntry destPath="net/jwt/view/assets/icons/16x16Mis.png" sourcePath="net/jwt/view/assets/icons/16x16Mis.png"/>
+    <resourceEntry destPath="net/jwt/view/RateCode/view/assets/icons/13x14-Costing.png" sourcePath="net/jwt/view/RateCode/view/assets/icons/13x14-Costing.png"/>
+    <resourceEntry destPath="net/jwt/view/RateCode/view/assets/icons/12x12-Booking-LOST.png" sourcePath="net/jwt/view/RateCode/view/assets/icons/12x12-Booking-LOST.png"/>
+    <resourceEntry destPath="net/jwt/view/helper/assets/icons/Lock-Unlock-icon-16x16.png" sourcePath="net/jwt/view/helper/assets/icons/Lock-Unlock-icon-16x16.png"/>
+    <resourceEntry destPath="net/jwt/view/helper/assets/icons/save16x16.png" sourcePath="net/jwt/view/helper/assets/icons/save16x16.png"/>
+    <resourceEntry destPath="net/jwt/view/assets/icons/home24x24.png" sourcePath="net/jwt/view/assets/icons/home24x24.png"/>
+    <resourceEntry destPath="net/jwt/view/assets/icons/icontexto-webdev-about-032x032.png" sourcePath="net/jwt/view/assets/icons/icontexto-webdev-about-032x032.png"/>
+    <resourceEntry destPath="net/jhl/view/common/assets/fonts/Lato-Thin.ttf" sourcePath="net/jhl/view/common/assets/fonts/Lato-Thin.ttf"/>
+    <resourceEntry destPath="net/jwt/view/helper/assets/icons/refresh-16x16.gif" sourcePath="net/jwt/view/helper/assets/icons/refresh-16x16.gif"/>
+    <resourceEntry destPath="net/jwt/view/assets/icons/24x24_mail_forward.png" sourcePath="net/jwt/view/assets/icons/24x24_mail_forward.png"/>
+    <resourceEntry destPath="net/jwt/view/assets/icons/24x24_bar_chart.png" sourcePath="net/jwt/view/assets/icons/24x24_bar_chart.png"/>
+    <resourceEntry destPath="net/jwt/view/assets/icons/icontexto-webdev-ok-016x016.png" sourcePath="net/jwt/view/assets/icons/icontexto-webdev-ok-016x016.png"/>
+    <resourceEntry destPath="net/jwt/view/RateCode/view/assets/icons/search.png" sourcePath="net/jwt/view/RateCode/view/assets/icons/search.png"/>
+    <resourceEntry destPath="net/jwt/view/assets/icons/16x16brush.png" sourcePath="net/jwt/view/assets/icons/16x16brush.png"/>
+    <resourceEntry destPath="net/jhl/view/metro/assets/icons/guest_icon_3.jpg" sourcePath="net/jhl/view/metro/assets/icons/guest_icon_3.jpg"/>
+    <resourceEntry destPath="net/jwt/view/assets/icons/icontexto-webdev-help-032x032.png" sourcePath="net/jwt/view/assets/icons/icontexto-webdev-help-032x032.png"/>
+    <resourceEntry destPath="net/jwt/view/helper/assets/icons/security_300x300.png" sourcePath="net/jwt/view/helper/assets/icons/security_300x300.png"/>
+    <resourceEntry destPath="net/jwt/view/helper/tourHelper/assets/icons/13-x14-Booking-open.png" sourcePath="net/jwt/view/helper/tourHelper/assets/icons/13-x14-Booking-open.png"/>
+    <resourceEntry destPath="net/jwt/view/assets/icons/24x24add.png" sourcePath="net/jwt/view/assets/icons/24x24add.png"/>
+    <resourceEntry destPath="net/jwt/view/helper/tourHelper/assets/icons/16x16tag.png" sourcePath="net/jwt/view/helper/tourHelper/assets/icons/16x16tag.png"/>
+    <resourceEntry destPath="net/jwt/view/assets/icons/16x16agents.png" sourcePath="net/jwt/view/assets/icons/16x16agents.png"/>
+    <resourceEntry destPath="com/objects/assets/icons/rectangle24x24.PNG" sourcePath="com/objects/assets/icons/rectangle24x24.PNG"/>
+    <resourceEntry destPath="net/jwt/view/assets/icons/spring.png" sourcePath="net/jwt/view/assets/icons/spring.png"/>
+    <resourceEntry destPath="net/jwt/view/assets/icons/tours/plane.png" sourcePath="net/jwt/view/assets/icons/tours/plane.png"/>
+    <resourceEntry destPath="net/jwt/view/assets/icons/13 x13-Hotel-voucher-amended-not-latest-printed.png" sourcePath="net/jwt/view/assets/icons/13 x13-Hotel-voucher-amended-not-latest-printed.png"/>
+    <resourceEntry destPath="net/jhl/view/metro/assets/icons/chart_120x120.jpg" sourcePath="net/jhl/view/metro/assets/icons/chart_120x120.jpg"/>
+    <resourceEntry destPath="net/jwt/view/assets/icons/tours/currency.png" sourcePath="net/jwt/view/assets/icons/tours/currency.png"/>
+    <resourceEntry destPath="com/objects/assets/icons/checkengine.png" sourcePath="com/objects/assets/icons/checkengine.png"/>
+    <resourceEntry destPath="net/jwt/view/assets/icons/icontexto-webdev-user-016x016.png" sourcePath="net/jwt/view/assets/icons/icontexto-webdev-user-016x016.png"/>
+    <resourceEntry destPath="net/jwt/view/RateCode/view/assets/icons/spring.png" sourcePath="net/jwt/view/RateCode/view/assets/icons/spring.png"/>
+    <resourceEntry destPath="net/jhl/view/metro/assets/icons/filefolder_60x60.png" sourcePath="net/jhl/view/metro/assets/icons/filefolder_60x60.png"/>
+    <resourceEntry destPath="net/jhl/view/common/assets/fonts/SourceSansPro-Light.otf" sourcePath="net/jhl/view/common/assets/fonts/SourceSansPro-Light.otf"/>
+    <resourceEntry destPath="net/jhl/view/metro/assets/images/mainbackground.png" sourcePath="net/jhl/view/metro/assets/images/mainbackground.png"/>
+    <resourceEntry destPath="net/jwt/view/assets/icons/16x16chart_down.png" sourcePath="net/jwt/view/assets/icons/16x16chart_down.png"/>
+    <resourceEntry destPath="net/jwt/view/assets/icons/icontexto-webdev-rss-feed-032x032.png" sourcePath="net/jwt/view/assets/icons/icontexto-webdev-rss-feed-032x032.png"/>
+    <resourceEntry destPath="net/jwt/view/helper/tourHelper/assets/icons/13-x13-Hotel-voucher-new.png" sourcePath="net/jwt/view/helper/tourHelper/assets/icons/13-x13-Hotel-voucher-new.png"/>
+    <resourceEntry destPath="net/jhl/view/RateCode/assets/icons/tree_sbr_25x25_v2.png" sourcePath="net/jhl/view/RateCode/assets/icons/tree_sbr_25x25_v2.png"/>
+    <resourceEntry destPath="net/jwt/view/helper/tourHelper/assets/icons/12x12-Booking-BILLED.png" sourcePath="net/jwt/view/helper/tourHelper/assets/icons/12x12-Booking-BILLED.png"/>
+    <resourceEntry destPath="net/jwt/view/RateCode/view/assets/icons/13-x14-Booking-paid.png" sourcePath="net/jwt/view/RateCode/view/assets/icons/13-x14-Booking-paid.png"/>
+    <resourceEntry destPath="net/jwt/view/assets/icons/icontexto-webdev-arrow-down-016x016.png" sourcePath="net/jwt/view/assets/icons/icontexto-webdev-arrow-down-016x016.png"/>
+    <resourceEntry destPath="net/jwt/view/assets/icons/16x16adminkey.png" sourcePath="net/jwt/view/assets/icons/16x16adminkey.png"/>
+    <resourceEntry destPath="net/jhl/view/metro/assets/icons/tree_120x120.png" sourcePath="net/jhl/view/metro/assets/icons/tree_120x120.png"/>
+    <resourceEntry destPath="net/jwt/view/assets/icons/transport16x16.png" sourcePath="net/jwt/view/assets/icons/transport16x16.png"/>
+    <resourceEntry destPath="net/jwt/view/assets/icons/16x16warning.png" sourcePath="net/jwt/view/assets/icons/16x16warning.png"/>
+    <resourceEntry destPath="net/jwt/view/assets/icons/16x16trash.png" sourcePath="net/jwt/view/assets/icons/16x16trash.png"/>
+    <resourceEntry destPath="com/objects/assets/icons/palette24x24.png" sourcePath="com/objects/assets/icons/palette24x24.png"/>
+    <resourceEntry destPath="net/jwt/view/helper/assets/icons/company_24x24.png" sourcePath="net/jwt/view/helper/assets/icons/company_24x24.png"/>
+    <resourceEntry destPath="net/jwt/view/assets/icons/save16x16.png" sourcePath="net/jwt/view/assets/icons/save16x16.png"/>
+    <resourceEntry destPath="net/jwt/view/assets/icons/defaultIcon24x24.png" sourcePath="net/jwt/view/assets/icons/defaultIcon24x24.png"/>
+    <resourceEntry destPath="net/jhl/view/metro/assets/icons/find_60x60.png" sourcePath="net/jhl/view/metro/assets/icons/find_60x60.png"/>
+    <resourceEntry destPath="net/jwt/view/assets/fonts/Lato-Regular.ttf" sourcePath="net/jwt/view/assets/fonts/Lato-Regular.ttf"/>
+    <resourceEntry destPath="net/jwt/view/helper/assets/icons/company_16x16.png" sourcePath="net/jwt/view/helper/assets/icons/company_16x16.png"/>
+    <resourceEntry destPath="net/jwt/view/assets/icons/logout16x16.png" sourcePath="net/jwt/view/assets/icons/logout16x16.png"/>
+    <resourceEntry destPath="net/jwt/view/helper/tourHelper/assets/icons/13x14-Costing.png" sourcePath="net/jwt/view/helper/tourHelper/assets/icons/13x14-Costing.png"/>
+    <resourceEntry destPath="net/jwt/helper/assets/icons/defaultIcon24x24.png" sourcePath="net/jwt/helper/assets/icons/defaultIcon24x24.png"/>
+    <resourceEntry destPath="net/jwt/view/assets/icons/icon48.png" sourcePath="net/jwt/view/assets/icons/icon48.png"/>
+    <resourceEntry destPath="net/jhl/view/metro/assets/icons/rss_60x60.png" sourcePath="net/jhl/view/metro/assets/icons/rss_60x60.png"/>
+    <resourceEntry destPath="net/jwt/view/assets/icons/16x16pencil.png" sourcePath="net/jwt/view/assets/icons/16x16pencil.png"/>
+    <resourceEntry destPath="net/jwt/helper/assets/icons/image24x24.png" sourcePath="net/jwt/helper/assets/icons/image24x24.png"/>
+    <resourceEntry destPath="net/jwt/objects/assets/icons/32x32calendar.png" sourcePath="net/jwt/objects/assets/icons/32x32calendar.png"/>
+    <resourceEntry destPath="net/jhl/view/metro/assets/icons/rider_120x120.png" sourcePath="net/jhl/view/metro/assets/icons/rider_120x120.png"/>
+    <resourceEntry destPath="net/jwt/view/assets/icons/16x16tools.png" sourcePath="net/jwt/view/assets/icons/16x16tools.png"/>
+    <resourceEntry destPath="net/jwt/view/assets/icons/tours/excursions.png" sourcePath="net/jwt/view/assets/icons/tours/excursions.png"/>
+    <resourceEntry destPath="net/jwt/view/assets/icons/icontexto-webdev-reload-032x032.png" sourcePath="net/jwt/view/assets/icons/icontexto-webdev-reload-032x032.png"/>
+    <resourceEntry destPath="net/jhl/view/metro/assets/icons/leftarrow.png" sourcePath="net/jhl/view/metro/assets/icons/leftarrow.png"/>
+    <resourceEntry destPath="net/jwt/view/assets/icons/16x16find.png" sourcePath="net/jwt/view/assets/icons/16x16find.png"/>
+    <resourceEntry destPath="net/jwt/view/assets/icons/16x16emailold.png" sourcePath="net/jwt/view/assets/icons/16x16emailold.png"/>
+    <resourceEntry destPath="net/jwt/view/popup/assets/icons/close_button.jpg" sourcePath="net/jwt/view/popup/assets/icons/close_button.jpg"/>
+    <resourceEntry destPath="net/jwt/view/assets/icons/icontexto-webdev-arrow-down-032x032.png" sourcePath="net/jwt/view/assets/icons/icontexto-webdev-arrow-down-032x032.png"/>
+    <resourceEntry destPath="net/jhl/view/metro/assets/icons/infor_240x240.png" sourcePath="net/jhl/view/metro/assets/icons/infor_240x240.png"/>
+    <resourceEntry destPath="net/jhl/view/RateCode/assets/fonts/Lato-Regular.ttf" sourcePath="net/jhl/view/RateCode/assets/fonts/Lato-Regular.ttf"/>
+    <resourceEntry destPath="net/jwt/view/helper/tourHelper/assets/icons/12x12-Booking.png" sourcePath="net/jwt/view/helper/tourHelper/assets/icons/12x12-Booking.png"/>
+    <resourceEntry destPath="net/jwt/view/helper/tourHelper/assets/icons/16x16chess.png" sourcePath="net/jwt/view/helper/tourHelper/assets/icons/16x16chess.png"/>
+    <resourceEntry destPath="com/objects/assets/icons/eraser24x24.PNG" sourcePath="com/objects/assets/icons/eraser24x24.PNG"/>
+    <resourceEntry destPath="net/jwt/view/assets/icons/icontexto-webdev-file-032x032.png" sourcePath="net/jwt/view/assets/icons/icontexto-webdev-file-032x032.png"/>
+    <resourceEntry destPath="net/jwt/objects/assets/icons/16x16find.png" sourcePath="net/jwt/objects/assets/icons/16x16find.png"/>
+    <resourceEntry destPath="net/jwt/view/assets/icons/tours/newroute.PNG" sourcePath="net/jwt/view/assets/icons/tours/newroute.PNG"/>
+    <resourceEntry destPath="net/jwt/view/assets/icons/16x16graystar.png" sourcePath="net/jwt/view/assets/icons/16x16graystar.png"/>
+    <resourceEntry destPath="net/jwt/view/assets/icons/icontexto-webdev-home-032x032.png" sourcePath="net/jwt/view/assets/icons/icontexto-webdev-home-032x032.png"/>
+    <resourceEntry destPath="net/jwt/view/assets/icons/tours/activities.png" sourcePath="net/jwt/view/assets/icons/tours/activities.png"/>
+    <resourceEntry destPath="net/jwt/view/assets/icons/reset24x24.jpg" sourcePath="net/jwt/view/assets/icons/reset24x24.jpg"/>
+    <resourceEntry destPath="net/jwt/styles/gray.css" sourcePath="net/jwt/styles/gray.css"/>
+    <resourceEntry destPath="net/jwt/view/assets/icons/16x16chess.png" sourcePath="net/jwt/view/assets/icons/16x16chess.png"/>
+    <resourceEntry destPath="net/jhl/view/metro/assets/icons/guest_icon_2.jpg" sourcePath="net/jhl/view/metro/assets/icons/guest_icon_2.jpg"/>
+    <resourceEntry destPath="net/jwt/view/RateCode/view/assets/icons/16x16pencil.png" sourcePath="net/jwt/view/RateCode/view/assets/icons/16x16pencil.png"/>
+    <resourceEntry destPath="net/jwt/view/helper/tourHelper/assets/icons/16x16games.png" sourcePath="net/jwt/view/helper/tourHelper/assets/icons/16x16games.png"/>
+    <resourceEntry destPath="com/objects/assets/icons/camera24x24.png" sourcePath="com/objects/assets/icons/camera24x24.png"/>
+    <resourceEntry destPath="net/jwt/view/assets/icons/13-x13-Hotel-voucher-cancel.png" sourcePath="net/jwt/view/assets/icons/13-x13-Hotel-voucher-cancel.png"/>
+    <resourceEntry destPath="net/jwt/view/assets/fonts/SourceSansPro-LightIt.otf" sourcePath="net/jwt/view/assets/fonts/SourceSansPro-LightIt.otf"/>
+    <resourceEntry destPath="net/jwt/view/components/assets/logo/voucherHeaderTravels.png" sourcePath="net/jwt/view/components/assets/logo/voucherHeaderTravels.png"/>
+    <resourceEntry destPath="net/jwt/view/assets/icons/search.png" sourcePath="net/jwt/view/assets/icons/search.png"/>
+    <resourceEntry destPath="net/jwt/view/assets/icons/tours/bin.png" sourcePath="net/jwt/view/assets/icons/tours/bin.png"/>
+    <resourceEntry destPath="net/jwt/view/assets/icons/icontexto-webdev-bullet-032x032.png" sourcePath="net/jwt/view/assets/icons/icontexto-webdev-bullet-032x032.png"/>
+    <resourceEntry destPath="net/jwt/view/RateCode/view/assets/icons/24x24refresh.png" sourcePath="net/jwt/view/RateCode/view/assets/icons/24x24refresh.png"/>
+    <resourceEntry destPath="net/jwt/view/helper/tourHelper/assets/icons/12x12-Booking-PAID.png" sourcePath="net/jwt/view/helper/tourHelper/assets/icons/12x12-Booking-PAID.png"/>
+    <resourceEntry destPath="net/jwt/styles/chocolate.css" sourcePath="net/jwt/styles/chocolate.css"/>
+    <resourceEntry destPath="net/jwt/view/assets/icons/Restart.png" sourcePath="net/jwt/view/assets/icons/Restart.png"/>
+    <resourceEntry destPath="com/objects/assets/icons/text24x24.png" sourcePath="com/objects/assets/icons/text24x24.png"/>
+    <resourceEntry destPath="net/jwt/view/helper/tourHelper/assets/icons/13-x14-Booking-comp.png" sourcePath="net/jwt/view/helper/tourHelper/assets/icons/13-x14-Booking-comp.png"/>
+    <resourceEntry destPath="net/jwt/view/assets/icons/man.png" sourcePath="net/jwt/view/assets/icons/man.png"/>
+    <resourceEntry destPath="com/objects/assets/icons/closeButton.jpg" sourcePath="com/objects/assets/icons/closeButton.jpg"/>
+    <resourceEntry destPath="com/objects/assets/icons/layers24x24.png" sourcePath="com/objects/assets/icons/layers24x24.png"/>
+    <resourceEntry destPath="net/jwt/view/assets/icons/16x16car.png" sourcePath="net/jwt/view/assets/icons/16x16car.png"/>
+    <resourceEntry destPath="net/jwt/styles/redbull.css" sourcePath="net/jwt/styles/redbull.css"/>
+    <resourceEntry destPath="net/jwt/view/assets/icons/16x16chess-confirmed.png" sourcePath="net/jwt/view/assets/icons/16x16chess-confirmed.png"/>
+    <resourceEntry destPath="net/jwt/view/assets/icons/24x24info.png" sourcePath="net/jwt/view/assets/icons/24x24info.png"/>
+    <resourceEntry destPath="net/jwt/view/assets/icons/13-x13-Hotel-voucher-new.png" sourcePath="net/jwt/view/assets/icons/13-x13-Hotel-voucher-new.png"/>
+    <resourceEntry destPath="net/jwt/view/assets/icons/tours/activities_1.png" sourcePath="net/jwt/view/assets/icons/tours/activities_1.png"/>
+    <resourceEntry destPath="net/jwt/view/assets/icons/19x19hotel.png" sourcePath="net/jwt/view/assets/icons/19x19hotel.png"/>
+    <resourceEntry destPath="net/jhl/view/metro/assets/icons/jerrom_clackson_230x200.png" sourcePath="net/jhl/view/metro/assets/icons/jerrom_clackson_230x200.png"/>
+    <resourceEntry destPath="net/jwt/view/assets/icons/13 x13-Hotel-voucher-new-printed.png" sourcePath="net/jwt/view/assets/icons/13 x13-Hotel-voucher-new-printed.png"/>
+    <resourceEntry destPath="net/jhl/view/metro/assets/icons/Mu_60x60.png" sourcePath="net/jhl/view/metro/assets/icons/Mu_60x60.png"/>
+    <resourceEntry destPath="net/jhl/view/metro/assets/icons/tree_200x200.png" sourcePath="net/jhl/view/metro/assets/icons/tree_200x200.png"/>
+    <resourceEntry destPath="net/jwt/view/helper/tourHelper/assets/icons/24x24refresh.png" sourcePath="net/jwt/view/helper/tourHelper/assets/icons/24x24refresh.png"/>
+    <resourceEntry destPath="net/jwt/helper/assets/icons/excel24x24.png" sourcePath="net/jwt/helper/assets/icons/excel24x24.png"/>
+    <resourceEntry destPath="net/jwt/view/helper/assets/icons/quicktext-icon.png" sourcePath="net/jwt/view/helper/assets/icons/quicktext-icon.png"/>
+    <resourceEntry destPath="net/jwt/view/assets/icons/16x16chart_up.png" sourcePath="net/jwt/view/assets/icons/16x16chart_up.png"/>
+    <resourceEntry destPath="net/jhl/view/metro/assets/icons/admin_60x60.png" sourcePath="net/jhl/view/metro/assets/icons/admin_60x60.png"/>
+    <resourceEntry destPath="net/jwt/view/assets/icons/24x24refresh.png" sourcePath="net/jwt/view/assets/icons/24x24refresh.png"/>
+    <resourceEntry destPath="net/jwt/view/assets/icons/16x16dailyrates.png" sourcePath="net/jwt/view/assets/icons/16x16dailyrates.png"/>
+    <resourceEntry destPath="net/jwt/styles/snowhite.css" sourcePath="net/jwt/styles/snowhite.css"/>
+    <resourceEntry destPath="net/jwt/view/helper/tourHelper/assets/icons/16x16pencil.png" sourcePath="net/jwt/view/helper/tourHelper/assets/icons/16x16pencil.png"/>
+    <resourceEntry destPath="net/jwt/view/assets/icons/16x16down.png" sourcePath="net/jwt/view/assets/icons/16x16down.png"/>
+    <resourceEntry destPath="net/jwt/view/assets/icons/travelplan16x16.png" sourcePath="net/jwt/view/assets/icons/travelplan16x16.png"/>
+    <resourceEntry destPath="net/jwt/view/helper/assets/icons/pdf24x24.png" sourcePath="net/jwt/view/helper/assets/icons/pdf24x24.png"/>
+    <resourceEntry destPath="net/jwt/view/assets/icons/32x32chart_up.png" sourcePath="net/jwt/view/assets/icons/32x32chart_up.png"/>
+    <resourceEntry destPath="net/jwt/view/assets/icons/icon_b.JPG" sourcePath="net/jwt/view/assets/icons/icon_b.JPG"/>
+    <resourceEntry destPath="net/jhl/view/metro/assets/icons/fx_60x60.png" sourcePath="net/jhl/view/metro/assets/icons/fx_60x60.png"/>
+    <resourceEntry destPath="net/jwt/view/helper/assets/images/no-icon.jpg" sourcePath="net/jwt/view/helper/assets/images/no-icon.jpg"/>
+    <resourceEntry destPath="net/jwt/view/helper/tourHelper/assets/icons/13-x13-Hotel-voucher-amende-old.png" sourcePath="net/jwt/view/helper/tourHelper/assets/icons/13-x13-Hotel-voucher-amende-old.png"/>
+    <resourceEntry destPath="net/jwt/view/assets/icons/refresh.png" sourcePath="net/jwt/view/assets/icons/refresh.png"/>
+    <resourceEntry destPath="net/jwt/view/RateCode/view/assets/icons/12x12-Booking-PAID.png" sourcePath="net/jwt/view/RateCode/view/assets/icons/12x12-Booking-PAID.png"/>
+    <resourceEntry destPath="net/jwt/view/assets/icons/16x16minus.png" sourcePath="net/jwt/view/assets/icons/16x16minus.png"/>
+    <resourceEntry destPath="net/jwt/view/assets/icons/icontexto-webdev-money-032x032.png" sourcePath="net/jwt/view/assets/icons/icontexto-webdev-money-032x032.png"/>
+    <resourceEntry destPath="net/jwt/view/assets/icons/tours/logo-048x048.png" sourcePath="net/jwt/view/assets/icons/tours/logo-048x048.png"/>
+    <resourceEntry destPath="net/jwt/view/assets/icons/weather.png" sourcePath="net/jwt/view/assets/icons/weather.png"/>
+    <resourceEntry destPath="net/jhl/view/metro/assets/icons/calculator_60x60.png" sourcePath="net/jhl/view/metro/assets/icons/calculator_60x60.png"/>
+    <resourceEntry destPath="net/jhl/view/metro/assets/icons/guest_icon_4.jpg" sourcePath="net/jhl/view/metro/assets/icons/guest_icon_4.jpg"/>
+    <resourceEntry destPath="net/jwt/view/RateCode/view/assets/icons/13-x13-Supplementry-Costing.png" sourcePath="net/jwt/view/RateCode/view/assets/icons/13-x13-Supplementry-Costing.png"/>
+    <resourceEntry destPath="net/jwt/view/helper/assets/icons/email16x16.png" sourcePath="net/jwt/view/helper/assets/icons/email16x16.png"/>
+    <resourceEntry destPath="net/jhl/view/RateCode/assets/icons/guest_icon_4.jpg" sourcePath="net/jhl/view/RateCode/assets/icons/guest_icon_4.jpg"/>
+    <resourceEntry destPath="net/jwt/view/assets/icons/statement-16x16.png" sourcePath="net/jwt/view/assets/icons/statement-16x16.png"/>
+    <resourceEntry destPath="net/jhl/view/metro/assets/icons/guest_icon_1.jpg" sourcePath="net/jhl/view/metro/assets/icons/guest_icon_1.jpg"/>
+    <resourceEntry destPath="net/jwt/view/assets/icons/tours/visits.png" sourcePath="net/jwt/view/assets/icons/tours/visits.png"/>
+    <resourceEntry destPath="net/jwt/view/helper/tourHelper/assets/icons/24x24cut.png" sourcePath="net/jwt/view/helper/tourHelper/assets/icons/24x24cut.png"/>
+    <resourceEntry destPath="net/jwt/view/helper/assets/icons/security.png" sourcePath="net/jwt/view/helper/assets/icons/security.png"/>
+    <resourceEntry destPath="net/jwt/view/helper/tourHelper/assets/icons/12x12-Booking-LOST.png" sourcePath="net/jwt/view/helper/tourHelper/assets/icons/12x12-Booking-LOST.png"/>
+    <resourceEntry destPath="net/jwt/view/assets/icons/icontexto-webdev-arrow-up-016x016.png" sourcePath="net/jwt/view/assets/icons/icontexto-webdev-arrow-up-016x016.png"/>
+    <resourceEntry destPath="com/objects/assets/icons/pencil24x24.png" sourcePath="com/objects/assets/icons/pencil24x24.png"/>
+    <resourceEntry destPath="net/jhl/view/metro/assets/icons/jc1.png" sourcePath="net/jhl/view/metro/assets/icons/jc1.png"/>
+    <resourceEntry destPath="net/jwt/view/assets/icons/16x16add.png" sourcePath="net/jwt/view/assets/icons/16x16add.png"/>
+    <resourceEntry destPath="net/jwt/view/RateCode/view/assets/icons/13-x14-Booking-lost.png" sourcePath="net/jwt/view/RateCode/view/assets/icons/13-x14-Booking-lost.png"/>
+    <resourceEntry destPath="net/jwt/view/assets/icons/16x16games.png" sourcePath="net/jwt/view/assets/icons/16x16games.png"/>
+    <resourceEntry destPath="net/jwt/view/helper/tourHelper/assets/icons/13-x13-Supplementry-Costing.png" sourcePath="net/jwt/view/helper/tourHelper/assets/icons/13-x13-Supplementry-Costing.png"/>
+    <resourceEntry destPath="net/jwt/view/assets/icons/24x24weather.png" sourcePath="net/jwt/view/assets/icons/24x24weather.png"/>
+    <resourceEntry destPath="net/jwt/view/assets/icons/16x16unlock.png" sourcePath="net/jwt/view/assets/icons/16x16unlock.png"/>
+    <resourceEntry destPath="net/jwt/view/assets/icons/icontexto-webdev-help-016x016.png" sourcePath="net/jwt/view/assets/icons/icontexto-webdev-help-016x016.png"/>
+    <resourceEntry destPath="net/jhl/view/metro/assets/icons/guest_icon_3_190x190.png" sourcePath="net/jhl/view/metro/assets/icons/guest_icon_3_190x190.png"/>
+    <resourceEntry destPath="net/jhl/view/metro/assets/icons/ai_60x60.png" sourcePath="net/jhl/view/metro/assets/icons/ai_60x60.png"/>
+    <resourceEntry destPath="net/jwt/view/RateCode/view/assets/icons/13-x13-Hotel-voucher-cancel.png" sourcePath="net/jwt/view/RateCode/view/assets/icons/13-x13-Hotel-voucher-cancel.png"/>
+    <resourceEntry destPath="net/jwt/view/assets/icons/32x32attachment.png" sourcePath="net/jwt/view/assets/icons/32x32attachment.png"/>
+    <resourceEntry destPath="net/jwt/view/mis/assets/icons/close_button.jpg" sourcePath="net/jwt/view/mis/assets/icons/close_button.jpg"/>
+    <resourceEntry destPath="net/jhl/view/common/assets/fonts/SourceSansPro-Regular.otf" sourcePath="net/jhl/view/common/assets/fonts/SourceSansPro-Regular.otf"/>
+    <resourceEntry destPath="net/jwt/view/helper/assets/icons/Lock-16x16.png" sourcePath="net/jwt/view/helper/assets/icons/Lock-16x16.png"/>
+    <resourceEntry destPath="net/jwt/view/assets/icons/rulers24x24.png" sourcePath="net/jwt/view/assets/icons/rulers24x24.png"/>
+    <resourceEntry destPath="net/jwt/view/helper/assets/icons/yelp-16x16.png" sourcePath="net/jwt/view/helper/assets/icons/yelp-16x16.png"/>
+    <resourceEntry destPath="net/jwt/view/assets/icons/24x24red_flag.png" sourcePath="net/jwt/view/assets/icons/24x24red_flag.png"/>
+    <resourceEntry destPath="net/jwt/view/helper/assets/icons/security3.png" sourcePath="net/jwt/view/helper/assets/icons/security3.png"/>
+    <resourceEntry destPath="net/jwt/view/helper/assets/icons/notes-16x16.png" sourcePath="net/jwt/view/helper/assets/icons/notes-16x16.png"/>
+    <resourceEntry destPath="net/jwt/view/assets/icons/icontexto-webdev-security-032x032.png" sourcePath="net/jwt/view/assets/icons/icontexto-webdev-security-032x032.png"/>
+    <resourceEntry destPath="net/jwt/view/assets/icons/16x16yellowstar.png" sourcePath="net/jwt/view/assets/icons/16x16yellowstar.png"/>
+    <resourceEntry destPath="net/jwt/styles/Panel.css" sourcePath="net/jwt/styles/Panel.css"/>
+    <resourceEntry destPath="net/jwt/view/RateCode/view/assets/icons/16x16yellowstar.png" sourcePath="net/jwt/view/RateCode/view/assets/icons/16x16yellowstar.png"/>
+    <resourceEntry destPath="net/jwt/view/assets/icons/16x16calendar.png" sourcePath="net/jwt/view/assets/icons/16x16calendar.png"/>
+    <resourceEntry destPath="net/jwt/view/assets/icons/Thumbs.db" sourcePath="net/jwt/view/assets/icons/Thumbs.db"/>
+    <resourceEntry destPath="net/jwt/view/assets/icons/email16x16.png" sourcePath="net/jwt/view/assets/icons/email16x16.png"/>
+    <resourceEntry destPath="net/jwt/view/assets/icons/16x16weather.png" sourcePath="net/jwt/view/assets/icons/16x16weather.png"/>
+    <resourceEntry destPath="net/jwt/view/assets/icons/tours/shoping.png" sourcePath="net/jwt/view/assets/icons/tours/shoping.png"/>
+    <resourceEntry destPath="net/jhl/view/RateCode/assets/icons/guest_icons.jpg" sourcePath="net/jhl/view/RateCode/assets/icons/guest_icons.jpg"/>
+    <resourceEntry destPath="net/jhl/view/RateCode/assets/icons/guest_icon_3.jpg" sourcePath="net/jhl/view/RateCode/assets/icons/guest_icon_3.jpg"/>
+    <resourceEntry destPath="net/jwt/objects/assets/icons/16x16games.png" sourcePath="net/jwt/objects/assets/icons/16x16games.png"/>
+    <resourceEntry destPath="net/jwt/view/assets/icons/24x24comment.png" sourcePath="net/jwt/view/assets/icons/24x24comment.png"/>
+    <resourceEntry destPath="net/jwt/view/assets/icons/tours/car2.png" sourcePath="net/jwt/view/assets/icons/tours/car2.png"/>
+    <resourceEntry destPath="net/jwt/view/helper/tourHelper/assets/icons/16x16chess-cancel.png" sourcePath="net/jwt/view/helper/tourHelper/assets/icons/16x16chess-cancel.png"/>
+    <resourceEntry destPath="net/jwt/view/assets/icons/cloud.png" sourcePath="net/jwt/view/assets/icons/cloud.png"/>
+    <resourceEntry destPath="net/jwt/view/components/assets/logo/voucherHeaderECo.png" sourcePath="net/jwt/view/components/assets/logo/voucherHeaderECo.png"/>
+    <resourceEntry destPath="net/jwt/view/assets/icons/24x24chart_down.png" sourcePath="net/jwt/view/assets/icons/24x24chart_down.png"/>
+    <resourceEntry destPath="net/jwt/view/helper/tourHelper/assets/icons/16x23-folder.png" sourcePath="net/jwt/view/helper/tourHelper/assets/icons/16x23-folder.png"/>
+    <resourceEntry destPath="net/jwt/view/assets/icons/13 x13-Hotel-voucher-canceled-printed.png" sourcePath="net/jwt/view/assets/icons/13 x13-Hotel-voucher-canceled-printed.png"/>
+    <resourceEntry destPath="net/jhl/view/metro/assets/icons/jerrom_clackson_280x280.png" sourcePath="net/jhl/view/metro/assets/icons/jerrom_clackson_280x280.png"/>
+    <resourceEntry destPath="net/jwt/view/assets/icons/16x16cut.png" sourcePath="net/jwt/view/assets/icons/16x16cut.png"/>
+    <resourceEntry destPath="net/jwt/view/RateCode/view/assets/icons/12x12-Costing.png" sourcePath="net/jwt/view/RateCode/view/assets/icons/12x12-Costing.png"/>
+    <resourceEntry destPath="net/jwt/view/RateCode/view/assets/icons/24x24comment.png" sourcePath="net/jwt/view/RateCode/view/assets/icons/24x24comment.png"/>
+    <resourceEntry destPath="net/jwt/view/assets/icons/icontexto-webdev-remove-016x016.png" sourcePath="net/jwt/view/assets/icons/icontexto-webdev-remove-016x016.png"/>
+    <resourceEntry destPath="net/jwt/view/assets/icons/tours/alpha.png" sourcePath="net/jwt/view/assets/icons/tours/alpha.png"/>
+    <resourceEntry destPath="net/jwt/view/helper/assets/icons/bug24x24.png" sourcePath="net/jwt/view/helper/assets/icons/bug24x24.png"/>
+    <resourceEntry destPath="net/jwt/view/assets/icons/bugs16x16.png" sourcePath="net/jwt/view/assets/icons/bugs16x16.png"/>
+    <resourceEntry destPath="net/jwt/view/assets/icons/16x16attachment.png" sourcePath="net/jwt/view/assets/icons/16x16attachment.png"/>
+    <resourceEntry destPath="net/jwt/view/RateCode/view/assets/icons/24x24cut.png" sourcePath="net/jwt/view/RateCode/view/assets/icons/24x24cut.png"/>
+    <resourceEntry destPath="net/jhl/view/RateCode/assets/icons/guest_icon_2.jpg" sourcePath="net/jhl/view/RateCode/assets/icons/guest_icon_2.jpg"/>
+    <resourceEntry destPath="net/jhl/view/metro/assets/icons/blank_120x120.png" sourcePath="net/jhl/view/metro/assets/icons/blank_120x120.png"/>
+    <resourceEntry destPath="net/jwt/view/assets/icons/icontexto-webdev-chat-032x032.png" sourcePath="net/jwt/view/assets/icons/icontexto-webdev-chat-032x032.png"/>
+    <resourceEntry destPath="net/jwt/objects/assets/icons/16x16calendar.png" sourcePath="net/jwt/objects/assets/icons/16x16calendar.png"/>
+    <resourceEntry destPath="net/jwt/view/assets/icons/tours/car1.png" sourcePath="net/jwt/view/assets/icons/tours/car1.png"/>
+    <resourceEntry destPath="net/jwt/view/helper/tourHelper/assets/icons/12x12-Costing.png" sourcePath="net/jwt/view/helper/tourHelper/assets/icons/12x12-Costing.png"/>
+    <resourceEntry destPath="net/jwt/view/components/assets/logo/jwt_logo.png" sourcePath="net/jwt/view/components/assets/logo/jwt_logo.png"/>
+    <resourceEntry destPath="net/jwt/view/assets/icons/16x16database_server.png" sourcePath="net/jwt/view/assets/icons/16x16database_server.png"/>
+    <resourceEntry destPath="net/jwt/view/assets/icons/16x16refresh.png" sourcePath="net/jwt/view/assets/icons/16x16refresh.png"/>
+    <resourceEntry destPath="net/jwt/view/assets/icons/tours/restaurant.png" sourcePath="net/jwt/view/assets/icons/tours/restaurant.png"/>
+    <resourceEntry destPath="net/jwt/view/assets/icons/tours/members.png" sourcePath="net/jwt/view/assets/icons/tours/members.png"/>
+    <resourceEntry destPath="net/jwt/view/assets/icons/16x16paxview.png" sourcePath="net/jwt/view/assets/icons/16x16paxview.png"/>
+    <resourceEntry destPath="net/jwt/view/helper/assets/icons/word24x24.png" sourcePath="net/jwt/view/helper/assets/icons/word24x24.png"/>
+    <resourceEntry destPath="net/jwt/view/assets/icons/icontexto-webdev-arrow-left-032x032.png" sourcePath="net/jwt/view/assets/icons/icontexto-webdev-arrow-left-032x032.png"/>
+    <resourceEntry destPath="net/jwt/view/RateCode/view/assets/icons/13-x13-Hotel-voucher-amende-old.png" sourcePath="net/jwt/view/RateCode/view/assets/icons/13-x13-Hotel-voucher-amende-old.png"/>
+    <resourceEntry destPath="net/jwt/view/assets/icons/32x32design.png" sourcePath="net/jwt/view/assets/icons/32x32design.png"/>
+    <resourceEntry destPath="net/jwt/view/helper/tourHelper/assets/icons/13-x14-Booking-lost.png" sourcePath="net/jwt/view/helper/tourHelper/assets/icons/13-x14-Booking-lost.png"/>
+    <resourceEntry destPath="net/jwt/view/assets/icons/24x24calendar.png" sourcePath="net/jwt/view/assets/icons/24x24calendar.png"/>
+    <resourceEntry destPath="net/jwt/view/assets/images/ben-afflic.jpg" sourcePath="net/jwt/view/assets/images/ben-afflic.jpg"/>
+    <resourceEntry destPath="net/jwt/view/RateCode/view/assets/icons/12x12-Booking.png" sourcePath="net/jwt/view/RateCode/view/assets/icons/12x12-Booking.png"/>
+    <resourceEntry destPath="net/jhl/view/metro/assets/icons/arrowleft.png" sourcePath="net/jhl/view/metro/assets/icons/arrowleft.png"/>
+    <resourceEntry destPath="net/jhl/view/metro/assets/icons/br_60x60.png" sourcePath="net/jhl/view/metro/assets/icons/br_60x60.png"/>
+    <resourceEntry destPath="net/jwt/view/helper/assets/icons/accounts16x16.png" sourcePath="net/jwt/view/helper/assets/icons/accounts16x16.png"/>
+    <resourceEntry destPath="net/jwt/view/assets/logo/jetwing_single_solid_colour_logo.png" sourcePath="net/jwt/view/assets/logo/jetwing_single_solid_colour_logo.png"/>
+    <resourceEntry destPath="net/jwt/view/assets/icons/16x16approvals.png" sourcePath="net/jwt/view/assets/icons/16x16approvals.png"/>
+    <resourceEntry destPath="net/jwt/view/helper/assets/icons/person_16x16.png" sourcePath="net/jwt/view/helper/assets/icons/person_16x16.png"/>
+    <resourceEntry destPath="net/jwt/view/assets/icons/tours/car.png" sourcePath="net/jwt/view/assets/icons/tours/car.png"/>
+    <resourceEntry destPath="net/jhl/view/RateCode/assets/icons/win8.png" sourcePath="net/jhl/view/RateCode/assets/icons/win8.png"/>
+    <resourceEntry destPath="net/jwt/helper/assets/icons/word24x24.png" sourcePath="net/jwt/helper/assets/icons/word24x24.png"/>
+    <resourceEntry destPath="net/jhl/view/metro/assets/icons/sup_25x25.png" sourcePath="net/jhl/view/metro/assets/icons/sup_25x25.png"/>
+    <resourceEntry destPath="net/jwt/view/assets/icons/bug24x24.png" sourcePath="net/jwt/view/assets/icons/bug24x24.png"/>
+    <resourceEntry destPath="net/jwt/view/assets/icons/16x16users.png" sourcePath="net/jwt/view/assets/icons/16x16users.png"/>
+    <resourceEntry destPath="net/jwt/view/assets/icons/msgold.png" sourcePath="net/jwt/view/assets/icons/msgold.png"/>
+    <resourceEntry destPath="net/jwt/view/RateCode/view/assets/icons/12x12-Booking-OPEN.png" sourcePath="net/jwt/view/RateCode/view/assets/icons/12x12-Booking-OPEN.png"/>
+    <resourceEntry destPath="net/jhl/view/assets/icons/24x24trash.png" sourcePath="net/jhl/view/assets/icons/24x24trash.png"/>
+    <resourceEntry destPath="net/jwt/view/helper/assets/images/Shiromal.jpg" sourcePath="net/jwt/view/helper/assets/images/Shiromal.jpg"/>
+    <resourceEntry destPath="net/jhl/view/assets/icons/otium.png" sourcePath="net/jhl/view/assets/icons/otium.png"/>
+    <resourceEntry destPath="net/jhl/view/metro/assets/icons/cloud_60x60.png" sourcePath="net/jhl/view/metro/assets/icons/cloud_60x60.png"/>
+    <resourceEntry destPath="net/jhl/view/RateCode/assets/icons/tree_dis_25x25_v2.png" sourcePath="net/jhl/view/RateCode/assets/icons/tree_dis_25x25_v2.png"/>
+    <resourceEntry destPath="net/jwt/view/assets/icons/tours/bata.png" sourcePath="net/jwt/view/assets/icons/tours/bata.png"/>
+    <resourceEntry destPath="net/jhl/view/metro/assets/icons/leftarrw.png" sourcePath="net/jhl/view/metro/assets/icons/leftarrw.png"/>
+    <resourceEntry destPath="net/jwt/view/assets/icons/image24x24.png" sourcePath="net/jwt/view/assets/icons/image24x24.png"/>
+    <resourceEntry destPath="net/jwt/view/RateCode/view/assets/icons/16x16folder.png" sourcePath="net/jwt/view/RateCode/view/assets/icons/16x16folder.png"/>
+    <resourceEntry destPath="net/jwt/view/assets/icons/16x16folder.png" sourcePath="net/jwt/view/assets/icons/16x16folder.png"/>
+    <resourceEntry destPath="net/jwt/view/assets/icons/16x16tag.png" sourcePath="net/jwt/view/assets/icons/16x16tag.png"/>
+    <resourceEntry destPath="net/jwt/view/assets/icons/24x24warning.png" sourcePath="net/jwt/view/assets/icons/24x24warning.png"/>
+    <resourceEntry destPath="net/jwt/view/assets/icons/tours/resurant.png" sourcePath="net/jwt/view/assets/icons/tours/resurant.png"/>
+    <resourceEntry destPath="net/jwt/view/assets/icons/24x24up.png" sourcePath="net/jwt/view/assets/icons/24x24up.png"/>
+    <resourceEntry destPath="net/jwt/view/assets/icons/checkengine.png" sourcePath="net/jwt/view/assets/icons/checkengine.png"/>
+    <resourceEntry destPath="net/jwt/view/helper/tourHelper/assets/icons/24x24comment.png" sourcePath="net/jwt/view/helper/tourHelper/assets/icons/24x24comment.png"/>
+    <resourceEntry destPath="net/jwt/view/assets/icons/16x16chess-cancel.png" sourcePath="net/jwt/view/assets/icons/16x16chess-cancel.png"/>
+    <resourceEntry destPath="net/jwt/view/assets/icons/icontexto-webdev-money-016x016.png" sourcePath="net/jwt/view/assets/icons/icontexto-webdev-money-016x016.png"/>
+    <resourceEntry destPath="net/jwt/objects/assets/icons/16x16info.png" sourcePath="net/jwt/objects/assets/icons/16x16info.png"/>
+    <resourceEntry destPath="net/jwt/view/assets/icons/msgnew.png" sourcePath="net/jwt/view/assets/icons/msgnew.png"/>
+    <resourceEntry destPath="net/jhl/view/RateCode/assets/icons/tree_br_25x25_v2.png" sourcePath="net/jhl/view/RateCode/assets/icons/tree_br_25x25_v2.png"/>
+    <resourceEntry destPath="net/jwt/view/helper/assets/icons/email-16x16.png" sourcePath="net/jwt/view/helper/assets/icons/email-16x16.png"/>
+    <resourceEntry destPath="net/jwt/view/assets/icons/quicktext-icon.png" sourcePath="net/jwt/view/assets/icons/quicktext-icon.png"/>
+    <resourceEntry destPath="net/jhl/view/metro/assets/icons/email_60x60.png" sourcePath="net/jhl/view/metro/assets/icons/email_60x60.png"/>
+    <resourceEntry destPath="net/jhl/view/common/assets/fonts/Lato-Regular.ttf" sourcePath="net/jhl/view/common/assets/fonts/Lato-Regular.ttf"/>
+    <resourceEntry destPath="net/jwt/helper/assets/icons/pdf24x24.png" sourcePath="net/jwt/helper/assets/icons/pdf24x24.png"/>
+    <resourceEntry destPath="net/jwt/view/helper/assets/icons/defaultIcon24x24.png" sourcePath="net/jwt/view/helper/assets/icons/defaultIcon24x24.png"/>
+    <resourceEntry destPath="net/jwt/view/assets/icons/24x24chart_up.png" sourcePath="net/jwt/view/assets/icons/24x24chart_up.png"/>
+    <resourceEntry destPath="net/jwt/view/assets/icons/icontexto-webdev-ok-032x032.png" sourcePath="net/jwt/view/assets/icons/icontexto-webdev-ok-032x032.png"/>
+    <resourceEntry destPath="net/jhl/view/metro/assets/icons/people_60x60.png" sourcePath="net/jhl/view/metro/assets/icons/people_60x60.png"/>
+    <resourceEntry destPath="net/jwt/view/assets/icons/32x32chart_down.png" sourcePath="net/jwt/view/assets/icons/32x32chart_down.png"/>
+  </includeResources>
+  <namespaceManifests/>
+</flexLibProperties>

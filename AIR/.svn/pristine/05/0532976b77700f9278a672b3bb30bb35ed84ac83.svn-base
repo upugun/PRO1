@@ -1,0 +1,21 @@
+package net.jwt.value.objects
+{
+	[RemoteClass(alias="net.jwt.value.objects.RoomCategoriesOfHotel")]
+	
+	[Bindable]
+	public class RoomCategoriesOfHotel
+	{
+		public var uuid:String 				= "";
+		public var idhotel:String			= "";
+		public var idroomCategory:String	= "";
+		public var roomCatagoryObj:RoomCategory;
+		public var status:int 				= 1;
+		
+		public function RoomCategoriesOfHotel()
+		{
+			roomCatagoryObj = new RoomCategory();
+			uuid			= new String;
+		}
+
+	}
+}

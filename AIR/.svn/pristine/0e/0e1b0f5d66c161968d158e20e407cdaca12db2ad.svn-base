@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:VBox xmlns:mx="http://www.adobe.com/2006/mxml" width="100%" height="100%">
+	<mx:Script>
+		<![CDATA[
+			import mx.controls.ComboBox;
+			import mx.controls.TextInput;
+			import mx.controls.ComboBase;
+			[Bindable]
+			public var combo:ComboBox = new ComboBox;
+			[Bindable]
+			public var tourNO:TextInput = new TextInput;
+		]]>
+	</mx:Script>
+	<mx:DataGrid width="100%" height="98%" id="DG_list">
+		<mx:columns>
+			<mx:DataGridColumn headerText="File Name" dataField="fileName"/>
+			<mx:DataGridColumn headerText="Created Date" />
+			<mx:DataGridColumn headerText="Size" />
+		</mx:columns>
+	</mx:DataGrid>
+	<mx:RadioButtonGroup id="RD_G_filter"/>
+</mx:VBox>

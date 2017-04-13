@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:VBox xmlns:mx="http://www.adobe.com/2006/mxml" width="100%" height="100%" >
+		<mx:HBox width="100%" height="10%" verticalAlign="middle">
+				<mx:Label text="Search" fontWeight="bold" width="58"/>
+				<mx:RadioButtonGroup id="radiogroup1"/>
+				<mx:RadioButton label="GL Code" groupName="radiogroup1" selected="true" id="RD_code"/>
+				<mx:RadioButton label="First Name" groupName="radiogroup1" id="RD_fname"/>
+				<mx:RadioButton label="Last Name" groupName="radiogroup1" id="RD_lname"/>
+				<mx:TextInput id="T_search"/>
+		</mx:HBox>
+		<mx:HBox width="100%" height="90%">
+			<mx:DataGrid id="DG" width="100%" height="100%" 
+						 dragEnabled="true" dragMoveEnabled="false">
+				<mx:columns>
+					<mx:DataGridColumn headerText="First Name" dataField="ownerName" />
+					<mx:DataGridColumn headerText="Last Name" dataField="surename"/>
+				</mx:columns>
+			</mx:DataGrid>
+			
+		</mx:HBox>	
+</mx:VBox>

@@ -1,0 +1,138 @@
+package net.jwt.view.mis
+{
+	import flash.display.DisplayObject;
+	import flash.events.Event;
+	
+	import mx.charts.BubbleChart;
+	import mx.charts.HitData;
+	import mx.charts.events.ChartItemEvent;
+	import mx.collections.ArrayCollection;
+	import mx.controls.Label;
+	import mx.core.UIComponent;
+	import mx.events.CollectionEvent;
+	
+	import net.jwt.event.INotificationArguments;
+	import net.jwt.event.NotificationArguments;
+	import net.jwt.value.objects.SalesReport;
+	import net.jwt.view.Mediator;
+	
+	public class PPPVsTourLengthVsSaleAnalysisMediator extends Mediator
+	{
+		private var _view:PPPVsTourLengthVsSaleAnalysisView;
+		private var _args:INotificationArguments;
+		private var selectedReportCount:int = 0;
+		
+		[Bindable] private var panelList:ArrayCollection = new ArrayCollection;
+		
+		private const CLASS_NAME:String 	= "net.jwt.view.mis.PPPVsTourLengthVsSaleAnalysisView.mxml \n" +
+											  "net.jwt.view.mis.PPPVsTourLengthVsSaleAnalysisMediator.cs \n" +
+											  "net.jwt.control.PPPVsTourLengthVsSaleAnalysisCommand.cs \n" +
+											  "PPPVsTourLengthVsSaleAnalysisDAO.java \n" ;
+											  
+		[Bindable] public var args:NotificationArguments = new NotificationArguments();
+		
+		public function PPPVsTourLengthVsSaleAnalysisMediator(view:UIComponent, args:INotificationArguments)
+		{
+			super(view);
+			if(view != null)
+			{
+				_view  = view as PPPVsTourLengthVsSaleAnalysisView ;
+	
+			}
+			
+			if(args != null)
+			{
+				_args = args;
+				//_loggedInUser = (_args.viewComponent as MainView).user;
+			}
+		}
+		
+		protected override function viewComponentInitialize():void
+		{
+			setLoggedInUser();
+			(_args.argumentObjects as ArrayCollection).addEventListener(CollectionEvent.COLLECTION_CHANGE, handlecollectionChae);
+			_view.bubblechartPerformance.addEventListener(ChartItemEvent.ITEM_CLICK, handleChartItemClick);
+			
+			loadGraph();
+		}
+		
+				
+		private function setLoggedInUser():void
+		{
+		}
+		
+		private function loadGraph():void
+		{
+			var list:ArrayCollection = (_args.argumentObjects as ArrayCollection);
+			if(list != null && list.length >0)
+			{
+				if(list.getItemAt(0) != null)
+				{
+					if((list.getItemAt(0) as SalesReport).children.length > 0)
+					{
+						var saleReportList:ArrayCollection = (list.getItemAt(0) as SalesReport).children as ArrayCollection;
+						_view.bubblechartPerformance.dataProvider = saleReportList;
+					}
+				}
+			}
+		}
+		
+		private function handlecollectionChae(e:Event):void
+		{
+			loadGraph();
+		}
+		
+		private function handleChartItemClick(e:Event):void
+		{
+			var locX:int = (e as ChartItemEvent).localX;
+			var locY:int = (e as ChartItemEvent).localY;
+			var chart:BubbleChart = (e as ChartItemEvent).currentTarget as BubbleChart;
+			var hitData:HitData = (e as ChartItemEvent).hitData as HitData;
+				//hitData.displayText. = (hitData.item as SalesReport).label + "</BR>" + (hitData.item as SalesReport).totalProfit ;
+				
+			var g:DisplayObject = createG((hitData.item as SalesReport).label);
+				g.x = hitData.x + 20;
+				g.y = hitData.y;
+				
+			chart.addChild(g);	
+		}
+		
+		private function createG(str:String):DisplayObject
+		{
+			var tx:Label = new Label;
+				tx.width = 150;
+				tx.height= 20;
+				tx.text = str;	
+				tx.setStyle("color", "#656666");	
+					
+				return tx;
+		}
+		
+		/* private function createG():Shape
+		{
+			var squareSize:uint = 100; 
+			var square:Shape = new Shape(); 
+				/* square.graphics.beginFill(0xFF0000, 0.5); 
+				square.graphics.drawRect(0, 0, squareSize, squareSize); 
+				square.graphics.beginFill(0x00FF00, 0.5); 
+				square.graphics.drawRect(200, 0, squareSize, squareSize);  //
+				square.graphics.beginFill(0x0000FF, 0.5); 
+				square.graphics.drawRect(0, 0, 200, 25); 
+				square.graphics.endFill(); 
+				square.graphics.lineStyle(1, 0xFF0000);
+				square.graphics.lineTo(100,50);
+				
+			var tx:Text = new Text;
+				tx.width = 50;
+				tx.height= 20;
+				tx.text = "Hello Texy";	
+				tx.setStyle("Color", "red");	
+			var bitmapdata:BitmapData = new BitmapData(100, 75, true, 0x00000000);
+				bitmapdata.draw(tx);
+				square.graphics.beginBitmapFill(bitmapdata);
+					
+				return square;
+		} */
+		
+	}
+}

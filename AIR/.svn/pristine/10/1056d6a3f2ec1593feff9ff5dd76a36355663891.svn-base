@@ -1,0 +1,28 @@
+package net.jwt.value.objects
+{
+	[RemoteClass(alias="net.jwt.value.objects.HotelRatesIdentity")]
+	
+	[Bindable]
+	public class HotelRatesIdentity
+	{
+		public var uuid:String 			= "";
+		public var idMarket:String		= "";
+		public var marketName:String	= "";
+		public var idHotel:String		= "";
+		public var fromDate:String		= "";
+		public var toDate:String		= "";
+		public var remarks:String		= "";
+		public var taxIncluded:String	= "";
+		public var rateType:String		= "";
+		public var createdByUuid:String	= "";
+		public var status:int 			= 1;
+		
+		public var guidAccomodationObj:GuideAccommodation= new GuideAccommodation();
+		
+		public function HotelRatesIdentity()
+		{
+			
+		}
+
+	}
+}

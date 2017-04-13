@@ -1,0 +1,29 @@
+package net.jwt.value.objects
+{
+	[RemoteClass(alias="net.jwt.value.objects.SupportingObject")]
+	
+	[Bindable]
+	public class SupportingObject
+	{
+		public var SOSearchCode:String 	= "";
+		public var SOcondition01:String = "";
+		public var SOcondition02:String	= "";
+		public var SOcondition03:String	= "";
+		public var SOcondition04:String	= "";
+		public var SOcondition05:String = "";
+		public var SOcondition06:String = "";
+		public var SOcondition07:String = "";
+		public var SOcondition08:String = "";
+		public var SOcondition09:String = "";
+		public var SOcondition10:String = "";
+		public var SOcondition11:String = "";
+		
+		public var user:User;
+		
+		public function SupportingObject()
+		{
+				user = new User;
+		}
+
+	}
+}

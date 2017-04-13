@@ -1,0 +1,26 @@
+package net.jhl.value.objects
+{
+	import net.jhl.value.objects.common.TimeStamp;
+	import net.jhl.view.JWHConstants;
+	
+	[RemoteClass(alias="net.jhl.objects.MealDetails")]
+	
+	[Bindable]
+	public class MealDetails
+	{
+		public var uuid:String 			= "";
+		public var code:String 			= "";
+		public var mealBasis:String 	= "";
+		public var arrivalMeal:String 	= "";
+		public var leaveMeal:String 	= "";
+		public var status:String		= JWHConstants.STATUS_LABLE_ACTIVE;
+		
+		public var timeStamp:TimeStamp;
+		
+		public function MealDetails()
+		{
+			timeStamp = new TimeStamp;
+		}
+
+	}
+}

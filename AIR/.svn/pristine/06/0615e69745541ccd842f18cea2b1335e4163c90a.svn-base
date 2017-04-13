@@ -1,0 +1,3519 @@
+package net.jhl.view
+{
+	import flash.events.Event;
+	import flash.events.FocusEvent;
+	import flash.events.KeyboardEvent;
+	import flash.events.MouseEvent;
+	import flash.html.HTMLLoader;
+	import flash.net.URLRequest;
+	import flash.net.navigateToURL;
+	
+	import mx.collections.ArrayCollection;
+	import mx.controls.Alert;
+	import mx.controls.ComboBox;
+	import mx.controls.DateField;
+	import mx.controls.TextInput;
+	import mx.core.UIComponent;
+	import mx.events.CloseEvent;
+	import mx.events.DropdownEvent;
+	import mx.events.ListEvent;
+	import mx.messaging.messages.ErrorMessage;
+	import mx.rpc.events.FaultEvent;
+	import mx.rpc.events.ResultEvent;
+	import mx.utils.ObjectUtil;
+	
+	import net.jhl.value.objects.AgentDetails;
+	import net.jhl.value.objects.DesOccupancy;
+	import net.jhl.value.objects.DiscountApprovalRequest;
+	import net.jhl.value.objects.DmcMarket;
+	import net.jhl.value.objects.Guest;
+	import net.jhl.value.objects.GuideDetails;
+	import net.jhl.value.objects.MealDetails;
+	import net.jhl.value.objects.Property;
+	import net.jhl.value.objects.RateCode.Discounts;
+	import net.jhl.value.objects.RateCode.RateCode;
+	import net.jhl.value.objects.Reservation;
+	import net.jhl.value.objects.ReservationByRoomDetails;
+	import net.jhl.value.objects.ReservationDetails;
+	import net.jhl.value.objects.ReservationDiscounts;
+	import net.jhl.value.objects.ReservationPaymentDetails;
+	import net.jhl.value.objects.RoomCategory;
+	import net.jhl.value.objects.RoomRateQueryObject;
+	import net.jhl.value.objects.common.Tax;
+	import net.jhl.view.RateCode.RateCodeGenerateVisualBox;
+	import net.jhl.view.logic.RoomRateCalculation;
+	import net.jhl.visual.objects.DiscountLineHbox;
+	import net.jhl.visual.objects.ReservationLineHBox;
+	import net.jhl.visual.objects.ReservationPaymentDetailsLineHBox;
+	import net.jhl.visual.objects.ReservationTaxLineHBox;
+	import net.jhl.visual.objects.RoomBasisChildHbox;
+	import net.jhl.visual.objects.RoomBasisCostHBox;
+	import net.jwt.ApplicationFacade;
+	import net.jwt.Constants;
+	import net.jwt.event.NotificationArguments;
+	import net.jwt.helper.UtilFunction;
+	import net.jwt.value.objects.Country;
+	import net.jwt.value.objects.CurrencyMaster;
+	import net.jwt.value.objects.QuerryObject;
+	import net.jwt.value.objects.ServerConfig;
+	import net.jwt.view.MainView;
+	import net.jwt.view.Mediator;
+	import net.jwt.view.popup.JWTPopUpCanvas;
+
+	
+	public class ReservationMediator extends Mediator
+	{
+		private var _view:ReservationView;
+		private var _args:NotificationArguments;
+		
+		private const MS_PER_DAY:uint = 1000 * 60 * 60 * 24;
+		
+		private var comboBox:ComboBox = new ComboBox;
+		private	var textBox:TextInput = new TextInput;
+		private	var date:DateField	  = new DateField;
+		
+		private var propertyList:ArrayCollection 		= new ArrayCollection;
+		private var guestList:ArrayCollection 			= new ArrayCollection; 
+		private var dynamicList:ArrayCollection       	= new ArrayCollection();
+		private var dynamicGuideRoomList:ArrayCollection= new ArrayCollection();
+		private var seasonList:ArrayCollection   	  	= new ArrayCollection();
+		private var dynamicOtherList:ArrayCollection  	= new ArrayCollection();
+		private var deleteList:ArrayCollection   	 	= new ArrayCollection();
+		private var agentList:ArrayCollection   	 	= new ArrayCollection();
+		private var marketList:ArrayCollection   	 	= new ArrayCollection();
+		private var agetnTypeList:ArrayCollection   	= new ArrayCollection();
+		private var rateCodeList:ArrayCollection   		= new ArrayCollection();
+		private var dynamicRateBoxList:ArrayCollection  = new ArrayCollection();
+		private var otheCostMasterList:ArrayCollection  = new ArrayCollection();
+		private var currencyList:ArrayCollection  	    = new ArrayCollection();
+		private var discountList:ArrayCollection 		= new ArrayCollection();
+		private var dynamicDiscountList:ArrayCollection = new ArrayCollection(); 
+		private var modeOfPaymentList:ArrayCollection 	= new ArrayCollection(); 
+		private var dmcMarketList:ArrayCollection 		= new ArrayCollection;
+		private var reservationList:ArrayCollection 	= new ArrayCollection;
+		private var occupancyList:ArrayCollection		= new ArrayCollection;
+		private var dynamicTaxList:ArrayCollection		= new ArrayCollection;
+		
+		private var dynamicPaymentDetailsList:ArrayCollection 	= new ArrayCollection(); 
+		private var taxesList:ArrayCollection 	= new ArrayCollection(); 
+		
+		private var fileName:String;
+		private var fileType:String;
+		private var docURL:String 		=	"";
+		
+		private var isRetriewMode:Boolean  		= false;
+		private var isAgentChanged:Boolean 		= false;
+		private var isToRefreshRates:Boolean 	= true;
+		private var isPromoCodeActivate:Boolean = false;
+		private var isToCheckAvailability:Boolean = true;
+		
+		[Bindable]
+		private var roomCategoryList:ArrayCollection  	= new ArrayCollection();
+		
+		private var _mainView:MainView;
+		
+		[Bindable]
+		private var nextCheckinDate:String;
+		
+		private var oldCheckinDate:String = "";
+		private var oldNoOfDays:String = "0";
+		
+		[Bindable] private var selectedIndex:int 		= -1;
+		
+		[Bindable] private var rateCodeTotal:Number		= 0;
+		
+		[Bindable]public var args:NotificationArguments = new NotificationArguments();
+		
+		public function ReservationMediator(view:UIComponent, args:NotificationArguments)
+		{
+			super(view);
+			if(view != null)
+			{
+				_view  = view as ReservationView;
+				
+			}
+			
+			_mainView	  = (args.viewComponent as MainView);
+			
+			if(args != null)
+			{
+				if((args.viewComponent as MainView) != null)
+				{
+					_args = args;
+					_loggedInUser = (args.viewComponent as MainView).user;
+				}
+				else if((args.viewComponent as JWTPopUpCanvas) != null)
+				{
+					_args = args;
+					_loggedInUser = args.user;
+					
+					if((args.viewComponent as JWTPopUpCanvas).args!=null)
+					{
+						var res:Reservation = ((args.viewComponent as JWTPopUpCanvas).args.originatorObject) as Reservation;
+						_view.reservation = res;
+						isRetriewMode = true;
+						setLoggedInUser();
+						loadProperty();
+					}
+				}
+			}
+		}
+		
+		protected override function viewComponentInitialize():void{
+			setLoggedInUser();
+			loadProperty();
+			loadServerConfig();
+			setInitialData();
+			_view.B_save.addEventListener(MouseEvent.CLICK, saveItemHandler);
+//			_view.B_new.addEventListener(MouseEvent.CLICK, addNewHandler);
+			
+			_view.B_add.addEventListener(MouseEvent.CLICK, addLineHandler);
+			_view.B_del.addEventListener(MouseEvent.CLICK,deleteHandler);
+			
+			_view.B_country.addEventListener(MouseEvent.CLICK, openCountryHelp);
+			_view.B_guestDetails.addEventListener(MouseEvent.CLICK, openGuestHelp);
+			_view.B_agent_search.addEventListener(MouseEvent.CLICK, openAgentHelp);
+			_view.B_preferences.addEventListener(MouseEvent.CLICK, openBedPreferencesHelp);
+			_view.B_promoCode.addEventListener(MouseEvent.CLICK, applyPromoCode);
+			_view.B_approval.addEventListener(MouseEvent.CLICK, openDiscountRequestHelp);
+//			_view.T_guestFirstName.addEventListener(KeyboardEvent.KEY_UP ,keyStrokesHandle);
+//			_view.T_guestLastName.addEventListener(KeyboardEvent.KEY_UP ,keyStrokesHandle);
+//			_view.T_passport.addEventListener(KeyboardEvent.KEY_UP ,keyStrokesHandle);
+			_view.CMB_dmcMarket.addEventListener(ListEvent.CHANGE, dmcMarketChangeHandler);
+			_view.CMB_property.addEventListener(ListEvent.CHANGE, loadRooms);
+			_view.CMB_currency.addEventListener(ListEvent.CHANGE, currencyChangeHandler);
+			
+			_view.D_checkin.addEventListener(DropdownEvent.OPEN, storeDate);
+			_view.D_checkin.addEventListener(Event.CHANGE, setCheckOutDate);
+			_view.D_checkout.addEventListener(Event.CHANGE, checkOutDateHandler);
+			_view.T_no_ofDays.addEventListener(FocusEvent.FOCUS_IN, getoriginalNoOfDays);
+			_view.T_no_ofDays.addEventListener(Event.CHANGE, noOfDaysChangeHandler);
+			_view.B_showRates.addEventListener(MouseEvent.CLICK, openHoelRatesWindow);
+			_view.B_avaiability.addEventListener(MouseEvent.CLICK, openAvailablityHelp);
+			_view.B_refresh.addEventListener(MouseEvent.CLICK, confirmRefresh);
+			_view.B_res.addEventListener(MouseEvent.MOUSE_UP, openReservationSummaryHelp);
+			_view.RD_bt_individual.addEventListener(MouseEvent.CLICK, makeGuestNameEditable);
+			_view.RD_bt_group.addEventListener(MouseEvent.CLICK, makeGuestNameEditable);
+			_view.B_view.addEventListener(MouseEvent.MOUSE_UP, openViewAllResHelp);
+			_view.B_new.addEventListener(MouseEvent.MOUSE_UP, addNewHandler);
+			_view.T_guideRate.addEventListener(Event.CHANGE, generateDynamicGuideRooms);
+			_view.T_noOfGuide.addEventListener(Event.CHANGE, generateDynamicGuideRooms);
+			_view.CMB_guide_room.addEventListener(Event.CHANGE, generateDynamicGuideRooms);
+			_view.CMB_guide_meal.addEventListener(Event.CHANGE, generateDynamicGuideRooms);
+			_view.CMB_guide_occupancy.addEventListener(Event.CHANGE, guideOccupancyTypeChangeHadler);
+			_view.CHK_guide_required.addEventListener(Event.CHANGE, showGuideDetailsGrid);
+			_view.B_editTax.addEventListener(MouseEvent.CLICK, makeTaxEditable);
+			
+			_view.CHK_promotionCode.addEventListener(MouseEvent.CLICK, promotionCodeVisibilityHadler);
+		}
+		
+		private function makeTaxEditable(e:Event):void
+		{
+			_view.V_pd_dynamicTax.removeAllChildren();
+			
+			for(var i:int=0; i<dynamicTaxList.length; i++)
+			{
+				var line:ReservationTaxLineHBox = dynamicTaxList.getItemAt(i) as ReservationTaxLineHBox;
+				
+				line.chk_select.enabled = true;		
+				
+				_view.V_pd_dynamicTax.addChild(line);	
+			}
+		}
+		
+		private function loadTaxes():void
+		{
+			startBusyCursor();
+			taxRO.dynamicSearch("effectiveDate", _view.D_checkout.text);
+		}
+		
+		private function getoriginalNoOfDays(e:FocusEvent):void
+		{
+			oldNoOfDays = _view.T_no_ofDays.text;
+		}
+		
+		private function storeDate(e:Event):void
+		{
+			oldCheckinDate = _view.D_checkin.text;
+		}
+		
+		private function showGuideDetailsGrid(e:Event):void
+		{
+			if(_view.CHK_guide_required.selected)
+			{
+				_view.V_guide.percentHeight = 100;
+				_view.L_guide_rate_desc.visible = true;
+			}
+			else
+			{
+				_view.V_guide.height = 0;	
+				_view.L_guide_rate_desc.visible = false;
+				_view.reservation.guide = new GuideDetails;
+				deleteAllGuideLines();
+				generateDynamicPaymentDetailsBox();
+			}
+		}
+		
+		private function guideOccupancyTypeChangeHadler(e:Event):void
+		{
+			deleteAllGuideLines();
+			generateDynamicGuideRooms();
+		}
+		
+		private function generateDynamicGuideRooms(e:Event=null):void
+		{
+			
+			if(_view.reservation.guide.noOfGuides>0)
+			{
+				for(var i:int=0; i<dynamicList.length; i++)
+				{
+					var line:ReservationLineHBox 		= dynamicList.getItemAt(i) as ReservationLineHBox;
+					
+					var list:ArrayCollection 			= roomCategoryList;
+					
+					var guideLine:ReservationLineHBox 	= getGuideLine(list, line.uuid);
+						guideLine.checkInDate			= line.checkInDate;
+						guideLine.checkOutDate			= line.checkOutDate;
+						guideLine.uuid					= line.uuid;
+						guideLine.rateCode				= line.rateCode;
+						guideLine.roomPaxType			= JWHConstants.ROOM_PAX_TYPE_GUIDE;
+						
+					var guideMeal:String	= "";
+					if(_view.CMB_guide_meal.selectedItem!=null)
+						guideMeal	=	_view.CMB_guide_meal.selectedItem.id;
+					
+					var guideOccupancy:String = "";
+					if(_view.CMB_guide_occupancy.selectedItem!=null)
+						guideOccupancy = _view.CMB_guide_occupancy.selectedItem.id;
+						
+						guideLine.cmb_roomBasis.selectedIndex = setComboSelectedItemById(JWHConstants.roomBasisList, "id", guideMeal);
+					
+					guideLine.sglCount.text	=	"";
+					guideLine.dblCount.text	=	"";
+					guideLine.tplCount.text	=	"";
+					
+					//deleteGuideLine(line.uuid);                               
+					
+					if(guideOccupancy == JWHConstants.ROOM_OCCUPANCY_TYPE_SGL)
+					{
+						guideLine.sglCount.text	= _view.T_noOfGuide.text;
+						guideLine.sglRate		= _view.reservation.guide.guideRate;
+					}
+					else if(guideOccupancy == JWHConstants.ROOM_OCCUPANCY_TYPE_DBL)
+					{
+						guideLine.dblCount.text	= roundOffLastTwoDecimals(Number(_view.T_noOfGuide.text)/2).toString();
+						guideLine.dblRate		= _view.reservation.guide.guideRate;
+					}
+					else if(guideOccupancy == JWHConstants.ROOM_OCCUPANCY_TYPE_TLP)
+					{
+						guideLine.tplCount.text	= roundOffLastTwoDecimals(Number(_view.T_noOfGuide.text)/3).toString();
+						guideLine.tplRate		= _view.reservation.guide.guideRate;
+					}	
+					
+					var guideRoom:RoomCategory = new RoomCategory;
+					
+					
+					if(_view.CMB_guide_room.selectedItem!=null)
+						guideRoom	= _view.CMB_guide_room.selectedItem as RoomCategory;
+						
+					guideLine.cmb_roomCategory.selectedIndex = setComboSelectedItemById(list, "uuid", guideRoom.uuid);
+					
+					if(!isGuideLineAvailable(line.uuid, line.checkInDate.text))
+						dynamicGuideRoomList.addItem(guideLine);
+				}
+			}
+			else
+			{
+				deleteAllGuideLines();
+			}
+			
+			generateDynamicPaymentDetailsBox();
+		}
+		
+		private function deleteAllGuideLines():void
+		{
+			for(var i:int=0; i<dynamicGuideRoomList.length; i++)
+			{
+				//Alert.show("added to delete list in line no : 287");
+				deleteList.addItem(dynamicGuideRoomList.getItemAt(i));
+				dynamicGuideRoomList.removeItemAt(i);
+				i--;
+			}
+		}
+		
+		private function deleteAllGuestLines():void
+		{
+			_view.V_dynamic_rates.removeAllChildren();
+			
+			for(var i:int=0; i<dynamicList.length; i++)
+			{
+				var line:ReservationLineHBox = dynamicList.getItemAt(i) as ReservationLineHBox;
+				
+				deleteFromVisualBox(line);
+				//Alert.show("added to delete list in line no : 303");
+				deleteList.addItem(dynamicList.getItemAt(i));
+				dynamicList.removeItemAt(i);
+				_view.V_dynamic_vbox_for_res.removeChildAt(i);
+				i--;
+			}
+		}
+		
+		private function getGuideLine(list:ArrayCollection, visualId:String):ReservationLineHBox
+		{
+			var line:ReservationLineHBox = new ReservationLineHBox(list);
+			
+			for(var i:int=0; i<dynamicGuideRoomList.length; i++)
+			{
+				var tempLine:ReservationLineHBox = dynamicGuideRoomList.getItemAt(i) as ReservationLineHBox;
+				
+				if(visualId == tempLine.uuid)
+				{
+					line = tempLine;
+					break
+				}	
+			}
+			return line;
+		}
+		
+		private function isGuideLineAvailable(visualId:String, checkInDate:String):Boolean
+		{
+			var isAvailable:Boolean = false;
+			
+			for(var i:int=0; i<dynamicGuideRoomList.length; i++)
+			{
+				var tempLine:ReservationLineHBox = dynamicGuideRoomList.getItemAt(i) as ReservationLineHBox;
+				
+				if(visualId == tempLine.uuid || checkInDate == tempLine.checkInDate.text)
+				{
+					isAvailable = true;
+					break
+				}	
+			}
+			return isAvailable;
+		}
+		
+		private function removeAllGuideRooms():void
+		{
+			for(var i:int=0; i<dynamicList.length; i++)
+			{
+				var line:ReservationLineHBox = dynamicList.getItemAt(i) as ReservationLineHBox;
+				
+				if(line.roomPaxType == JWHConstants.ROOM_PAX_TYPE_GUIDE)
+					dynamicList.removeItemAt(i);
+			}
+		}
+		
+		private function getGuideRoomCategory(useableType:String):ArrayCollection
+		{
+			var list:ArrayCollection = new ArrayCollection;
+			for(var i:int=0; i<roomCategoryList.length; i++)
+			{
+				var room:RoomCategory = roomCategoryList.getItemAt(i) as RoomCategory;
+				
+				if(room.roomUseableType == useableType)
+					list.addItem(room);
+					
+			}
+			
+			return list;
+		}
+		
+		private function applyPromoCode(e:Event):void
+		{
+			selectedIndex = 0; // to auto fetch discounts selectedIndex should be 0
+			dynamicRateBoxList.removeAll();
+	        dispatctRatesOnAgentChange(selectedIndex);
+	        
+	        isPromoCodeActivate = true;
+		}
+		
+		private function promotionCodeVisibilityHadler(e:Event=null):void
+		{
+			
+			if(_view.CHK_promotionCode.selected)
+			{
+				_view.T_promoCode.visible 		= true;
+				_view.B_promoCode.visible 		= true;	
+			}
+			else
+			{
+				_view.T_promoCode.visible 		= false;
+				_view.reservation.promotionCode = "";
+				_view.B_promoCode.visible 		= false;	
+				
+				_view.B_promoCode.dispatchEvent(new MouseEvent(MouseEvent.CLICK));
+			}
+			
+		}
+		
+		private function openBedPreferencesHelp(e:Event):void
+		{
+			var dimention:Object	=	new Object;
+				dimention.width		=   300;
+				dimention.heigth	=   300;
+			args.originatorObject  	=	convsrtStringToArray(_view.reservation.bedPreferences);	
+			createPopUpCanvas(ApplicationFacade.HS743_HELPER_BedPreferences, _view, args, "Choose Bed Preferences", ApplicationFacade.HS743_HELPER_BedPreferences, true, dimention);
+		}
+		
+		private function convsrtStringToArray(str:String):Array
+		{
+			var strArray:Array;
+			if(str!=null)
+			{
+				if(str != "")
+					strArray = str.split(",");
+			}
+				
+			return strArray;
+		}
+		
+		private function currencyChangeHandler(e:Event):void
+		{
+			if(_view.CMB_currency.selectedItem!=null)
+				_view.currencyType = (_view.CMB_currency.selectedItem as CurrencyMaster).currencyCode;
+				
+			isAgentChanged = true;
+    		selectedIndex = 0; // to auto fetch discounts selectedIndex should be 0
+    		dynamicRateBoxList.removeAll();
+    		dispatctRatesOnAgentChange(selectedIndex);
+		}
+		
+		private function dmcMarketChangeHandler(e:Event):void
+		{
+			selectedIndex = 0; // to auto fetch discounts selectedIndex should be 0
+			dynamicRateBoxList.removeAll();
+	        dispatctRatesOnAgentChange(selectedIndex);
+		}
+		
+		private function dispatctRatesOnAgentChange(index:int):void
+		{
+			_view.V_dynamic_rates.removeAllChildren();
+			//dynamicRateBoxList.removeAll();
+			
+			_view.V_pd_dynamicTax.removeAllChildren();
+			
+			if(index>-1 && dynamicList.length>index)
+			{
+				var line:ReservationLineHBox  	 = dynamicList.getItemAt(index) as ReservationLineHBox;
+					line.cmb_roomCategory.dispatchEvent(new ListEvent(ListEvent.CHANGE));
+			}
+			else
+				isAgentChanged = false;
+		}
+		
+		private function setInitialData():void
+		{
+			if(_view.reservation.reservationsStatus == JWHConstants.RESERVATION_BOOKING_STATUS_CONFIRMED)
+				_view.RD_confirmed.selected 	= true;
+				
+			_view.CMB_arrivalMeal.selectedIndex = setComboSelectedItemById(JWHConstants.mealTypeList, "uuid", "2");
+			_view.CMB_leaveMeal.selectedIndex   = setComboSelectedItemById(JWHConstants.mealTypeList, "uuid", "0");
+			
+			if(_view.CMB_currency.selectedItem!=null)
+				_view.currencyType = (_view.CMB_currency.selectedItem as CurrencyMaster).currencyCode;
+			
+			_view.reservation.timeStamp.createdByTimeStamp = getCurrentDateTimeString();
+		}
+		
+		private function checkFieldValication():Boolean
+		{
+			_view.T_guest.setFiledValidation();
+			_view.T_adults.setFiledValidation();
+			_view.T_agent.setFiledValidation();
+			_view.T_country.setFiledValidation();
+			
+			var validatorArr:Array = new Array;
+				validatorArr.push(_view.T_adults.textValidator);
+				validatorArr.push(_view.T_guest.textValidator);
+				validatorArr.push(_view.T_agent.textValidator);
+				validatorArr.push(_view.T_country.textValidator);
+				
+			_view.errorFree  =  validateForm(validatorArr);
+			
+			if(_view.errorFree)
+			{
+				if(dynamicList.length>0)
+					_view.errorFree = true;
+				else
+				{
+					_view.errorFree = false;	
+					createJHErrorAlert(_view, "No rooms found for the reservation!");
+				}
+			}
+			
+			return _view.errorFree;
+		}
+		
+		private function arrangeLinesForRetriewMode(list:ArrayCollection):void
+		{
+			_view.V_dynamic_vbox_for_res.removeAllChildren();
+			dynamicList.removeAll();
+			dynamicGuideRoomList.removeAll();
+			
+			var index:int=0;
+			
+			for(var i:int=0; i<list.length; i++)
+			{
+				var res:ReservationDetails		 = list.getItemAt(i) as ReservationDetails;
+				
+				var tempRoomList:ArrayCollection = new ArrayCollection;
+				
+				//if(res.roomPaxType == JWHConstants.ROOM_PAX_TYPE_GUEST)
+					tempRoomList	= getGuideRoomCategory(JWHConstants.ROOM_USEABLE_TYPE_ACTUAL);
+				//else if(res.roomPaxType == JWHConstants.ROOM_PAX_TYPE_GUIDE)
+					//tempRoomList	= getGuideRoomCategory(JWHConstants.ROOM_USEABLE_TYPE_GUIDE);
+				
+				var line:ReservationLineHBox  	 = new ReservationLineHBox(tempRoomList);
+				
+				var tempLine:ReservationLineHBox = findAllreadyAddedResForRetriew(res.visualLineId, res.roomPaxType)
+				
+				if(tempLine!=null)
+				{
+					line = tempLine;
+					
+					if(res.occupancyType == "SGL")
+					{
+						line.sglCount.text					= res.noOfRooms.toString();
+						line.sglUuid						= res.uuid;
+					}
+					
+					if(res.occupancyType == "DBL")
+					{	
+						line.dblCount.text					= res.noOfRooms.toString();
+						line.dblUuid						= res.uuid;
+					}
+					
+					if(res.occupancyType == "TPL")
+					{		
+						line.tplCount.text					= res.noOfRooms.toString();
+						line.tplUuid						= res.uuid;
+					}
+				}
+				else
+				{
+				 	line  	 = addLine(index, res.roomPaxType);
+					
+					line.uuid							= res.visualLineId;
+					line.checkInDate.text				= res.checkInDate;
+					line.checkOutDate.text				= res.checkOutDate;
+					line.cmb_roomCategory.selectedIndex	= setComboSelectedItemById(tempRoomList, "uuid", res.roomCategoryId);
+					line.cmb_roomBasis.selectedIndex	= setComboSelectedItemById(JWHConstants.roomBasisList, "id", res.mealBasis);
+					
+					if(res.occupancyType == "SGL")
+					{
+						line.sglCount.text					= res.noOfRooms.toString();
+						line.sglUuid						= res.uuid;
+					}
+					
+					if(res.occupancyType == "DBL")
+					{	
+						line.dblCount.text					= res.noOfRooms.toString();
+						line.dblUuid						= res.uuid;
+					}
+					
+					if(res.occupancyType == "TPL")
+					{		
+						line.tplCount.text					= res.noOfRooms.toString();
+						line.tplUuid						= res.uuid;
+					}
+					line.rateCode.uuid					= res.rateCodeId;	
+					line.adultCount.text				= res.noOfAdults.toString();
+					line.childCount.text				= res.noOfChildren.toString();
+					line.guideCount.text				= res.guide.toString();
+					
+					line.savedDiscountList				= res.discountList;
+					
+					if(line.roomPaxType == JWHConstants.ROOM_PAX_TYPE_GUEST)
+					{
+						++index;
+						dynamicList.addItem(line);
+						_view.V_dynamic_vbox_for_res.addChild(line);
+					}
+					else if(line.roomPaxType == JWHConstants.ROOM_PAX_TYPE_GUIDE)
+					{
+						dynamicGuideRoomList.addItem(line);
+					}
+					
+					//line.cmb_roomCategory.dispatchEvent(new ListEvent(ListEvent.CHANGE));
+					
+				
+				}
+				
+				
+			}
+			selectedIndex	=	0;
+			dispatchToCallDiscounts(selectedIndex);
+			
+		}
+		
+		private function dispatchToCallDiscounts(index:int):void
+		{
+			if(index>-1 && dynamicList.length>index)
+			{
+				var line:ReservationLineHBox  	 = dynamicList.getItemAt(index) as ReservationLineHBox;
+					line.cmb_roomCategory.dispatchEvent(new ListEvent(ListEvent.CHANGE));
+			}
+			else
+				isRetriewMode = false;
+		}
+		
+		private function findAllreadyAddedResForRetriew(visualId:String, roomPayType:String):ReservationLineHBox
+		{
+			var line:ReservationLineHBox  	 = null;
+			
+			var list:ArrayCollection = new ArrayCollection;
+			
+			if(roomPayType == JWHConstants.ROOM_PAX_TYPE_GUEST)
+				list = dynamicList;
+			else if(roomPayType == JWHConstants.ROOM_PAX_TYPE_GUIDE)
+				list = dynamicGuideRoomList;
+				
+			for(var i:int=0; i<list.length; i++)
+			{
+				if((list.getItemAt(i) as ReservationLineHBox).uuid == visualId && (list.getItemAt(i) as ReservationLineHBox).roomPaxType == roomPayType)
+				{
+					line =  list.getItemAt(i) as ReservationLineHBox;
+					break
+				}
+			}
+			
+			return line;
+		}
+		
+		private function openViewAllScren(e:Event):void
+		{
+			facade.sendNotification(ApplicationFacade.HS743_VIEW_ALL_RESERVATIONS, _args);
+		}
+		
+		private function makeGuestNameEditable(e:Event):void
+		{
+			if(_view.RD_bt_individual.selected)
+			{
+				_view.T_guest.editable = false;
+				_view.T_guestLname.editable = false;
+				_view.reservation.guestFirstName = "";
+				_view.reservation.guestLastName  = "";
+				_view.reservation.guestDetails = new Guest;
+				_view.B_country.enabled= false;
+			}
+			else if(_view.RD_bt_group.selected)
+			{
+				_view.reservation.guestFirstName = "";
+				_view.reservation.guestLastName  = "";
+				_view.reservation.guestDetails = new Guest;
+				_view.T_guest.editable 	= true;
+				_view.T_guestLname.editable = true;
+				_view.B_country.enabled = true;
+			}
+					
+		}
+		
+		private function loadServerConfig():void 
+		{
+			var _con:ServerConfig = UtilFunction.getServerConfigDetails();
+			if(_con != null)
+			{
+				docURL 		=  _con.documentURL;
+			}
+		}
+		
+		private function clearAllAutoGenaratedLines():void
+		{
+			for(var i:int=dynamicList.length; i>0; i--)
+			{
+				selectedIndex	=	dynamicList.length - 1;
+				deleteLine();
+			}
+		}
+		
+		private function autoGenerateReservationLines(list:ArrayCollection):void
+		{
+			for(var i:int=0; i<list.length; i++)
+			{
+				var mainLine:ReservationLineHBox = list.getItemAt(i) as ReservationLineHBox;
+				var line:ReservationLineHBox  	 = addLine(i, JWHConstants.ROOM_PAX_TYPE_GUEST);
+					
+					line.checkInDate.text				= mainLine.checkInDate.text;
+					line.checkOutDate.text				= mainLine.checkOutDate.text;
+					line.cmb_roomCategory.selectedIndex	= mainLine.cmb_roomCategory.selectedIndex;
+					line.cmb_roomBasis.selectedIndex	= mainLine.cmb_roomBasis.selectedIndex;
+					line.sglCount.text					= mainLine.sglCount.text;
+					line.dblCount.text					= mainLine.dblCount.text;
+					line.tplCount.text					= mainLine.tplCount.text;
+					line.adultCount.text				= mainLine.adultCount.text;
+					line.childCount.text				= mainLine.childCount.text;
+					line.guideCount.text				= mainLine.guideCount.text;
+				
+				_view.V_dynamic_vbox_for_res.addChild(line);
+				dynamicList.addItem(line);
+				
+				selectedIndex	=	line.sequence;
+				
+				//line.cmb_roomCategory.dispatchEvent(new ListEvent(ListEvent.CHANGE));
+				//loadOtherCosts();
+				//calculateTotalPax();
+			}
+			
+		}
+		
+		private function noOfDaysChangeHandler(e:Event):void
+		{
+			_view.reservation.departureDetails.checkOutDate = setDateForGivenRange(_view.D_checkin.text, int(_view.T_no_ofDays.text));
+			if(dynamicList.length>0)
+				confirmDateChange();
+			else
+			{
+				deleteAllGuestLines();
+				deleteAllGuideLines();
+				calculateTotalPax();
+	    		selectedIndex = 0; // to auto fetch discounts selectedIndex should be 0
+			}	
+		}
+		
+		private function checkOutDateHandler(e:Event):void
+		{
+			_view.reservation.numberOfNights = calculateDaysOfTwoDates(_view.D_checkin.text, _view.D_checkout.text);
+		}
+		
+		private function calculateWithTaxes():void
+		{
+			initializeRoomRateCalculationRemortingObject();
+			rateCalculationRO.setLogedInUser(_loggedInUser);
+			if(taxesList.length>0)
+				rateCalculationRO.reverseTaxesForReservation(taxesList, _view.totalDisplayAmount, _view.D_checkout.text)
+			else
+				rateCalculationRO.reverseTaxesForReservation(_view.totalDisplayAmount, _view.D_checkout.text)	
+		}
+		
+		private function getAllDynamicRoomLines():ArrayCollection
+		{
+			var list:ArrayCollection = new ArrayCollection;
+			
+			for(var i:int=0; i<dynamicList.length; i++)
+			{
+				list.addItem(dynamicList.getItemAt(i));
+			}
+			
+			for(var j:int=0; j<dynamicGuideRoomList.length; j++)
+			{
+				list.addItem(dynamicGuideRoomList.getItemAt(j));
+			}
+			
+			return list;
+		}
+		
+		private function generateDynamicPaymentDetailsBox():void
+		{
+			dynamicPaymentDetailsList.removeAll();
+			_view.V__pd_dynamicRoomRate.removeAllChildren();
+			_view.totalRooms	=	0;
+			
+			var sglRate:Number = 0;
+			var dblRate:Number = 0;
+			var tplRate:Number = 0;
+			
+			var list:ArrayCollection = getAllDynamicRoomLines(); // actual rooms + guide romms just to show payment details
+						
+			for(var i:int=0; i<list.length; i++)
+			{
+				var resBox:ReservationLineHBox = list.getItemAt(i) as ReservationLineHBox;
+				
+				
+				for(var j:int=0; j<JWHConstants.roomBasisList.length; j++)
+				{
+					var resPaymentSGLLine:ReservationPaymentDetailsLineHBox = new ReservationPaymentDetailsLineHBox;
+						resPaymentSGLLine.L_roomOccupancy.text	=	"SGL";
+						resPaymentSGLLine.L_guestpaxType.text	= resBox.roomPaxType;
+						resPaymentSGLLine.L_roomRate.addEventListener(MouseEvent.CLICK,openRateBreakdownHelp);
+					var resPaymentDBLLine:ReservationPaymentDetailsLineHBox = new ReservationPaymentDetailsLineHBox;
+						resPaymentDBLLine.L_roomOccupancy.text	=	"DBL";
+						resPaymentDBLLine.L_roomRate.addEventListener(MouseEvent.CLICK,openRateBreakdownHelp);
+						resPaymentDBLLine.L_guestpaxType.text	= resBox.roomPaxType;
+					var resPaymentTPLLine:ReservationPaymentDetailsLineHBox = new ReservationPaymentDetailsLineHBox;
+						resPaymentTPLLine.L_roomOccupancy.text	=	"TPL";
+						resPaymentTPLLine.L_roomRate.addEventListener(MouseEvent.CLICK,openRateBreakdownHelp);
+						resPaymentTPLLine.L_guestpaxType.text	= resBox.roomPaxType;
+						
+					if(resBox.cmb_roomCategory.selectedItem!=null)
+					{
+						resPaymentSGLLine.L_roomCategory.text				 = (resBox.cmb_roomCategory.selectedItem as RoomCategory).roomCategoryName;
+						resPaymentDBLLine.L_roomCategory.text				 = (resBox.cmb_roomCategory.selectedItem as RoomCategory).roomCategoryName;
+						resPaymentTPLLine.L_roomCategory.text				 = (resBox.cmb_roomCategory.selectedItem as RoomCategory).roomCategoryName;
+						
+						resPaymentSGLLine.roomCategoryId					 = (resBox.cmb_roomCategory.selectedItem as RoomCategory).uuid;
+						resPaymentDBLLine.roomCategoryId					 = (resBox.cmb_roomCategory.selectedItem as RoomCategory).uuid;
+						resPaymentTPLLine.roomCategoryId					 = (resBox.cmb_roomCategory.selectedItem as RoomCategory).uuid;
+						
+						resPaymentSGLLine.seasonId				 			 = resBox.rateCode.seasonId;
+						resPaymentSGLLine.currencyId						 = resBox.rateCode.currency;
+						resPaymentDBLLine.seasonId				 			 = resBox.rateCode.seasonId;
+						resPaymentDBLLine.currencyId						 = resBox.rateCode.currency;
+						resPaymentTPLLine.seasonId				 			 = resBox.rateCode.seasonId;
+						resPaymentTPLLine.currencyId						 = resBox.rateCode.currency;
+					}
+				
+					if(resBox.cmb_roomBasis.selectedItem!=null)
+					{
+						if(resBox.cmb_roomBasis.selectedItem.id == JWHConstants.roomBasisList.getItemAt(j).id)
+						{
+							resPaymentSGLLine.L_mealPlan.text				 	= resBox.cmb_roomBasis.selectedItem.id;
+							resPaymentDBLLine.L_mealPlan.text				 	= resBox.cmb_roomBasis.selectedItem.id;
+							resPaymentTPLLine.L_mealPlan.text				 	= resBox.cmb_roomBasis.selectedItem.id;
+							
+							resPaymentSGLLine.roomCount	=	int(resBox.sglCount.text);
+							resPaymentDBLLine.roomCount	=	int(resBox.dblCount.text);
+							resPaymentTPLLine.roomCount	=	int(resBox.tplCount.text);
+							
+							_view.totalRooms += resPaymentSGLLine.roomCount + resPaymentDBLLine.roomCount + resPaymentTPLLine.roomCount;
+							
+							resPaymentSGLLine.roomRate	=	resBox.sglRate;
+							resPaymentDBLLine.roomRate	=	resBox.dblRate;
+							resPaymentTPLLine.roomRate	=	resBox.tplRate;
+							
+							resPaymentSGLLine.totalRoomRate = resBox.sglRate * resPaymentSGLLine.roomCount;
+							resPaymentDBLLine.totalRoomRate = resBox.dblRate * resPaymentDBLLine.roomCount;
+							resPaymentTPLLine.totalRoomRate = resBox.tplRate * resPaymentTPLLine.roomCount;
+							
+							resPaymentSGLLine.L_noOfRooms.text	=	resBox.sglCount.text;
+							resPaymentDBLLine.L_noOfRooms.text	=	resBox.dblCount.text;
+							resPaymentTPLLine.L_noOfRooms.text	=	resBox.tplCount.text;
+							
+							resPaymentSGLLine.L_roomRate.text	=	_view.displayFinalRoundedFormattedValue(resBox.sglRate);
+							resPaymentSGLLine.rateBreakdown		=   resBox.sglRateBreakdown;
+							resPaymentDBLLine.L_roomRate.text	=	_view.displayFinalRoundedFormattedValue(resBox.dblRate);
+							resPaymentDBLLine.rateBreakdown		=   resBox.dblRateBreakdown;
+							resPaymentTPLLine.L_roomRate.text	=	_view.displayFinalRoundedFormattedValue(resBox.tplRate);
+							resPaymentTPLLine.rateBreakdown		=   resBox.tplRateBreakdown;
+							
+							if(resPaymentSGLLine.roomCount>0)
+							{
+								var sglLineTotal:Number = resPaymentSGLLine.roomRate * resPaymentSGLLine.roomCount;
+								if(!checkAlreadyAddedPaymentDetail(resPaymentSGLLine))
+								{
+									sglRate += sglLineTotal;
+									resPaymentSGLLine.totalRoomRate = sglLineTotal;	
+									resPaymentSGLLine.L_totalroomRate.text	=	_view.displayFinalRoundedFormattedValue(sglLineTotal);
+									
+									resBox.roomDetailsList.addItem(resPaymentSGLLine);
+									dynamicPaymentDetailsList.addItem(resPaymentSGLLine);
+									_view.V__pd_dynamicRoomRate.addChild(resPaymentSGLLine);
+								}
+								else
+									sglRate += sglLineTotal; /** already in the list calculate the total**/
+									
+							}
+							
+							if(resPaymentDBLLine.roomCount>0)
+							{
+								var dblLineTotal:Number = resPaymentDBLLine.roomRate * resPaymentDBLLine.roomCount;
+								
+								if(!checkAlreadyAddedPaymentDetail(resPaymentDBLLine))
+								{
+									dblRate += dblLineTotal;
+									resPaymentDBLLine.totalRoomRate = dblLineTotal;	
+									resPaymentDBLLine.L_totalroomRate.text	=	_view.displayFinalRoundedFormattedValue(dblLineTotal);
+									
+									resBox.roomDetailsList.addItem(resPaymentDBLLine);
+									dynamicPaymentDetailsList.addItem(resPaymentDBLLine);
+									_view.V__pd_dynamicRoomRate.addChild(resPaymentDBLLine);
+								}
+								else
+									dblRate += dblLineTotal; /** already in the list calculate the total**/
+							}
+							
+							if(resPaymentTPLLine.roomCount>0)
+							{
+								var tplLineTotal:Number = resPaymentTPLLine.roomRate * resPaymentTPLLine.roomCount;
+								
+								if(!checkAlreadyAddedPaymentDetail(resPaymentTPLLine))
+								{
+									tplRate += tplLineTotal;
+									resPaymentTPLLine.totalRoomRate = tplLineTotal;	
+									resPaymentTPLLine.L_totalroomRate.text	=	_view.displayFinalRoundedFormattedValue(tplLineTotal);
+									
+									resBox.roomDetailsList.addItem(resPaymentTPLLine);
+									dynamicPaymentDetailsList.addItem(resPaymentTPLLine);
+									_view.V__pd_dynamicRoomRate.addChild(resPaymentTPLLine);
+								}
+								else
+									tplRate += tplLineTotal;/** already in the list calculate the total**/
+							}
+						}
+						
+					}
+					
+				}
+			
+				
+			}
+			
+			_view.totalWithTaxAmount = sglRate + dblRate + tplRate;
+			_view.totalDisplayAmount = _view.totalWithTaxAmount;
+			calculateWithTaxes();	
+		}
+		
+		private function arrangeDiscountRequestObject():DiscountApprovalRequest
+		{
+			
+			var systemRateArray:Array 			= new Array;
+			var occupancyArray:Array 			= new Array;
+			
+			var request :DiscountApprovalRequest = new DiscountApprovalRequest;
+			
+			
+			for(var i:int=0; i<dynamicPaymentDetailsList.length;i++)
+			{
+				var line:ReservationPaymentDetailsLineHBox = dynamicPaymentDetailsList.getItemAt(i) as ReservationPaymentDetailsLineHBox;
+				
+					request.agent			= _view.reservation.agentDetails;
+					request.agentId			= request.agent.uuid;
+					request.agentMarketId	= request.agent.agentMarketUuid;
+					request.checkInDate		= _view.reservation.arrivalDetails.checkInDate;
+					request.checkOutDate	= _view.reservation.departureDetails.checkOutDate;
+					
+					if(_view.CMB_property.selectedItem!=null)
+					request.property		= _view.CMB_property.selectedItem as Property;
+					
+					request.propertyId		= request.property.uuid;
+					
+					systemRateArray.push(line.rateBreakdown.netRate.toString());
+					occupancyArray.push(line.L_roomOccupancy.text);
+					
+					request.seasonId		= line.seasonId;
+					request.currencyId		= line.currencyId;
+					
+			}
+			
+			request.systemRate		= systemRateArray.join(",");
+			request.occupancyType	= occupancyArray.join(",");
+			
+			return request;
+		}
+		
+		private function openDiscountRequestHelp(e:MouseEvent):void
+		{
+			args.originatorObject   = 	arrangeDiscountRequestObject();
+			var dimention:Object	=	new Object;
+				dimention.width		=   600;
+				dimention.heigth	=   500;
+			args.user	= _loggedInUser;	
+			createPopUpCanvas(ApplicationFacade.HS743_HELPER_DiscountApprovalRequest, _view, args, "Discount Approval Request", ApplicationFacade.HS743_HELPER_DiscountApprovalRequest, true, dimention);
+		}
+		
+		private function openConfirmationVoucherHelp():void
+		{
+			args.originatorObject   = 	_view.reservation.property;
+			var dimention:Object	=	new Object;
+				dimention.width		=   600;
+				dimention.heigth	=   500;
+			args.user	= _loggedInUser;	
+			createPopUpCanvas(ApplicationFacade.HS743_HELPER_CONFIRMATION_VOUCHER_DETAILS, _view, args, "Setup Confirmation Voucher Details", ApplicationFacade.HS743_HELPER_CONFIRMATION_VOUCHER_DETAILS, true, dimention);
+		}
+		
+		private function openViewAllResHelp(e:MouseEvent):void
+		{
+			var dimention:Object	=	new Object;
+				dimention.width		=   1200;
+				dimention.heigth	=   600;
+			createPopUpCanvas(ApplicationFacade.HS743_VIEW_ALL_RESERVATIONS, _view, args, "View All Reservations", ApplicationFacade.HS743_VIEW_ALL_RESERVATIONS, true, dimention);
+		}
+		
+		private function openCountryHelp(event:Event):void
+		{
+			createPopUpCanvas(HELP_COUNTRY, _view, args, "Search and select Country", ApplicationFacade.HELP_COUNTRY_SEARCH, true);
+		}
+		
+		private function openRateBreakdownHelp(e:MouseEvent):void
+		{
+			var payLine:ReservationPaymentDetailsLineHBox = e.currentTarget.parent  as ReservationPaymentDetailsLineHBox
+			var dimention:Object	=	new Object;
+				dimention.width		=   550;
+				dimention.heigth	=   400;
+				args.originatorObject = payLine.rateBreakdown;
+			createPopUpCanvas(ApplicationFacade.HS743_HELPER_ROOM_RATE_BREAKDOWN, _view, args, "Rate Breakdown", ApplicationFacade.HS743_HELPER_ROOM_RATE_BREAKDOWN, true, dimention);
+		}
+		
+		private function checkAlreadyAddedPaymentDetail(inResPaymentSGLLine:ReservationPaymentDetailsLineHBox):Boolean
+		{
+			var isAvailable:Boolean = false;
+			
+			for(var i:int=0; i<dynamicPaymentDetailsList.length; i++)
+			{
+				var resPaymentSGLLine:ReservationPaymentDetailsLineHBox = dynamicPaymentDetailsList.getItemAt(i) as ReservationPaymentDetailsLineHBox;
+				
+				if(resPaymentSGLLine.roomCategoryId == inResPaymentSGLLine.roomCategoryId && resPaymentSGLLine.L_mealPlan.text == inResPaymentSGLLine.L_mealPlan.text && resPaymentSGLLine.L_roomOccupancy.text == inResPaymentSGLLine.L_roomOccupancy.text && resPaymentSGLLine.roomRate == inResPaymentSGLLine.roomRate)
+				{
+					isAvailable = true;
+					resPaymentSGLLine.roomCount  		 += inResPaymentSGLLine.roomCount;
+					resPaymentSGLLine.L_noOfRooms.text 	  = resPaymentSGLLine.roomCount.toString();
+					resPaymentSGLLine.roomRate		 	  = inResPaymentSGLLine.roomRate;
+					resPaymentSGLLine.totalRoomRate		  = resPaymentSGLLine.roomRate * resPaymentSGLLine.roomCount;
+					resPaymentSGLLine.L_roomRate.text	  = _view.displayFinalRoundedFormattedValue(inResPaymentSGLLine.roomRate);
+					resPaymentSGLLine.L_totalroomRate.text= _view.displayFinalRoundedFormattedValue(resPaymentSGLLine.totalRoomRate);
+					break;
+				}
+			}
+			
+			return isAvailable;
+		}
+		
+		private function openRatecodeTree(evt:MouseEvent):void
+		{
+			var dimention:Object = new Object;
+				dimention.width  = 900;
+				dimention.heigth = 745;
+				
+				args.argumentObject = new Object;
+				args.user			=	_loggedInUser;
+				
+				createPopUpCanvas("Rate Code Tree View", _view, args, "Tree view", ApplicationFacade.HS743_RATE_CODE_TREE_VIEW, false, dimention);
+		 }
+		 
+		
+		private function openHoelRatesWindow(e:Event):void
+		{
+			var dimention:Object = new Object;
+				dimention.width  = 1100;
+				dimention.heigth = 800;
+				args.argumentObject = new Object;
+				args.user		 = _loggedInUser;
+				
+			createPopUpCanvas(ApplicationFacade.HS743_HELPER_SHOW_ALL_RATES,_mainView,args,"",ApplicationFacade.HS743_HELPER_SHOW_ALL_RATES, false,dimention);
+		}
+		
+		private function setCheckOutDate(e:Event):void
+		{
+			setCommonCheckOutDate();
+			if(dynamicList.length>0)
+			{
+				confirmDateChange();
+			}
+			else
+			{
+				deleteAllGuestLines();
+				deleteAllGuideLines();
+				calculateTotalPax();
+	    		selectedIndex = 0; // to auto fetch discounts selectedIndex should be 0
+			}
+			//loadTaxes();
+		}
+		
+		private function setCommonCheckOutDate():void
+		{
+			nextCheckinDate		  							= _view.D_checkin.text;	
+			_view.reservation.departureDetails.checkOutDate = setDateForGivenRange(_view.D_checkin.text, 1);
+			_view.reservation.numberOfNights = calculateDaysOfTwoDates(_view.D_checkin.text, _view.D_checkout.text);
+		}
+		
+		private function confirmDateChange():void
+		{
+			
+			Alert.show("This change may have rate changes. Do you want to proceed ?",
+			"Confirm Change",Alert.YES|Alert.NO,null,dateChangeResultHandler,null,Alert.NO);
+		}
+		
+		// delete method
+		private function dateChangeResultHandler(event:CloseEvent):void {
+		if (event.detail==Alert.YES){
+		{
+			deleteAllGuestLines();
+			deleteAllGuideLines();
+			calculateTotalPax();
+			isToRefreshRates = true;
+    		selectedIndex = 0; // to auto fetch discounts selectedIndex should be 0
+    		//dynamicRateBoxList.removeAll();
+    		//dispatctRatesOnAgentChange(selectedIndex);
+		}
+			
+		//Your delete command here
+		}else if(event.detail==Alert.NO){
+			_view.reservation.arrivalDetails.checkInDate = oldCheckinDate;
+			_view.reservation.numberOfNights = int(oldNoOfDays);
+			
+			nextCheckinDate		  							= _view.D_checkin.text;	
+			_view.reservation.departureDetails.checkOutDate = setDateForGivenRange(_view.D_checkin.text, _view.reservation.numberOfNights);
+			_view.reservation.numberOfNights = int(oldNoOfDays);
+		}
+		}
+		
+		
+		private function loadCurrencyList():void
+		{
+			startBusyCursor();
+			currencyMasterRO.dynamicSearch("","");
+		}
+		
+//		public function keyStrokesHandle(event:KeyboardEvent):void
+//		{
+//			
+//			if(event.keyCode == 13)
+//				//loadGuest()
+//			else if(event.keyCode == 120)
+//				Alert.show("TODO:Delete this record");
+//			else if(event.keyCode == 112)
+//				Alert.show("TODO:Show HELP page");
+//				
+//		}
+		
+		public override function closeCanvasPopup(event:Event):void
+            {
+                popup = null;
+                
+                if(args != null)
+                {
+                	if((event.target as JWTPopUpCanvas).id == HS743_HELP_GUEST_DETAILS)
+                	{
+                		if(args.argumentObject is Guest)
+                		{
+	                		//setGuestSearchButtonStatus(false);
+	                		_view.reservation.guestDetails 		= args.argumentObject as Guest;
+	                		_view.reservation.guestFirstName 	= _view.reservation.guestDetails.personalDetails.firstName;
+	                		_view.reservation.guestLastName 	= _view.reservation.guestDetails.personalDetails.lastName;
+	                		_view.reservation.confirmedBy		= _view.reservation.guestDetails.personalDetails.firstName;
+	                		_view.reservation.contactEmail		= _view.reservation.guestDetails.contactDetails.email;
+	                		_view.reservation.contactMobileNo	= _view.reservation.guestDetails.contactDetails.mobileNo;
+	                		_view.reservation.countryId		    = _view.reservation.guestDetails.personalDetails.country.uuid;
+                		}
+                	}
+                	else if((event.target as JWTPopUpCanvas).id == HS743_HELP_AGENT_SEARCH)
+                	{
+                		if(args.argumentObject is AgentDetails)
+                		{
+	                		_view.reservation.agentDetails 	= args.argumentObject as AgentDetails;
+	                		
+	                		_view.CMB_dmcMarket.selectedItem = null;
+	                		
+	                		isAgentChanged = true;
+	                		selectedIndex = 0; // to auto fetch discounts selectedIndex should be 0
+	                		dynamicRateBoxList.removeAll();
+	                		dispatctRatesOnAgentChange(selectedIndex);
+	                		
+	                		if(_view.reservation.agentDetails.agentTypeId == JWHConstants.AGENT_CATEGORY_TYPE_DMC)
+	                		{
+	                			loadDMCMarkets();
+	                			_view.gr_dmc.percentHeight = 100;
+	                		}
+	                		else
+	                		{	
+	                			loadAgentType();
+	                			_view.gr_dmc.height = 0;
+	                			dmcMarketList		= new ArrayCollection;
+	                		}
+                		}
+                	}
+                	else if((event.target as JWTPopUpCanvas).id == ApplicationFacade.HS743_HELPER_RESERVATION_SUMMARY_CREATE)
+                	{
+                		if(args.argumentObjects is ArrayCollection)
+                		{
+                			isRetriewMode 			= true;
+                			isToCheckAvailability 	= true;
+                			
+                			selectedIndex = dynamicList.length - 1;
+                			clearAllAutoGenaratedLines();
+                			autoGenerateReservationLines(args.argumentObjects as ArrayCollection);
+                			
+                			selectedIndex = 0; // to auto fetch discounts selectedIndex should be 0
+                			dispatchToCallDiscounts(selectedIndex);
+                		}
+                	}
+                	else if((event.target as JWTPopUpCanvas).id == ApplicationFacade.HS743_VIEW_ALL_RESERVATIONS)
+                	{
+                		if(args.argumentObject is Reservation)
+                		{
+                			_view.B_save.enabled = true;
+                			_view.reservation = args.argumentObject as Reservation;
+                			isRetriewMode 			= true;
+                			isToCheckAvailability 	= false;
+                			
+							loadProperty();
+                		}
+                	}
+                	else if((event.target as JWTPopUpCanvas).id == ApplicationFacade.HS743_HELPER_DISCOUNT_CHOOSABLE)
+                	{
+                		if(args.argumentObject as ReservationLineHBox)
+                		{
+                			var newLine:ReservationLineHBox = args.argumentObject as ReservationLineHBox;
+                			var index:int = _view.V_dynamic_vbox_for_res.getChildIndex(newLine);
+                			
+                			if(index>-1 && dynamicList.length>index)
+                			{
+                				var line:ReservationLineHBox = dynamicList.getItemAt(index) as ReservationLineHBox;
+                					line.sglDiscountList	 = newLine.sglDiscountList;
+                					line.dblDiscountList	 = newLine.dblDiscountList;
+                					line.tplDiscountList	 = newLine.tplDiscountList;
+                					//changeSavedDiscountStatus(line.savedDiscountList);	
+                				calculateTotalPax();
+                			}
+                		}
+                	}
+                	else if((event.target as JWTPopUpCanvas).id == HELP_COUNTRY)
+                	{
+                		if(args.argumentObject is Country)
+                		{
+                			_view.reservation.guestDetails.personalDetails.country = args.argumentObject as Country;
+                			_view.reservation.countryId							   = _view.reservation.guestDetails.personalDetails.country.uuid;
+                		}
+                	}
+                	else if((event.target as JWTPopUpCanvas).id == ApplicationFacade.HS743_HELPER_BedPreferences)
+                	{
+                		if(args.argumentObject is Array)
+                		{
+                			_view.reservation.bedPreferences = (args.argumentObject as Array).join(",");
+                		}
+                	}
+                	else if((event.target as JWTPopUpCanvas).id == ApplicationFacade.HS743_HELPER_DiscountApprovalRequest)
+                	{
+                		if(args.argumentObject is DiscountApprovalRequest)
+                		{
+                			sendForApproval(args.argumentObject as DiscountApprovalRequest)
+                		}
+                	}
+                	else if((event.target as JWTPopUpCanvas).id == ApplicationFacade.HS743_HELPER_CONFIRMATION_VOUCHER_DETAILS)
+                	{
+                		if(args.argumentObject is ArrayCollection)
+                		{
+                			var list:ArrayCollection = args.argumentObject as ArrayCollection;
+                			prepareToPrint(list);
+                		}
+                	}
+                		
+                }
+                
+            }
+        
+        private function sendForApproval(request:DiscountApprovalRequest):void
+        {
+        	_view.rd_approval.selected 			= true;
+        	_view.RD_confirmed.selected 		= false;
+        	_view.rd_waitlisted.selected 		= false;
+        	_view.rd_tentative.selected 		= false;
+        	_view.rd_cancel.selected 			= false;
+        	_view.reservation.discountRequest 	= request;
+        	_view.reservation.remarks			= _view.reservation.remarks +"\nNote: Special Rates Approval Request Sent";
+        	saveItem();
+        	
+        }    
+           
+           
+        private function changeSavedDiscountStatus(list:ArrayCollection):void
+        {
+        	for(var i:int=0; i<list.length; i++)
+        	{
+        		var disc:ReservationDiscounts = list.getItemAt(i) as ReservationDiscounts;
+        			disc.status				  = JWHConstants.STATUS_LABLE_INACTIVE;
+        	}
+        } 
+          
+        private function loadDMCMarkets():void
+		{
+			startBusyCursor();
+			dmcMarketRO.dynamicSearch("","");
+		}   
+		
+		private function openAvailablityHelp(e:Event):void
+		{
+			var q:QuerryObject		= new QuerryObject;
+			
+			if(_view.CMB_property.selectedItem!=null)
+				q.condition1		=	(_view.CMB_property.selectedItem as Property).uuid;
+				
+				q.condition2		= _view.D_checkin.text;
+				q.condition3		= _view.D_checkout.text;
+			args.user				= _loggedInUser;
+			args.originatorObject	=   q;
+			var dimention:Object	=	new Object;
+				dimention.width		=   _view.width - 50;
+				dimention.heigth	=   _view.height - 50;
+				
+			createPopUpCanvas(ApplicationFacade.HS743_HELPER_ROOM_AVAILABILITY, _view, args, "Search Room Availability", ApplicationFacade.HS743_HELPER_ROOM_AVAILABILITY, true, dimention);
+		} 
+		
+		private function openReservationSummaryHelp(e:Event):void
+		{
+			var q:QuerryObject		= new QuerryObject;
+				q.condition1		= _view.D_checkin.text;
+				q.condition2		= _view.D_checkout.text;
+				q.list				= getGuideRoomCategory(JWHConstants.ROOM_USEABLE_TYPE_ACTUAL);
+				
+			args.user				= _loggedInUser;
+			args.originatorObject	=   q;
+			var dimention:Object	=	new Object;
+				dimention.width		=   750;
+				dimention.heigth	=   150;
+				
+			createPopUpCanvas(ApplicationFacade.HS743_HELPER_RESERVATION_SUMMARY_CREATE, _view, args, "Reservation Summary", ApplicationFacade.HS743_HELPER_RESERVATION_SUMMARY_CREATE, true, dimention);
+		} 
+		
+		
+		private function openGuestHelp(e:Event):void
+		{
+			var q:QuerryObject = new QuerryObject;
+				q.searchCode   = "searchForReservation";
+//				q.condition1   = _view.T_passport.text.toString();
+//				q.condition2   = _view.T_guestFirstName.text.toString();
+//				q.condition3   = _view.T_guestLastName.text.toString();
+				
+			args.originatorObject 	= q;
+			args.user				= _loggedInUser;
+			
+			var dimention:Object	=	new Object;
+				dimention.width		=   980;
+				dimention.heigth	=   600;
+				
+			createPopUpCanvas(HS743_HELP_GUEST_DETAILS, _view, args, "Search and select Guest", ApplicationFacade.HS743_HELPER_GUEST_DETAILS, true, dimention);
+		}
+		
+		private function openAgentHelp(e:Event):void
+		{
+			var dimention:Object	=	new Object;
+				dimention.width		=   800;
+				dimention.heigth	=   600;
+				
+			if(_view.CMB_property.selectedItem!=null)	
+				args.originatorObject   =   _view.CMB_property.selectedItem as Property;
+				
+			createPopUpCanvas(HS743_HELP_AGENT_SEARCH, _view, args, "Search and select Agent", ApplicationFacade.HS743_HELPER_AGENT_SEARCH, true, dimention);
+		}
+		
+		private function loadRateCode(e:Event=null):void
+		{
+			var q:QuerryObject 	= new QuerryObject;
+				q.searchCode	= "searchByForReservation";
+			
+			if(_view.CMB_property.selectedItem!=null)
+				q.condition1	= (_view.CMB_property.selectedItem as Property).uuid;
+				
+				q.condition2	= (dynamicList.getItemAt(selectedIndex) as ReservationLineHBox).checkInDate.text;
+				q.condition3	= _view.reservation.agentDetails.agentMarketUuid;	
+			
+			if(_view.CMB_currency.selectedItem!=null)
+				q.condition4	= (_view.CMB_currency.selectedItem as CurrencyMaster).uuid;	
+					
+			startBusyCursor();
+			rc_rateCodeRO.dynamicSearch(q);
+		}
+		
+		private function showSelectedGuest(e:Event=null):void
+		{
+//			if(_view.CMB_guest.selectedItem!=null)
+//				_view.reservation.guestDetails = _view.CMB_guest.selectedItem as Guest;
+		}
+		
+		private function loadAgentType(e:Event=null):void
+		{
+			startBusyCursor();
+			agentTypeRO.dynamicSearch("","");
+		}
+		
+		private function loadProperty(e:Event=null):void
+		{
+			startBusyCursor();
+			propertyRO.dynamicSearch("","");
+		}
+		
+		private function loadRooms(e:Event=null):void
+		{
+			var hotelId:String 		= "";
+			var hotelName:String 	= "";
+			if(_view.CMB_property.selectedItem!=null)
+			{
+				hotelId 	= (_view.CMB_property.selectedItem as Property).uuid;
+			}
+			
+			startBusyCursor();
+			roomCategoryRO.dynamicSearch("searchByHotelId",hotelId);
+		}
+		
+		private function loadAgents(e:Event=null):void
+		{
+			var propertyId:String = "";
+			
+			if(_view.CMB_property.selectedItem!=null)
+				propertyId	=	(_view.CMB_property.selectedItem as Property).uuid;
+				
+			startBusyCursor();
+			agentDetailsRO.dynamicSearch("searchByPropertId",propertyId);
+		}
+		
+		private function loadMarkets(e:Event=null):void
+		{
+			var agentId:String = "";
+			
+				agentId	=	_view.reservation.agentDetails.uuid;
+			
+			startBusyCursor();
+			agentMarketRO.dynamicSearch("searchByAgentId",agentId);
+		}
+		
+//		private function loadGuest(e:Event=null):void
+//		{
+//			if(isGuestSearchingOn)
+//			{
+//				var q:QuerryObject = new QuerryObject;
+//					q.searchCode   = "searchForReservation";
+////					q.condition1   = _view.T_passport.text.toString();
+////					q.condition2   = _view.T_guestFirstName.text.toString();
+////					q.condition3   = _view.T_guestLastName.text.toString();
+//					
+//				startBusyCursor();
+//				guestProfileRO.dynamicSearch(q);
+//			}
+//			else
+//			{
+//				_view.reservation.guestDetails = new Guest;
+//				setGuestSearchButtonStatus(true);
+//			}
+//		}
+		
+		private function loadDiscounts(seasonId:String):void
+		{
+			var q:QuerryObject = new QuerryObject;
+				q.searchCode   = "searchDiscountsForReservation";
+				
+			var propertyId:String = "";
+			var currencyId:String = "";
+			
+			if(_view.CMB_property.selectedItem!=null)
+				propertyId	=	(_view.CMB_property.selectedItem as Property).uuid;
+				
+			if(_view.CMB_currency.selectedItem!=null)
+				currencyId	=	(_view.CMB_currency.selectedItem as CurrencyMaster).uuid;	
+					
+				q.condition1   = seasonId;
+				q.condition2   = JWHConstants.DISCOUT_APPLY_TO_ALL;
+				q.condition3   = _view.reservation.agentDetails.uuid;
+				q.condition4   = _view.reservation.agentDetails.agentMarketUuid;
+				q.condition5   = propertyId;
+				q.condition6   = currencyId;
+				q.condition7   = _view.reservation.uuid;
+				
+				
+			startBusyCursor();
+			rc_discountRO.dynamicSearch(q);
+		}
+		
+		private function loadAvailability(e:Event=null):void
+		{
+			if(isToCheckAvailability)
+			{
+				if(selectedIndex>-1 && dynamicList.length>selectedIndex)
+				{
+					var line:ReservationLineHBox = dynamicList.getItemAt(selectedIndex) as ReservationLineHBox;
+					var q:QuerryObject		= new QuerryObject;
+					var propertyCode:String;
+					
+					if(_view.CMB_property.selectedItem!=null)
+					{
+						q.condition1		=	(_view.CMB_property.selectedItem as Property).uuid;
+						propertyCode		=	(_view.CMB_property.selectedItem as Property).propertyCode;
+					}
+						
+						q.condition2		= line.checkInDate.text.toString();
+						q.condition3		= line.checkInDate.text.toString();
+						
+					startBusyCursor();
+					destinityFetchRO.setPropertyCode(propertyCode);
+					destinityFetchRO.getOccupancyDetails(q);
+				}
+			}
+			else
+				loadOtherCosts(); 
+		}
+		
+		private function loadOtherCosts(e:Event=null):void
+		{
+			if(selectedIndex>-1 && dynamicList.length>selectedIndex)
+			{
+				var line:ReservationLineHBox = dynamicList.getItemAt(selectedIndex) as ReservationLineHBox;
+				checkIncompleteReservationLineToHighLight(line);
+				
+				calculateTotalPax();
+				startBusyCursor();
+				rc_otherCostMasterRO.dynamicSearch("","");
+			}
+			
+		}
+		
+		private function loadModeOfPayments():void
+		{
+			startBusyCursor();
+			modeOfPaymentRO.dynamicSearch("","");
+		}
+		
+		private function addLineHandler(e:Event):void
+		{
+			if(roomCategoryList.length>0)
+			{
+				var index:int = 0;
+				
+				if(dynamicList.length>0)
+					index = selectedIndex + 1;
+				
+				
+				var line:ReservationLineHBox = addLine(index, JWHConstants.ROOM_PAX_TYPE_GUEST);
+				
+				//if(isRetriewMode)
+				//{
+					if(dynamicList.length> index-1 && dynamicList.length>0)
+						addPreviousSavedDiscountsToList((dynamicList.getItemAt(index-1) as ReservationLineHBox).savedDiscountList, line.savedDiscountList);
+				//}
+				
+				selectedIndex = index;
+				
+				dynamicList.addItemAt(line, index);
+				flushResLinesAndReOrder(dynamicList);//
+				
+			}
+			else
+			{
+				_view.CMB_property.setFocus();
+				createJHErrorAlert(_view, "No rooms allocated for the selected property!");
+			}
+		}
+		
+		private function addPreviousSavedDiscountsToList(list:ArrayCollection, newList:ArrayCollection):ArrayCollection
+		{
+			for(var i:int=0; i<list.length; i++)
+			{
+				var dis:ReservationDiscounts 	= list.getItemAt(i) as ReservationDiscounts;
+				var newDis:ReservationDiscounts = new ReservationDiscounts;
+					newDis.discountId		= dis.discountId;
+					newDis.occupancyType	= dis.occupancyType;
+					newDis.applicableStatus = dis.applicableStatus;
+					
+				newList.addItem(newDis);
+			}
+			
+			return newList;
+		}
+		
+		private function addLine(index:int, roomPaxType:String):ReservationLineHBox
+		{
+			var tempRoomList:ArrayCollection = new ArrayCollection;
+				
+				//if(roomPaxType == JWHConstants.ROOM_PAX_TYPE_GUEST)
+					tempRoomList	= getGuideRoomCategory(JWHConstants.ROOM_USEABLE_TYPE_ACTUAL);
+				//else if(roomPaxType == JWHConstants.ROOM_PAX_TYPE_GUIDE)
+					//tempRoomList	= getGuideRoomCategory(JWHConstants.ROOM_USEABLE_TYPE_GUIDE);
+					
+			var line:ReservationLineHBox = new ReservationLineHBox(tempRoomList);
+				
+				line.sequence			=	index;
+				line.roomPaxType		=	roomPaxType;
+				
+				if(nextCheckinDate!=null)
+				{
+					line.checkInDate.text	=   nextCheckinDate;
+					line.checkOutDate.text	=	setDateForGivenRange(nextCheckinDate,1);
+					//nextCheckinDate			=	line.checkOutDate.text;
+					//calculateDays(line);
+				}
+				
+				line.checkInDate.selectableRange  = setDateSelectableRange(_view.D_checkin.text, deductDateForGivenRange(_view.D_checkout.text, 1));
+				line.checkOutDate.selectableRange = setDateSelectableRange(line.checkOutDate.text, _view.D_checkout.text);
+				
+				//line.addEventListener(MouseEvent.MOUSE_OVER, handleMouseUp);
+				line.addEventListener(MouseEvent.MOUSE_UP, handleMouseUp);
+				line.addEventListener(KeyboardEvent.KEY_UP, handleKeyUp);
+				line.cmb_roomCategory.addEventListener(ListEvent.CHANGE, loadAvailability);
+				line.checkOutDate.addEventListener(Event.CHANGE, handleReservationCheckOutDate);
+				line.checkInDate.addEventListener(DropdownEvent.CLOSE, handleReservationCheckInDate);
+				line.sglCount.addEventListener(Event.CHANGE, calculateTotalPax); 
+				line.dblCount.addEventListener(Event.CHANGE, calculateTotalPax);
+				line.tplCount.addEventListener(Event.CHANGE, calculateTotalPax);
+				line.adultCount.addEventListener(Event.CHANGE, calculateTotalPax);
+				line.childCount.addEventListener(Event.CHANGE, calculateTotalPax);
+				line.guideCount.addEventListener(Event.CHANGE, calculateTotalPax);
+				line.cmb_roomBasis.addEventListener(Event.CHANGE, calculateTotalPax);
+				line.setNotCompeleteBorder();
+				
+				line.discountBox.addEventListener(MouseEvent.MOUSE_UP, openDiscountChooableHelp);
+				
+			checkIncompleteReservationLineToHighLight(line);
+			
+			return line;
+		}
+		
+		
+		private function openDiscountChooableHelp(e:MouseEvent):void
+		{
+			var dimention:Object	=	new Object;
+				dimention.width		=   550;
+				dimention.heigth	=   350;
+				
+			var line:ReservationLineHBox 	= e.currentTarget.parent as ReservationLineHBox;
+			
+			if(line.discountBox.enabled)
+			{	
+				args.originatorObject = line;
+				createPopUpCanvas(ApplicationFacade.HS743_HELPER_DISCOUNT_CHOOSABLE, _view, args, "Choose Discounts/ Supplements", ApplicationFacade.HS743_HELPER_DISCOUNT_CHOOSABLE, true, dimention);
+			}
+		}
+		
+		private function checkIncompleteReservationLineToHighLight(line:ReservationLineHBox):void
+		{
+			line.setNotCompeleteBorder();
+			
+		}
+		
+//		private function calculateDays(res:ReservationLineHBox):void {
+//			if(res.checkInDate.text.length>5)
+//			{
+//				var checkIn:Date	=	DateField.stringToDate(res.checkInDate.text.toString(), "YYYY-MM-DD");
+//                var checkOut:Date	=	DateField.stringToDate(res.checkOutDate.text.toString(), "YYYY-MM-DD");
+//                if(checkIn!=null && checkOut!=null)
+//                {
+//	                var tempDate:Date = new Date(checkOut.time - checkIn.time);
+//	              	var days:int	  = Math.round((tempDate.time / MS_PER_DAY));
+//	              	
+//	              	res.noOfNights	= days;
+//                }
+//			}
+//        }
+        
+        private function calculateDaysOfTwoDates(fromDate:String, toDate:String):int {
+			var noDayes:int = 0;
+			
+			if(fromDate.length>5)
+			{
+				var checkIn:Date	=	DateField.stringToDate(fromDate, "YYYY-MM-DD");
+                var checkOut:Date	=	DateField.stringToDate(toDate, "YYYY-MM-DD");
+                if(checkIn!=null && checkOut!=null)
+                {
+	                var tempDate:Date = new Date(checkOut.time - checkIn.time);
+	              	var days:int	  = Math.round((tempDate.time / MS_PER_DAY));
+	              	
+	              	noDayes	= days;
+                }
+			}
+			
+			return noDayes;
+        }
+		
+		private function calculateTotalPax(e:Event=null):void
+		{
+			
+			checkRoomAvailablityCommom();
+			
+			startBusyCursor();
+			
+			if(selectedIndex>-1 && dynamicList.length>selectedIndex){
+				var line:ReservationLineHBox = dynamicList.getItemAt(selectedIndex) as ReservationLineHBox;
+				checkIncompleteReservationLineToHighLight(line);
+			}
+			
+			var sglResTotal:Number = 0;
+			var dblResTotal:Number = 0;
+			var tplResTotal:Number = 0;
+			
+			var resTempTotal:Number = 0;
+			
+			var sglTotal:Number = 0;
+			var dblTotal:Number = 0;
+			var tplTotal:Number = 0;
+			
+			var adultsTotal:Number 	= 0;
+			var childTotal:Number 	= 0;
+			var guideTotal:Number 	= 0;
+			
+			var totalSglRate:Number	= 0;
+			var totalDblRate:Number	= 0;
+			var totalTplRate:Number	= 0;
+			
+			var totalNights:Number	= 0;
+			
+			rateCodeTotal = 0;
+			
+			var tempDynamicList:ArrayCollection = getAllDynamicRoomLines();
+			
+			for(var i:int=0; i<tempDynamicList.length; i++)
+			{
+				var hbox:ReservationLineHBox = tempDynamicList.getItemAt(i) as ReservationLineHBox;
+				
+				hbox.sglRateWithoutDorS			= getRateForSpecificReservation(hbox, "SGL");
+				hbox.dblRateWithoutDorS			= getRateForSpecificReservation(hbox, "DBL");
+				hbox.tplRateWithoutDorS			= getRateForSpecificReservation(hbox, "TPL");
+				
+				var dmcMarket:String = JWHConstants.DMC_ALL_MARKET_CODE;
+				
+				if(_view.CMB_dmcMarket.selectedItem!=null)
+				{
+					if((_view.CMB_dmcMarket.selectedItem as DmcMarket).dmcCode != JWHConstants.DMC_ALL_MARKET_CODE)
+						dmcMarket = (_view.CMB_dmcMarket.selectedItem as DmcMarket).uuid;
+				}
+				
+				var sglDiscList:ArrayCollection    = showSavedeDiscounts(hbox.savedDiscountList, hbox.sglDiscountList, JWHConstants.ROOM_OCCUPANCY_TYPE_SGL);
+					
+				var rrqoSGL:RoomRateQueryObject = new RoomRateQueryObject;
+					rrqoSGL.standardRate		= hbox.sglRateWithoutDorS;
+					rrqoSGL.discountList		= sglDiscList;
+					rrqoSGL.agentDeatils		= _view.reservation.agentDetails;
+					rrqoSGL.checkInDate			= hbox.checkInDate.text.toString();
+					rrqoSGL.selectedDmcMarket	= dmcMarket;
+					rrqoSGL.resCreatedDate		= _view.reservation.timeStamp.updatedByTimeStamp;
+					rrqoSGL.promoCode			= _view.reservation.promotionCode;
+					rrqoSGL.occupancyType		= JWHConstants.ROOM_OCCUPANCY_TYPE_SGL;
+					if(hbox.cmb_roomBasis.selectedItem!=null)
+						rrqoSGL.selectedBasis		= hbox.cmb_roomBasis.selectedItem.id;
+					
+					if(hbox.cmb_roomCategory.selectedItem!=null)
+						rrqoSGL.roomCategory		= hbox.cmb_roomCategory.selectedItem.uuid;
+				
+				var dblDiscList:ArrayCollection = showSavedeDiscounts(hbox.savedDiscountList, hbox.dblDiscountList, JWHConstants.ROOM_OCCUPANCY_TYPE_DBL);
+					
+				var rrqoDBL:RoomRateQueryObject = new RoomRateQueryObject;
+					rrqoDBL.standardRate		= hbox.dblRateWithoutDorS;
+					rrqoDBL.discountList		= dblDiscList;
+					rrqoDBL.agentDeatils		= _view.reservation.agentDetails;
+					rrqoDBL.checkInDate			= hbox.checkInDate.text.toString();
+					rrqoDBL.selectedDmcMarket	= dmcMarket;
+					rrqoDBL.resCreatedDate		= _view.reservation.timeStamp.updatedByTimeStamp;
+					rrqoDBL.promoCode			= _view.reservation.promotionCode;
+					rrqoDBL.occupancyType		= JWHConstants.ROOM_OCCUPANCY_TYPE_DBL;
+					
+					if(hbox.cmb_roomBasis.selectedItem!=null)
+						rrqoDBL.selectedBasis		= hbox.cmb_roomBasis.selectedItem.id;
+						
+					if(hbox.cmb_roomCategory.selectedItem!=null)
+						rrqoDBL.roomCategory		= hbox.cmb_roomCategory.selectedItem.uuid;
+				
+				var tplDiscList:ArrayCollection = showSavedeDiscounts(hbox.savedDiscountList, hbox.tplDiscountList, JWHConstants.ROOM_OCCUPANCY_TYPE_TLP);
+					
+				var rrqoTpL:RoomRateQueryObject = new RoomRateQueryObject;
+					rrqoTpL.standardRate		= hbox.tplRateWithoutDorS;
+					rrqoTpL.discountList		= tplDiscList;
+					rrqoTpL.agentDeatils		= _view.reservation.agentDetails;
+					rrqoTpL.checkInDate			= hbox.checkInDate.text.toString();
+					rrqoTpL.selectedDmcMarket	= dmcMarket;
+					rrqoTpL.resCreatedDate		= _view.reservation.timeStamp.updatedByTimeStamp;
+					rrqoTpL.promoCode			= _view.reservation.promotionCode;
+					rrqoTpL.occupancyType		= JWHConstants.ROOM_OCCUPANCY_TYPE_TLP;
+					
+					if(hbox.cmb_roomBasis.selectedItem!=null)
+						rrqoTpL.selectedBasis		= hbox.cmb_roomBasis.selectedItem.id;
+						
+					if(hbox.cmb_roomCategory.selectedItem!=null)
+						rrqoTpL.roomCategory		= hbox.cmb_roomCategory.selectedItem.uuid;
+					
+				 //Update last selected line with relevant discounts 
+//				 if(Number(hbox.sglCount.text)>0)
+//				 {
+					hbox.sglRateBreakdown    = RoomRateCalculation.calculateDiscountAndSupplement(rrqoSGL);
+				 	hbox.sglRate    		 = roundOffLastTwoDecimals(hbox.sglRateBreakdown.netRate);
+//				 }
+//				 if(Number(hbox.dblCount.text)>0)
+//				 {
+				 	hbox.dblRateBreakdown    = RoomRateCalculation.calculateDiscountAndSupplement(rrqoDBL);
+				 	hbox.dblRate    		 = roundOffLastTwoDecimals(hbox.dblRateBreakdown.netRate);
+//				 }
+//				 if(Number(hbox.tplCount.text)>0)
+//				 {
+				 	hbox.tplRateBreakdown    = RoomRateCalculation.calculateDiscountAndSupplement(rrqoTpL);
+				 	hbox.tplRate    		 = roundOffLastTwoDecimals(hbox.tplRateBreakdown.netRate);
+//				 }
+				 hbox.discountListHandler();
+				 
+				/**Add d or S to room rates
+				hbox.sglRate		= hbox.sglRateWithoutDorS + hbox.sglDiscount;
+				hbox.dblRate		= hbox.dblRateWithoutDorS + hbox.dblDiscount;
+				hbox.tplRate		= hbox.tplRateWithoutDorS + hbox.tplDiscount;**/
+				 
+				
+				if(hbox.roomPaxType == JWHConstants.ROOM_PAX_TYPE_GUEST)
+				{
+					sglTotal	+=	Number(hbox.sglCount.text);
+					dblTotal	+=	Number(hbox.dblCount.text);
+					tplTotal	+=	Number(hbox.tplCount.text);
+				}
+				
+				adultsTotal	=	Number(hbox.adultCount.text);
+				childTotal	=	Number(hbox.childCount.text);
+				guideTotal	=	Number(hbox.guideCount.text);
+				
+				sglResTotal = hbox.sglRate * Number(hbox.sglCount.text);
+				dblResTotal = hbox.dblRate * Number(hbox.dblCount.text);
+				tplResTotal = hbox.tplRate * Number(hbox.tplCount.text);
+				
+				totalNights += hbox.noOfNights
+				
+				rateCodeTotal += (sglResTotal + dblResTotal + tplResTotal) * hbox.noOfNights;
+				
+				//rateCodeTotal += DSCalculation.applyDiscountsSupplements(_view.reservation, resTempTotal, hbox.discountList)
+			}
+			
+			
+			var roudValue:Number =	roundOffLastTwoDecimals(rateCodeTotal);
+			
+//			if(Number(_view.reservation.totalAmount)>0)
+//			{
+//				if(_view.reservation.totalAmount != numberFormatting(roudValue.toString()))
+//					Alert.show("There is a mismatch in the Rates!");
+//			}
+			
+			_view.reservation.totalAmount  	 = numberFormatting(roudValue.toString());
+			//_view.reservation.numberOfNights = totalNights;
+			_view.reservation.noOfSglRooms 	 = sglTotal;
+			_view.reservation.noOfDblRooms 	 = dblTotal;
+			_view.reservation.noOfTplRooms 	 = tplTotal;
+			
+//			_view.reservation.noOfAdults 	= adultsTotal;
+//			_view.reservation.noOfChildren 	= childTotal;
+//			_view.reservation.noOfGuides 	= guideTotal;
+			generateDynamicGuideRooms();
+			
+			stoptBusyCursor();
+		}
+		
+		private function calculatePaxCount():void
+		{
+			var list:ArrayCollection = setSelectedDateRangeForGreaph();
+			
+			var totalAdultCount:int = 0;
+			var totalChildCount:int = 0;
+				
+			for(var i:int=0; i<list.length; i++)
+			{
+				var adultCount:int = 0;
+				var childCount:int = 0;
+				
+				for(var j:int=0; j<dynamicList.length; j++)
+				{
+					var line:ReservationLineHBox = dynamicList.getItemAt(j) as ReservationLineHBox;
+					
+					if(list.getItemAt(i).toString() == line.checkInDate.text)
+					{
+						adultCount += int(line.adultCount.text);
+						childCount += int(line.childCount.text);
+					}
+				}
+				
+				totalAdultCount += adultCount;
+				totalChildCount += childCount;
+				
+			}
+			
+			Alert.show("total adults : " + totalAdultCount.toString()+ "total children :" + totalChildCount.toString());
+		}
+		
+		private function setSelectedDateRangeForGreaph():ArrayCollection
+		{
+			var list:ArrayCollection = new ArrayCollection;
+			
+			var dynamicDate:String = _view.D_checkin.text.toString();
+			
+			list.addItem(dynamicDate);
+			
+			while(dynamicDate != _view.D_checkout.text.toString())
+			{
+				dynamicDate = setDateForGivenRange(dynamicDate, 1);
+				
+				
+				list.addItem(dynamicDate);
+				
+			}
+			
+			return list;
+		}
+		
+		private function showSavedeDiscounts(savedList:ArrayCollection, inList:ArrayCollection, occupancy:String):ArrayCollection
+		{
+			
+			var list:ArrayCollection = new ArrayCollection;
+			
+			for(var i:int=0; i<inList.length; i++)
+			{
+				var dis:Discounts = inList.getItemAt(i) as Discounts;
+				
+				if(dis.choosable)// all chooseable discounts should be showed even its a saved reservation
+					list.addItem(dis);
+				
+				for(var j:int=0; j<savedList.length; j++)
+				{
+					var resDis:ReservationDiscounts = savedList.getItemAt(j) as ReservationDiscounts;
+					
+					if(resDis.status == JWHConstants.STATUS_LABLE_ACTIVE && resDis.occupancyType == occupancy)
+					{
+						if(resDis.discountId == dis.uuid)
+						{
+							dis.toBeAppliedForCalculation = true;
+							if(!dis.applicableStatus)
+								dis.applicableStatus	  = resDis.applicableStatus;
+							dis.noOfUnits				  = resDis.noOfUnits;
+							
+							if(!dis.choosable)// since all chooseble discounts are added avoid adding same chooseable discount again
+								list.addItem(dis);
+						}
+					}
+				}
+			}
+			
+			if(isToRefreshRates)
+				list = inList;
+			//Alert.show("applicable list size : " + list.length +", discounts list size "+ inList.length);
+			return list;
+		}
+		
+		private function handleReservationCheckInDate(e:Event):void
+		{
+			var line:ReservationLineHBox = e.currentTarget.owner as ReservationLineHBox
+				selectedIndex 	= line.sequence;
+				nextCheckinDate = line.checkInDate.text;
+				
+				
+				line.checkOutDate.text = setDateForGivenRange(nextCheckinDate, 1);
+				
+				//calculateDays(line);
+				loadAvailability();
+				reaOrderLinesAfterDateChange(dynamicList, line);
+				//calculateTotalPax();
+		}
+		
+		private function handleReservationCheckOutDate(e:Event):void
+		{
+			if(selectedIndex>-1 && dynamicList.length>selectedIndex)
+			{
+				nextCheckinDate = (dynamicList.getItemAt(selectedIndex) as ReservationLineHBox).checkOutDate.text;
+				//calculateDays(dynamicList.getItemAt(selectedIndex) as ReservationLineHBox);
+				calculateTotalPax();
+			}
+		}
+		
+		private function deleteHandler(e:Event):void
+		{
+			deleteLine();
+			calculateTotalPax();
+		}
+		
+		private function deleteLine():void
+		{
+			if(selectedIndex>-1 && dynamicList.length>selectedIndex)
+			{
+				var hbox:ReservationLineHBox = dynamicList.getItemAt(selectedIndex) as ReservationLineHBox;
+				nextCheckinDate = hbox.checkInDate.text;
+				//Alert.show("added to delete list in line no : 1867");
+				deleteList.addItem(dynamicList.getItemAt(selectedIndex));
+				_view.V_dynamic_vbox_for_res.removeChildAt(selectedIndex);
+				dynamicList.removeItemAt(selectedIndex);
+				
+				deleteGuideLine(hbox.uuid);
+				
+				selectedIndex = selectedIndex - 1;
+				reaOrderLines(dynamicList);
+				reaOrderLines(dynamicGuideRoomList);
+				
+				deleteFromVisualBox(hbox);
+				
+				//deleteDiscountVisualLines();
+			}
+		}
+		
+		private function deleteGuideLine(visualId:String):void
+		{
+			for(var i:int=0; i<dynamicGuideRoomList.length; i++)
+			{
+				var line:ReservationLineHBox = dynamicGuideRoomList.getItemAt(i) as ReservationLineHBox;
+				if(line.uuid == visualId)
+				{
+					//Alert.show("added to delete list in line no : 1891");
+					deleteList.addItem(dynamicGuideRoomList.getItemAt(i));
+					dynamicGuideRoomList.removeItemAt(i);
+					break;
+				}
+			}
+		}
+		
+//		private function deleteDiscountVisualLines():void
+//		{
+//			_view.V_discounts.removeAllChildren();
+//			dynamicDiscountList.removeAll();
+//			
+//			for(var i:int=0; i<dynamicList.length; i++)
+//			{
+//				var res:ReservationLineHBox = dynamicList.getItemAt(i) as ReservationLineHBox;
+//				for(var j:int=0; j<res.discountList.length; j++)
+//				{
+//					var dis:Discounts				= res.discountList.getItemAt(i) as Discounts;
+//					var disHbox:DiscountLineHbox	= new DiscountLineHbox(dis);
+//					addToDynamicDiscountView(disHbox);
+//				}
+//				
+//			}
+//		}
+		
+		private function deleteFromVisualBox(resLine:ReservationLineHBox):void
+		{
+			for(var i:int=0; i<dynamicRateBoxList.length; i++)
+			{
+				if((dynamicRateBoxList.getItemAt(i) as RoomBasisCostHBox).rateCodeId == resLine.rateCode.uuid)
+				{
+					if(!checkForSameRateCodeReservationsBeforeReomveTheVisualBox(resLine.rateCode.uuid))
+					{
+						_view.V_dynamic_rates.removeAllChildren();
+						dynamicRateBoxList.removeItemAt(i);
+						i-=1;
+					}
+				}
+			}
+			reArrangeViusalRateObject(dynamicRateBoxList);
+		}
+		
+		private function reArrangeViusalRateObject(temp:ArrayCollection):void
+		{
+			
+			for(var i:int=0; i<temp.length; i++)
+			{
+				if(!checkFortAlreadyAddedVisualBox( (temp.getItemAt(i) as RoomBasisCostHBox).rateCodeId , (temp.getItemAt(i) as RoomBasisCostHBox).roomLabel.text))
+				{
+					_view.V_dynamic_rates.addChild(temp.getItemAt(i) as RoomBasisCostHBox);
+				}
+			}
+		}
+		
+		
+		private function checkForSameRateCodeReservationsBeforeReomveTheVisualBox(rateCodeId:String):Boolean
+		{
+			var isSameRateCodeFound:Boolean = false;
+			
+			for(var i:int=0; i<dynamicList.length; i++)
+			{
+				if((dynamicList.getItemAt(i) as ReservationLineHBox).rateCode.uuid == rateCodeId)
+				{
+					isSameRateCodeFound = true;
+					break;
+				}
+			}
+			
+			return isSameRateCodeFound;
+		}
+		
+		private function arrayCollectionSort(list:ArrayCollection, line:ReservationLineHBox):void 
+		{
+			
+				
+			for(var j:int=0; j<list.length; j++)
+			{
+				var nextLine:ReservationLineHBox = list.getItemAt(j) as ReservationLineHBox;
+				
+				trace(nextLine.checkInDate.text);
+				
+				if(compareTwoDates(line.checkInDate.text, nextLine.checkInDate.text) == false && nextLine.sequence>line.sequence)
+				{
+					list.setItemAt(nextLine, line.sequence);
+					list.setItemAt(line, j);
+					list.refresh();
+				}
+			}
+				
+		   
+		}
+		
+		
+		private function reaOrderLinesAfterDateChange(list:ArrayCollection, current:ReservationLineHBox):void
+		{
+			arrayCollectionSort(list, current);
+			
+			_view.V_dynamic_vbox_for_res.removeAllChildren();
+			
+			for(var i:int=0; i<list.length; i++)
+			{
+				var line:ReservationLineHBox = list.getItemAt(i) as ReservationLineHBox;
+					line.sequence	=	i;
+				_view.V_dynamic_vbox_for_res.addChild(line);
+			}
+		}
+		
+		private function reaOrderLines(list:ArrayCollection):void
+		{
+			for(var i:int=0; i<list.length; i++)
+			{
+				var line:ReservationLineHBox = dynamicList.getItemAt(i) as ReservationLineHBox;
+					line.sequence	=	i;
+			}
+		}
+		
+		private function flushResLinesAndReOrder(list:ArrayCollection):void
+		{
+			_view.V_dynamic_vbox_for_res.removeAllChildren();
+			
+			for(var i:int=0; i<list.length; i++)
+			{
+				var line:ReservationLineHBox = dynamicList.getItemAt(i) as ReservationLineHBox;
+					line.sequence	=	i;
+				
+				_view.V_dynamic_vbox_for_res.addChild(line);	
+			}
+		}
+		
+		private function handleMouseUp(event:Event):void
+		{
+			if(event.currentTarget as ReservationLineHBox)
+				selectedIndex = (event.currentTarget as ReservationLineHBox).sequence;
+				
+		}
+		
+		private function handleKeyUp(event:KeyboardEvent):void
+		{
+			if(event.currentTarget as ReservationLineHBox)
+				selectedIndex = (event.currentTarget as ReservationLineHBox).sequence;
+			
+		}
+		
+		private function addNewHandler(e:Event):void
+		{
+			addNew();
+		}
+		
+		private function addNew():void
+		{
+			//_view.B_status.setJLabel(JWHConstants.STATUS_LABLE_ACTIVE);
+			setLoggedInUser();
+			
+			isToRefreshRates = true;
+			isRetriewMode    = false;
+			isToCheckAvailability = true;
+			
+			_view.B_save.enabled = true;
+			
+			_view.reservation = new Reservation;
+			
+			_view.V_discounts.removeAllChildren();
+			_view.V_dynamic_rates.removeAllChildren();
+			_view.V_dynamic_vbox_for_res.removeAllChildren();
+			_view.V_pd_dynamicTax.removeAllChildren();
+			_view.V__pd_dynamicRoomRate.removeAllChildren();
+			
+			dynamicList.removeAll();
+			dynamicRateBoxList.removeAll();
+			dynamicDiscountList.removeAll();
+			dynamicGuideRoomList.removeAll();
+			dynamicTaxList.removeAll();
+			
+			_view.totalNetAmount 		= 0;
+			_view.totalRooms	 		= 0;
+			_view.totalTaxAmount 		= 0;
+			_view.totalWithTaxAmount 	= 0;
+			_view.totalDisplayAmount	= 0;
+			
+			_view.currencyType = "";
+			_view.resNo= "";
+			
+			setInitialData();
+			
+//			_view.CMB_property.selectedItem = null;
+//			_view.CMB_currency.selectedItem = null;
+//			_view.CMB_market.selectedItem 	= null;
+//			_view.CMB_payments.selectedItem = null;
+		}
+		
+		private function showSelectedItem():void
+		{
+			
+			if(_view.reservation.reservationsStatus == JWHConstants.RESERVATION_BOOKING_STATUS_WAITING_APPROVAL)
+			{
+				isToRefreshRates 					= true;
+				//_view.reservation.desCreateStatus	= "I";
+			}
+			else
+				isToRefreshRates = false;
+			
+			
+			removeNotSavedTaxes();
+			_view.resNo= _view.reservation.originator+"-"+_view.reservation.reservationYear+"-"+_view.reservation.reservationNo;
+			nextCheckinDate	  = _view.D_checkin.text;
+			oldCheckinDate    = _view.D_checkin.text;
+			oldNoOfDays		  = _view.reservation.numberOfNights.toString();
+			
+			if(_view.reservation.applyPromotionCode)
+				promotionCodeVisibilityHadler();	
+			
+			_view.CMB_property.selectedIndex = setComboSelectedItemById(propertyList, "uuid", _view.reservation.propertyId);
+			_view.CMB_property.dispatchEvent(new ListEvent(ListEvent.CHANGE));
+			
+			_view.CMB_currency.selectedIndex = setComboSelectedItemById(currencyList, "uuid", _view.reservation.currency);
+			_view.currencyType = (_view.CMB_currency.selectedItem as CurrencyMaster).currencyCode;
+			
+			_view.CMB_arrivalMeal.selectedIndex = setComboSelectedItemById(JWHConstants.mealTypeList, "uuid", _view.reservation.mealDetails.arrivalMeal);
+			_view.CMB_leaveMeal.selectedIndex	= setComboSelectedItemById(JWHConstants.mealTypeList, "uuid", _view.reservation.mealDetails.leaveMeal);
+			
+			_view.CMB_guide_meal.selectedIndex 		= setComboSelectedItemById(JWHConstants.roomBasisList, "id", _view.reservation.guide.guideMeal);
+			_view.CMB_guide_occupancy.selectedIndex = setComboSelectedItemById(JWHConstants.roomOccupancyList, "id", _view.reservation.guide.guideOccupancyType);
+			
+			_view.CHK_guide_required.dispatchEvent(new Event(Event.CHANGE));
+			
+			if(_view.reservation.reservedBy == JWHConstants.RESERVATION_BOOKING_TYPE_FIT)
+				_view.RD_bt_fit.selected 	= true;
+			else if(_view.reservation.reservedBy == JWHConstants.RESERVATION_BOOKING_TYPE_OTA)
+				_view.RD_bt_ota.selected 	= true;
+			else if(_view.reservation.reservedBy == JWHConstants.RESERVATION_BOOKING_TYPE_OPERATOR)
+				_view.RD_bt_agent.selected 	= true;	
+				
+			if(_view.reservation.resPaxType == JWHConstants.RESERVATION_PAX_TYPE_INDIVIDUAL)
+			{
+				_view.RD_bt_individual.selected = true;
+				_view.T_guest.editable = false;
+				_view.T_guestLname.editable = false;
+				_view.B_country.enabled = false;
+			}
+			else if(_view.reservation.resPaxType == JWHConstants.RESERVATION_PAX_TYPE_GROUP)
+			{
+				_view.RD_bt_group.selected 		= true;	
+				_view.T_guest.editable = true;
+				_view.T_guestLname.editable = true;
+				_view.B_country.enabled = true;
+			}
+				
+				
+			if(_view.reservation.guestType == JWHConstants.RESERVATION_GUEST_TYPE_LOCAL)
+				_view.RD_bt_local.selected 	 = true;
+			else if(_view.reservation.guestType == JWHConstants.RESERVATION_GUEST_TYPE_FOREIGN)
+				_view.RD_bt_foreign.selected = true;	
+				
+			if(_view.reservation.reservationsStatus == JWHConstants.RESERVATION_BOOKING_STATUS_CONFIRMED)
+				_view.RD_confirmed.selected 	= true;
+			else if(_view.reservation.reservationsStatus == JWHConstants.RESERVATION_BOOKING_STATUS_WAITLISTED)
+				_view.rd_waitlisted.selected 	= true;
+			else if(_view.reservation.reservationsStatus == JWHConstants.RESERVATION_BOOKING_STATUS_TENTATIVE)
+				_view.rd_tentative.selected 	= true;	
+			else if(_view.reservation.reservationsStatus == JWHConstants.RESERVATION_BOOKING_STATUS_CANCELED)
+				_view.rd_cancel.selected 		= true;	
+			else if(_view.reservation.reservationsStatus == JWHConstants.RESERVATION_BOOKING_STATUS_WAITING_APPROVAL)
+				_view.rd_approval.selected 		= true;		
+				
+			if(_view.reservation.paymentModeId == JWHConstants.RESERVATION_PAYMENT_MODE_CREDIT)
+				_view.RD_credit.selected 		= true;
+			else if(_view.reservation.paymentModeId == JWHConstants.RESERVATION_PAYMENT_MODE_CASH)
+				_view.RD_cash.selected  		= true;
+			else if(_view.reservation.paymentModeId == JWHConstants.RESERVATION_PAYMENT_MODE_AGENT)
+				_view.RD_agent.selected			= true;	
+			else if(_view.reservation.paymentModeId == JWHConstants.RESERVATION_PAYMENT_MODE_CREDIT_CARD)
+				_view.RD_creditCard.selected 	= true;
+			else if(_view.reservation.paymentModeId == JWHConstants.RESERVATION_PAYMENT_MODE_COMPLIMENTARY)
+				_view.RD_complementry.selected 	= true;
+				
+				
+		}
+		
+		
+		
+		private function confirmRefresh(e:Event=null):void
+		{
+			Alert.show("Some changes were found, refresh all?",
+			"Confirm refresh",Alert.YES|Alert.NO,null,dataRefreshHandler,null,Alert.NO);
+		}
+		
+		private function dataRefreshHandler(event:CloseEvent):void 
+		{
+			if (event.detail==Alert.YES)
+			{
+				isToRefreshRates = true;
+				calculateTotalPax();
+			}
+			else
+			{
+				//isToRefreshRates = false;
+			}
+			
+		}
+		
+		private function setLoggedInUser():void
+		{
+			initializeGuestProfileRemortingObject();
+			guestProfileRO.setLogedInUser(_loggedInUser);
+			
+			initializePropertyRemortingObject();
+			propertyRO.setLogedInUser(_loggedInUser);
+			
+			initializeAgentDetailsRemortingObject();
+			agentDetailsRO.setLogedInUser(_loggedInUser);
+			
+			initializeAgentMarketsRemortingObject();
+			agentMarketRO.setLogedInUser(_loggedInUser);
+			
+			initializeRoomCategoryRemortingObject();
+			roomCategoryRO.setLogedInUser(_loggedInUser);
+			
+			initializeAgentTypeRemortingObject();
+			agentTypeRO.setLogedInUser(_loggedInUser);
+			
+			initializeRCRemortingObject();
+			rc_rateCodeRO.setLogedInUser(_loggedInUser);
+			
+			initializeRCOtherCostsMasterRemortingObject();
+			rc_otherCostMasterRO.setLogedInUser(_loggedInUser);
+			
+			initializeCurrencyMasterRemortingObject();
+			currencyMasterRO.setLogedInUser(_loggedInUser);
+			
+			initializeRCDiscountRemortingObject();
+			rc_discountRO.setLogedInUser(_loggedInUser);
+			
+			initializeModeOfPaymentRemortingObject();
+			modeOfPaymentRO.setLogedInUser(_loggedInUser);
+			
+			initializeReservationRemortingObject();
+			hs743_reservationRO.setLogedInUser(_loggedInUser);
+			
+			initializeDmcMarketRemortingObject();
+			dmcMarketRO.setLogedInUser(_loggedInUser);
+			
+			initializeTaxRemortingObject();
+			taxRO.setLogedInUser(_loggedInUser);
+			
+			initializeDestinityFetchRemortingObject();
+		}
+		
+		private function prepareToPrint(list:ArrayCollection):void
+		{
+           	startBusyCursor();
+            initializePDFGeneratorHelperRemortingObject();
+            PDFGeneratorHelperRO.setLogedInUser(_loggedInUser);
+            PDFGeneratorHelperRO.generateVoucher(_view.reservation, list);
+		}
+		
+		private function confirmSave():void
+		{
+			
+			Alert.show("Do you want to make the booking ?",
+			"Confirm Save",Alert.YES|Alert.NO,null,resultHandler,null,Alert.NO);
+		}
+		
+		// delete method
+		private function resultHandler(event:CloseEvent):void {
+		if (event.detail==Alert.YES){
+			saveItem();
+		//Your delete command here
+		}else if(event.detail==Alert.NO){
+		//do something else
+		 }
+		}
+		
+		
+		private function confirmCancel():void
+		{
+			
+			Alert.show("Do you want to cancel the booking ?",
+			"Confirm Cancel",Alert.YES|Alert.NO,null,cancelResultHandler,null,Alert.NO);
+		}
+		
+		// delete method
+		private function cancelResultHandler(event:CloseEvent):void {
+		if (event.detail==Alert.YES){
+			saveItem();
+		//Your delete command here
+		}else if(event.detail==Alert.NO){
+		//do something else
+		 }
+		}
+		
+		private function saveItemHandler(e:Event):void
+		{
+			if(checkFieldValication())
+			{
+				if(_view.rd_cancel.selected)
+					confirmCancel();
+				else	
+					confirmSave();
+			}
+		}
+		
+		private function saveItem():void
+		{
+//			if(_view.reservation.uuid.length==0)
+//			{
+//				var uid:String = UIDUtil.createUID().toString();
+//				_view.reservation.uuid = uid;
+//			}
+			
+			if(_view.CMB_property.selectedItem!=null)
+			{
+				var prop:Property				=   _view.CMB_property.selectedItem as Property;
+				_view.reservation.propertyId	=	prop.uuid;
+				_view.reservation.property		=	prop;
+			}
+			
+			if(_view.CMB_dmcMarket.selectedItem!=null)
+				_view.reservation.dmcMarketId = (_view.CMB_dmcMarket.selectedItem as DmcMarket).uuid;
+				
+			if(_view.CMB_guide_meal.selectedItem!=null)
+				_view.reservation.guide.guideMeal = _view.CMB_guide_meal.selectedItem.id;
+				
+			if(_view.CMB_guide_occupancy.selectedItem!=null)
+				_view.reservation.guide.guideOccupancyType = _view.CMB_guide_occupancy.selectedItem.id;	
+				
+			if(_view.CMB_guide_room.selectedItem!=null)
+				_view.reservation.guide.guideRoomCategory = (_view.CMB_guide_room.selectedItem as RoomCategory).uuid;				
+			
+			var meal:MealDetails	=	new MealDetails;
+			
+			if(_view.CMB_arrivalMeal.selectedItem!=null)
+				meal.arrivalMeal = _view.CMB_arrivalMeal.selectedItem.uuid;
+				
+			if(_view.CMB_leaveMeal.selectedItem!=null)
+				meal.leaveMeal   = _view.CMB_leaveMeal.selectedItem.uuid;
+				
+			if(dynamicList.length>0)
+			{
+				var line:ReservationLineHBox = dynamicList.getItemAt(0) as ReservationLineHBox;
+				
+				if(line.cmb_roomBasis.selectedItem!=null)
+							meal.mealBasis   =	line.cmb_roomBasis.selectedItem.id;
+			}
+				
+//			if(_view.CMB_payments.selectedItem!=null)
+//				_view.reservation.paymentModeId	=	_view.CMB_payments.selectedItem.uuid;
+//			
+//			if(_view.CMB_currency.selectedItem!=null)
+//				_view.reservation.currency	=	_view.CMB_currency.selectedItem.uuid;		
+//			
+			_view.reservation.mealDetails				= meal;
+
+			_view.reservation.timeStamp.createdById 	= _loggedInUser.uuid;
+			_view.reservation.timeStamp.createdByName 	= _loggedInUser.userName;
+			
+			_view.reservation.timeStamp.updatedById 	= _loggedInUser.uuid;
+			_view.reservation.timeStamp.updatedByName 	= _loggedInUser.userName;	
+			
+//			if(_view.rd_rb_guest.selected)
+//				_view.reservation.reservedBy = JWHConstants.RESERVATION_RESERVED_BY_GUEST;
+//			else if(_view.rd_rb_agent.selected)
+//				_view.reservation.reservedBy = JWHConstants.RESERVATION_RESERVED_BY_AGENT;
+				
+			if(_view.RD_bt_fit.selected)
+				_view.reservation.reservedBy = JWHConstants.RESERVATION_BOOKING_TYPE_FIT;
+			else if(_view.RD_bt_ota.selected)
+				_view.reservation.reservedBy = JWHConstants.RESERVATION_BOOKING_TYPE_OTA;
+			else if(_view.RD_bt_agent.selected)
+				_view.reservation.reservedBy = JWHConstants.RESERVATION_BOOKING_TYPE_OPERATOR;	
+				
+			if(_view.RD_bt_individual.selected)
+				_view.reservation.resPaxType = JWHConstants.RESERVATION_PAX_TYPE_INDIVIDUAL;
+			else if(_view.RD_bt_group.selected)
+				_view.reservation.resPaxType = JWHConstants.RESERVATION_PAX_TYPE_GROUP;
+				
+			if(_view.RD_bt_local.selected)
+				_view.reservation.guestType = JWHConstants.RESERVATION_GUEST_TYPE_LOCAL;
+			else if(_view.RD_bt_foreign.selected)
+				_view.reservation.guestType = JWHConstants.RESERVATION_GUEST_TYPE_FOREIGN;	
+				
+			if(_view.RD_confirmed.selected)
+				_view.reservation.reservationsStatus = JWHConstants.RESERVATION_BOOKING_STATUS_CONFIRMED;
+			else if(_view.rd_waitlisted.selected)
+				_view.reservation.reservationsStatus = JWHConstants.RESERVATION_BOOKING_STATUS_WAITLISTED;
+			else if(_view.rd_tentative.selected)
+				_view.reservation.reservationsStatus = JWHConstants.RESERVATION_BOOKING_STATUS_TENTATIVE;
+			else if(_view.rd_cancel.selected)
+				_view.reservation.reservationsStatus = JWHConstants.RESERVATION_BOOKING_STATUS_CANCELED;	
+			else if(_view.rd_approval.selected)
+				_view.reservation.reservationsStatus = JWHConstants.RESERVATION_BOOKING_STATUS_WAITING_APPROVAL;		
+				
+			if(_view.RD_credit.selected)
+				_view.reservation.paymentModeId = JWHConstants.RESERVATION_PAYMENT_MODE_CREDIT;
+			else if(_view.RD_cash.selected)
+				_view.reservation.paymentModeId = JWHConstants.RESERVATION_PAYMENT_MODE_CASH;
+			else if(_view.RD_agent.selected)
+				_view.reservation.paymentModeId = JWHConstants.RESERVATION_PAYMENT_MODE_AGENT;	
+			else if(_view.RD_creditCard.selected)
+				_view.reservation.paymentModeId = JWHConstants.RESERVATION_PAYMENT_MODE_CREDIT_CARD;
+			else if(_view.RD_complementry.selected)
+				_view.reservation.paymentModeId = JWHConstants.RESERVATION_PAYMENT_MODE_COMPLIMENTARY;
+				
+			if(_view.CHK_promotionCode.selected)
+				_view.reservation.applyPromotionCode = true;
+			else
+				_view.reservation.applyPromotionCode = false;
+				
+			if(_view.CHK_guide_required.selected)
+				_view.reservation.guideRequire = true;
+			else
+				_view.reservation.guideRequire = false;		
+				
+//			if(_view.RD_bt_fit.selected)
+//				_view.reservation.countryId	= _view.reservation.guestDetails.personalDetails.countryId;
+//			else	
+//				_view.reservation.countryId	= _view.reservation.agentDetails.countryId;
+			
+			var tempRDList:ArrayCollection		= new ArrayCollection;;	
+			tempRDList							= arrageReservationDetailsForSaving(tempRDList, dynamicList);
+			tempRDList							= arrageReservationDetailsForSaving(tempRDList, dynamicGuideRoomList);
+			
+			_view.reservation.reservationList	= tempRDList;
+			_view.reservation.taxDetailsList	= arrangeTaxDetailsForSaving();
+			
+			//var amount:String				= _view.reservation.totalAmount;
+			_view.reservation.totalAmount	= _view.totalDisplayAmount.toString();
+			
+			var temp:ArrayCollection = new ArrayCollection;
+				temp.addItem(_view.reservation);
+				
+			var tempDeleteList:ArrayCollection = arrangeDeleteLines();
+			
+			_view.B_save.enabled = false;	
+			startBusyCursor();
+			hs743_reservationRO.create(temp, tempDeleteList);
+		}
+		
+		private function arrangDiscountsListForSaving(line:ReservationLineHBox, occupancyType:String):ArrayCollection
+		{
+			var list:ArrayCollection = new ArrayCollection;
+			
+			var discList:ArrayCollection = new ArrayCollection;
+			
+			if(occupancyType == JWHConstants.ROOM_OCCUPANCY_TYPE_SGL)
+				discList = line.sglDiscountList;
+			else if(occupancyType == JWHConstants.ROOM_OCCUPANCY_TYPE_DBL)
+				discList = line.dblDiscountList;
+			else if(occupancyType == JWHConstants.ROOM_OCCUPANCY_TYPE_TLP)
+				discList = line.tplDiscountList;
+				
+			
+			for(var n:int=0; n<discList.length; n++)
+			{
+				var sglDisc:Discounts				 = discList.getItemAt(n) as Discounts;
+				var sblSaveDisc:ReservationDiscounts = arrangeOccupancyWiseDiscounts(sglDisc, line.savedDiscountList, occupancyType);
+				
+				if(sblSaveDisc!=null)
+					list.addItem(sblSaveDisc);
+			}
+			
+			return list;
+		}
+		
+		private function arrangeOccupancyWiseDiscounts(disc:Discounts, savedList:ArrayCollection, occupancyType:String):ReservationDiscounts
+		{
+			var obj:ReservationDiscounts = null;
+			
+				obj 			   = getAlreadySavedDiscounts(savedList, disc.uuid , occupancyType);
+					
+				if(disc.toBeAppliedForCalculation == true)
+				{
+						if(obj==null)
+							obj						 = new ReservationDiscounts;
+							
+						obj.discountId	   		 = disc.uuid;
+						obj.amountType			 = disc.amountType;
+						obj.discountAmount		 = disc.amount;
+						obj.dsType				 = disc.dsType;
+						obj.status 				 = JWHConstants.STATUS_LABLE_ACTIVE;
+						obj.occupancyType		 = occupancyType;
+						obj.noOfUnits			 = disc.noOfUnits;
+						obj.applicableStatus	 = disc.applicableStatus;
+						
+						obj.timeStamp.createdById 		= _loggedInUser.uuid;
+						obj.timeStamp.createdByName 	= _loggedInUser.userName;
+					
+						obj.timeStamp.updatedById 		= _loggedInUser.uuid;
+						obj.timeStamp.updatedByName 	= _loggedInUser.userName;
+				}
+				else
+				{
+					if(checkAlreadySavedDiscounts(savedList, disc.uuid, occupancyType))
+					{
+						obj.discountId	   = disc.uuid;
+						obj.status 		   = JWHConstants.STATUS_LABLE_INACTIVE;
+					}
+				}
+					
+				
+			
+			return obj;
+		}
+		
+		private function checkAlreadySavedDiscounts(list:ArrayCollection, inId:String, occupancyType:String):Boolean
+		{
+			var isAlreadyIn:Boolean = false;
+			
+			for(var i:int=0; i<list.length; i++)
+        	{
+        		var disc:ReservationDiscounts = list.getItemAt(i) as ReservationDiscounts;
+        		if(disc.discountId == inId && disc.occupancyType == occupancyType)
+        		{
+        			isAlreadyIn = true;
+        			break;
+        		}
+        			
+        	}
+        	return isAlreadyIn;
+		}
+		
+		private function getAlreadySavedDiscounts(list:ArrayCollection, inId:String , occupancyType:String):ReservationDiscounts
+		{
+			var disc:ReservationDiscounts = null;
+			
+			for(var i:int=0; i<list.length; i++)
+        	{
+        		
+        		if(list.getItemAt(i).discountId == inId && list.getItemAt(i).occupancyType == occupancyType)
+        		{
+        			disc = list.getItemAt(i) as ReservationDiscounts;
+        			break;
+        		}
+        			
+        	}
+        	return disc;
+		}
+		
+		private function arrangeDeleteLines():ArrayCollection
+		{
+			var list:ArrayCollection = new ArrayCollection;
+			
+			for(var i:int=0; i<deleteList.length; i++)
+			{
+				var res:ReservationDetails = new ReservationDetails;
+					res.visualLineId	   = (deleteList.getItemAt(i) as ReservationLineHBox).uuid;
+					res.roomPaxType		   = (deleteList.getItemAt(i) as ReservationLineHBox).roomPaxType;
+				
+				list.addItem(res);
+			}
+			
+			return list;
+		}
+		
+		private function arrangeRoomDetailsForSaving(resLine:ReservationLineHBox):void
+		{
+			var saveList:ArrayCollection = new ArrayCollection;
+			
+			for(var i:int=0; i<resLine.roomDetailsList.length; i++)
+			{
+				var roomLine:ReservationPaymentDetailsLineHBox = resLine.roomDetailsList.getItemAt(i) as ReservationPaymentDetailsLineHBox;
+				var room:ReservationByRoomDetails			   = new ReservationByRoomDetails;
+					
+				room.mealPlan		=	roomLine.L_mealPlan.text;
+				room.occupancy		=	roomLine.L_roomOccupancy.text;
+				room.noOfRooms		=	roomLine.roomCount;
+				room.roomRate		=	roomLine.roomRate;
+				room.totalRoomRate	=	roomLine.totalRoomRate;
+				room.rateCodeId		=   resLine.rateCode.uuid;
+				
+				saveList.addItem(room);
+			}
+		}
+		
+		private function arrangeTaxDetailsForSaving():ArrayCollection
+		{
+			var saveList:ArrayCollection = new ArrayCollection;
+			
+			for(var i:int=0; i<taxesList.length; i++)
+			{
+				var line:Tax = taxesList.getItemAt(i) as Tax;
+				var obj:ReservationPaymentDetails		   = new ReservationPaymentDetails;
+					obj.costCode						   = line.uuid;
+					obj.tax								   = line;
+					obj.amount							   = line.taxCalculatedAmount.toString();
+					
+					obj.timeStamp.createdById 	= _loggedInUser.uuid;
+					obj.timeStamp.createdByName = _loggedInUser.userName;
+			
+					obj.timeStamp.updatedById 	= _loggedInUser.uuid;
+					obj.timeStamp.updatedByName = _loggedInUser.userName;
+				
+				if(line.status == JWHConstants.STATUS_LABLE_ACTIVE)	
+					saveList.addItem(obj);
+			}
+			
+			var totalObj:ReservationPaymentDetails = new ReservationPaymentDetails;
+				totalObj.costCode				   = JWHConstants.TAX_COST_CODE_TOTAL;
+				totalObj.amount					   = _view.totalWithTaxAmount.toString();
+				
+				totalObj.timeStamp.createdById 	= _loggedInUser.uuid;
+				totalObj.timeStamp.createdByName = _loggedInUser.userName;
+			
+				totalObj.timeStamp.updatedById 	= _loggedInUser.uuid;
+				totalObj.timeStamp.updatedByName = _loggedInUser.userName;
+				
+			saveList.addItem(totalObj);
+			
+			return saveList;
+		}
+		
+		private function arrageReservationDetailsForSaving(returnList:ArrayCollection, list:ArrayCollection):ArrayCollection
+		{
+			
+			for(var i:int=0; i<list.length; i++)
+			{
+				var box:ReservationLineHBox = list.getItemAt(i) as ReservationLineHBox;
+					
+				for(var j:int=0; j<JWHConstants.roomOcupancyTypeList.length; j++)
+				{
+					var res:ReservationDetails 	= new ReservationDetails;
+					
+						res.checkInDate			= box.checkInDate.text;
+						res.checkOutDate		= box.checkOutDate.text;
+						res.rateCode			= box.rateCode;
+						res.rateCodeId			= res.rateCode.uuid;
+						res.currency			= res.rateCode.currency;
+						res.visualLineId		= box.uuid;
+						res.roomPaxType			= box.roomPaxType;
+						
+						if(JWHConstants.roomOcupancyTypeList.getItemAt(j).uuid == JWHConstants.ROOM_OCCUPANCY_TYPE_SGL)
+						{
+							res.noOfRooms		= Number(box.sglCount.text);
+							res.occupancyType	= JWHConstants.ROOM_OCCUPANCY_TYPE_SGL;
+							res.rate			= box.sglRate.toString();
+							res.uuid			= box.sglUuid;
+							
+							//if(res.noOfRooms>0)
+								res.discountList	= arrangDiscountsListForSaving(box, JWHConstants.ROOM_OCCUPANCY_TYPE_SGL);
+						}
+						else if(JWHConstants.roomOcupancyTypeList.getItemAt(j).uuid == JWHConstants.ROOM_OCCUPANCY_TYPE_DBL)
+						{
+							res.noOfRooms		= Number(box.dblCount.text);
+							res.occupancyType	= JWHConstants.ROOM_OCCUPANCY_TYPE_DBL;
+							res.rate			= box.dblRate.toString();
+							res.uuid			= box.dblUuid;
+							
+							//if(res.noOfRooms>0)
+								res.discountList	= arrangDiscountsListForSaving(box, JWHConstants.ROOM_OCCUPANCY_TYPE_DBL);
+						}
+						else if(JWHConstants.roomOcupancyTypeList.getItemAt(j).uuid == JWHConstants.ROOM_OCCUPANCY_TYPE_TLP)
+						{
+							res.noOfRooms		= Number(box.tplCount.text);
+							res.occupancyType	= JWHConstants.ROOM_OCCUPANCY_TYPE_TLP;
+							res.rate			= box.tplRate.toString();
+							res.uuid			= box.tplUuid;
+							
+							//if(res.noOfRooms>0)
+								res.discountList	= arrangDiscountsListForSaving(box, JWHConstants.ROOM_OCCUPANCY_TYPE_TLP);
+						}
+									
+						res.noOfAdults			= Number(box.adultCount.text);
+						res.noOfChildren		= Number(box.childCount.text);
+						res.guide				= Number(box.guideCount.text);
+						res.noOfRoomNights		= box.noOfNights;
+						
+						if(box.cmb_roomCategory.selectedItem!=null)
+						{
+							res.roomCategoryId	=	(box.cmb_roomCategory.selectedItem as RoomCategory).uuid;
+							res.roomCategory	=	box.cmb_roomCategory.selectedItem as RoomCategory;
+						}
+						if(box.cmb_roomBasis.selectedItem!=null)
+							res.mealBasis		=	box.cmb_roomBasis.selectedItem.id;
+						
+						res.timeStamp.createdById 		= _loggedInUser.uuid;
+						res.timeStamp.createdByName 	= _loggedInUser.userName;
+						
+						res.timeStamp.updatedById 		= _loggedInUser.uuid;
+						res.timeStamp.updatedByName 	= _loggedInUser.userName;
+						
+						//res.roomDetailList = arrangeRoomDetailsForSaving(box);	
+					//if(res.noOfRooms>0)	
+						returnList.addItem(res);
+				}
+			}
+			
+			return returnList;
+		}
+		
+		private function confirmPDFGeneration():void
+		{
+			
+			Alert.show("Do you want to send confirmation Voucher ?",
+			"Confirmation Voucher",Alert.YES|Alert.NO,null,pdfPrintresultHandler,null,Alert.NO);
+		}
+		
+		// delete method
+		private function pdfPrintresultHandler(event:CloseEvent):void {
+		if (event.detail==Alert.YES){
+			openConfirmationVoucherHelp();
+		//Your delete command here
+		}else if(event.detail==Alert.NO){
+		//do something else
+		 }
+		}
+		
+		
+		public override function hs743reservationCreateResultsHandler (event:ResultEvent):void
+		{	
+			stoptBusyCursor();
+			reservationList 		= new ArrayCollection;
+			reservationList			= event.result as ArrayCollection;
+			
+			if(reservationList.length>0)
+			{
+				_view.reservation = reservationList.getItemAt(0) as Reservation;
+				_view.resNo= _view.reservation.originator+"-"+_view.reservation.reservationYear+"-"+_view.reservation.reservationNo;
+				confirmPDFGeneration();
+			}
+				
+//			activityAknowladgment();
+		}
+		
+		public override function marketingPropertyFetchResultsHandler (event:ResultEvent):void
+		{	
+			stoptBusyCursor();
+			propertyList = new ArrayCollection();
+			propertyList = event.result as ArrayCollection;
+			_view.CMB_property.dataProvider = propertyList;
+			
+			loadCurrencyList();
+			
+		}
+		
+//		public override function guestProfileFetchResultsHandler(event:ResultEvent):void
+//		{
+//			stoptBusyCursor();
+//			guestList	=	new ArrayCollection;
+//			guestList	=	event.result as ArrayCollection;
+//			
+//			//_view.B_guestDetails.visible = false;
+//			
+//			if(guestList.length==1)
+//			{
+//				_view.reservation.guestDetails 		= guestList.getItemAt(0) as Guest;
+//				_view.reservation.guestOrGroupName 	= _view.reservation.guestDetails.personalDetails.firstName +" "+_view.reservation.guestDetails.personalDetails.lastName;
+//				//_view.B_guestDetails.visible 	= true;
+//				setGuestSearchButtonStatus(false);
+//			}
+//			else if(guestList.length>1)
+//			{
+//				//setGuestSearchButtonStatus(true);
+//				//openGuestHelp();
+//			}
+//		}
+		
+		public override function agentDetailsFetchResultsHandler (event:ResultEvent):void
+		{	
+			stoptBusyCursor();
+			agentList = new ArrayCollection();
+			agentList = event.result as ArrayCollection;
+			
+			
+		}
+		
+		public override function agentMarketFetchResultsHandler(event:ResultEvent):void
+		{
+			stoptBusyCursor();
+			marketList	=	new ArrayCollection;
+			marketList	=	event.result as ArrayCollection;
+			
+//			_view.CMB_market.dataProvider = marketList;
+//			_view.CMB_market.selectedIndex= setComboSelectedItemById(marketList, "uuid", _view.reservation.agentDetails.agentMarketUuid);
+			
+		}
+		
+		public override function roomCategoryFetchResultsHandler (event:ResultEvent):void
+		{	
+			stoptBusyCursor();
+			roomCategoryList = new ArrayCollection();
+			roomCategoryList = event.result as ArrayCollection;
+			
+			_view.CMB_guide_room.dataProvider = roomCategoryList;
+			
+			if(isRetriewMode)
+			{	
+				if(_view.reservation.guide.guideRoomCategory!=null)
+					_view.CMB_guide_room.selectedIndex 		= setComboSelectedItemById(roomCategoryList, "uuid", _view.reservation.guide.guideRoomCategory);
+				
+				if(_view.reservation.agentDetails.agentTypeId == JWHConstants.AGENT_CATEGORY_TYPE_DMC)
+	    		{
+	    			loadDMCMarkets();
+	    			_view.gr_dmc.percentHeight = 100;
+	    		}
+	    		else
+	    		{	
+					arrangeLinesForRetriewMode(_view.reservation.reservationList);
+	    			_view.gr_dmc.height = 0;
+	    			dmcMarketList		= new ArrayCollection;
+	    		}	
+   			}
+   			
+		}
+		
+		public override function agentTypeFetchResultsHandler (event:ResultEvent):void
+		{	
+			stoptBusyCursor();
+			agetnTypeList = new ArrayCollection();
+			agetnTypeList = event.result as ArrayCollection;
+			
+//			_view.CMB_agentType.dataProvider = agetnTypeList;
+//			_view.CMB_agentType.selectedIndex= setComboSelectedItemById(agetnTypeList, "uuid", _view.reservation.agentDetails.agentTypeId);
+			loadMarkets();
+			
+		}
+		
+		public override function rateCodeFetchResultsHandler (event:ResultEvent):void
+		{	
+			stoptBusyCursor();
+			rateCodeList = new ArrayCollection();
+			rateCodeList = event.result as ArrayCollection;
+			
+			if(rateCodeList.length>0)
+			{
+				var rateCode:RateCode		= rateCodeList.getItemAt(0) as RateCode;
+				
+				_view.reservation.currency  = rateCode.currency;
+				
+				var res:ReservationLineHBox = dynamicList.getItemAt(selectedIndex) as ReservationLineHBox;
+					res.rateCode			= rateCode;
+				
+				var roomCatId:String;
+				
+				if(res.cmb_roomCategory.selectedItem!=null)
+					roomCatId = res.cmb_roomCategory.selectedItem.uuid
+					
+				var generateVisualBox:RateCodeGenerateVisualBox = new RateCodeGenerateVisualBox();
+				var temp:ArrayCollection = generateVisualBox.generateRoomRataBox(rateCode, roomCategoryList, otheCostMasterList, roomCatId, _view.D_checkin.text);
+				addDynamicViusalRateObject(temp, rateCode.uuid);
+				
+				// Call discount fecth to find and store relevant discounts
+				loadDiscounts((rateCodeList.getItemAt(0) as RateCode).seasonId);
+			}
+			else
+			{
+				if(_view.reservation.agentDetails.uuid.length<1)
+				{
+					_view.T_agent.setFocus();
+					createJHErrorAlert(_view, "Please select the operator");
+				}
+				else if(_view.reservation.arrivalDetails.checkInDate.length<1)
+				{
+					_view.D_checkin.setFocus();
+					createJHErrorAlert(_view, "Please select the check-in date");
+				}
+				else
+				{
+					createJHErrorAlert(_view,"Rate Code was not found!");
+				}
+			}
+			
+		}
+		
+		private function addDynamicViusalRateObject(temp:ArrayCollection, rateCodeId:String):void
+		{
+			
+			for(var i:int=0; i<temp.length; i++)
+			{
+				if(!checkFortAlreadyAddedVisualBox(rateCodeId, (temp.getItemAt(i) as RoomBasisCostHBox).roomLabel.text))
+				{
+					dynamicRateBoxList.addItem(temp.getItemAt(i));
+					_view.V_dynamic_rates.addChild(temp.getItemAt(i) as RoomBasisCostHBox);
+				}
+			}
+		}
+		
+		private function checkFortAlreadyAddedVisualBox(rateCodeId:String, roomCategory:String):Boolean
+		{
+			var isAlreadyadded:Boolean = false;
+			
+			for(var i:int=0; i<dynamicRateBoxList.length; i++)
+			{
+				if((dynamicRateBoxList.getItemAt(i) as RoomBasisCostHBox).rateCodeId == rateCodeId && (dynamicRateBoxList.getItemAt(i) as RoomBasisCostHBox).roomLabel.text == roomCategory)
+				{
+					isAlreadyadded = true
+					break;
+				}
+			}
+			
+			return isAlreadyadded;
+		}
+		
+		private function getRateForSpecificReservation(resBox:ReservationLineHBox, occupancy:String):Number
+		{
+			var _rate:Number = 0;
+			
+			var roomCategory:String = "";
+			if(resBox.cmb_roomCategory.selectedItem!=null)
+				roomCategory = (resBox.cmb_roomCategory.selectedItem as RoomCategory).roomCategoryName;
+			
+			var roomBasis:String = "";
+			if(resBox.cmb_roomBasis.selectedItem!=null)
+				roomBasis = resBox.cmb_roomBasis.selectedItem.id;	
+			
+			for(var i:int=0; i<dynamicRateBoxList.length; i++)
+			{
+				var box:RoomBasisCostHBox = dynamicRateBoxList.getItemAt(i) as RoomBasisCostHBox
+				if(box.roomLabel.text == roomCategory && box.rateCodeId == resBox.rateCode.uuid)
+				{
+					for(var j:int=0; j<box.rateHboxList.length; j++)
+					{
+						var cBox:RoomBasisChildHbox = box.rateHboxList.getItemAt(j) as RoomBasisChildHbox;
+						if(cBox.basisId == roomBasis)
+						{
+							if(occupancy == "SGL")
+							{
+								_rate = cBox.sglRate;
+								break;
+							}
+							else if(occupancy == "DBL")
+							{
+								_rate = cBox.dblRate;
+								break;
+							}
+							else if(occupancy == "TPL")
+							{
+								_rate = cBox.tplRate;
+								break;
+							}
+								
+						}
+					}
+				}
+			}
+			
+			return _rate;
+		}
+		
+		public override function rateCodeOtherCostMasterFetchResultsHandler (event:ResultEvent):void
+		{	
+			stoptBusyCursor();
+			otheCostMasterList = new ArrayCollection();
+			otheCostMasterList = event.result as ArrayCollection;
+			
+			loadRateCode();
+		}
+		
+		public override function currencyMasterFetchResultsHandler (event:ResultEvent):void
+		{	
+			stoptBusyCursor();
+			currencyList = new ArrayCollection();
+			currencyList = event.result as ArrayCollection;
+			_view.CMB_currency.dataProvider = currencyList;
+			_view.CMB_currency.selectedIndex= setComboSelectedItemById(currencyList, "currencyCode", "USD");
+			_view.CMB_currency.dispatchEvent(new ListEvent(ListEvent.CHANGE));
+			
+			if(isRetriewMode)
+				showSelectedItem();
+			else
+			{
+				//Set user's assigned property
+				if(_loggedInUser!=null)
+				{
+					if(_loggedInUser.market !=null)
+					{
+						var index:int= setUserProperty(propertyList, _loggedInUser.market.uuid);
+						_view.CMB_property.selectedIndex = index;
+						_view.CMB_property.dispatchEvent(new ListEvent(ListEvent.CHANGE));
+					}
+				}	
+			}
+			//loadModeOfPayments();
+		}
+		
+		public override function modeOfPaymentFetchResultsHandler (event:ResultEvent):void
+		{	
+			stoptBusyCursor();
+			modeOfPaymentList = new ArrayCollection();
+			modeOfPaymentList = event.result as ArrayCollection;
+//			_view.CMB_payments.dataProvider = modeOfPaymentList;
+		}
+		
+		public override function faultHandler(event:FaultEvent):void 
+		{
+			stoptBusyCursor();
+			var error:ErrorMessage	=	event.message as ErrorMessage;
+			
+			handleFaultMessage(error);
+		}
+		
+		private function activityAknowladgment():void
+		{
+			createJHAlert(_view, "Record saved Successfully");
+		}
+		
+		public override function rateCodeDiscountFetchResultsHandler (event:ResultEvent):void
+		{	
+			stoptBusyCursor();
+			discountList	=	new ArrayCollection;
+			discountList	=	event.result as ArrayCollection;
+			
+			if(isPromoCodeActivate)
+			{
+				alertPromoCodeApplied(discountList);
+				isPromoCodeActivate = false;
+			}
+			
+			if(selectedIndex>-1 && dynamicList.length>selectedIndex)
+			{
+				var res:ReservationLineHBox = dynamicList.getItemAt(selectedIndex) as ReservationLineHBox
+					//res.discountList		= new ArrayCollection;
+					
+					res.sglDiscountList		= new ArrayCollection;
+					res.dblDiscountList		= new ArrayCollection;
+					res.tplDiscountList		= new ArrayCollection;
+					
+				for(var i:int=0; i<discountList.length; i++)
+				{
+					var disc:Discounts 		= discountList.getItemAt(i) as Discounts;
+					
+					var occupancyTypeArray:Array = convsrtStringToArray(disc.discountConditions.roomOccupancyType);
+					
+					for(var j:int=0; j<occupancyTypeArray.length; j++)
+					{
+						if(occupancyTypeArray[j].toString() == JWHConstants.ROOM_OCCUPANCY_TYPE_SGL)
+							res.sglDiscountList.addItem(disc);
+						if(occupancyTypeArray[j].toString() == JWHConstants.ROOM_OCCUPANCY_TYPE_DBL)
+							res.dblDiscountList.addItem(disc);
+						if(occupancyTypeArray[j].toString() == JWHConstants.ROOM_OCCUPANCY_TYPE_TLP)
+							res.tplDiscountList.addItem(disc);
+					}
+				}
+				
+					//res.discountList 		= discountList;
+					
+					res.discountListHandler();
+			}
+			
+			calculateTotalPax();
+			
+			
+			if(isRetriewMode)
+			{
+				if(dynamicList.length>selectedIndex+1)
+				{
+					selectedIndex += 1;
+					dispatchToCallDiscounts(selectedIndex);
+				}
+			}
+			
+			if(isAgentChanged)
+			{
+				if(dynamicList.length>selectedIndex+1)
+				{
+					selectedIndex += 1;
+					dispatctRatesOnAgentChange(selectedIndex);
+				}
+			}
+		}
+		
+		private function alertPromoCodeApplied(list:ArrayCollection):void
+		{
+			var promoCodeFound:Boolean = false;
+			
+			for(var i:int=0; i<list.length; i++)
+			{
+				var dis:Discounts = list.getItemAt(i) as Discounts;
+				
+				if(dis.conditionType == JWHConstants.DISCOUNT_TYPE_BOOKING)
+				{
+					promoCodeFound = true;
+					break;
+				}
+				
+			}
+			
+			if(promoCodeFound)
+			{
+				createJHAlert(_view, "Promotion code applied!");
+				_view.B_promoCode.JLabel = "Applied";
+			}
+			else
+			{
+				_view.reservation.promotionCode = "";
+				createJHErrorAlert(_view, "Promotion code not found!");
+			}
+		}
+		
+		private function arrangeApplicableDiscountsList(list:ArrayCollection):ArrayCollection
+		{
+			var reList:ArrayCollection = new ArrayCollection;
+			
+			for(var i:int=0; i<list.length; i++)
+			{
+				var disc:Discounts = list.getItemAt(i) as Discounts;
+				
+				if(!disc.choosable)
+					reList.addItem(disc);
+			}
+			
+			return reList;
+		}
+		
+		private function addToDynamicDiscountView(disHbox:DiscountLineHbox):void
+		{
+			var isAlreadyAdded:Boolean = false;
+			
+			for(var i:int=0; i<dynamicDiscountList.length; i++)
+			{
+				if((dynamicDiscountList.getItemAt(i) as DiscountLineHbox).discount.uuid == disHbox.discount.uuid)
+				{
+					isAlreadyAdded = true;
+					break;
+				}	
+			}
+			
+			if(!isAlreadyAdded)
+			{
+				dynamicDiscountList.addItem(disHbox);
+				_view.V_discounts.addChild(disHbox);
+			}
+		}
+		
+		private function composeMail():void
+		{
+			var dimention:Object		=	new Object;
+				dimention.width			=   750;
+				dimention.heigth		=   500;
+				args.user				=	_loggedInUser;
+				args.argumentObject		=	arangeDataForEmailCompose();
+				
+				createPopUp(HELP_COMPOSE_NEW_MAIL, _view, args, "Compose mail", ApplicationFacade.EMAIL_COMPOSER, true, dimention);
+		}
+		
+		private function arangeDataForEmailCompose():Object
+		{
+			var _obj:Object	=	new Object;
+				
+				_obj.receiver	=	_view.reservation.contactEmail;
+				_obj.message	=	"Dear " + _view.reservation.confirmedBy+",\n\n" + 
+				"Greetings from Jetwing!  \n\n"+
+				"Please find here with the attached confirmation of your booking. \n"+
+				"Your confirmation details are as follows. \n\n"+
+				"Hotel Name\t\t\t: "+_view.reservation.property.propertyName+" \n"+
+				"Reservation No\t\t: "+_view.reservation.originator+"-"+_view.reservation.reservationYear+"-"+_view.reservation.reservationNo+" \n"+
+				"Reservation Status\t: "+_view.reservation.reservationsStatus +"\n\n"+
+				"Regards, \n"+
+				_loggedInUser.firstName + " " + _loggedInUser.lastName + "\n" +
+				Constants.COMPANY_NAME;
+				
+				_obj.subject	=	"Reservation Confirmation for " + _view.reservation.guestFirstName + " at " + _view.reservation.property.propertyName;
+				_obj.sender		=	_loggedInUser.email;
+				_obj.bccList	=	_loggedInUser.email;
+				_obj.file		=	fileName;
+				_obj.fileType	=	fileType;
+				
+				
+			return _obj;
+		}
+		
+		private static function checkForApplicableDates(dis:Discounts, res:ReservationLineHBox):Boolean
+		{
+			var isApplicable:Boolean = false;
+			
+			var dateFrom:Date = DateField.stringToDate(dis.discountConditions.condition2.conditionValue, "YYYY-MM-DD");
+			var dateTo:Date   = DateField.stringToDate(dis.discountConditions.condition3.conditionValue, "YYYY-MM-DD");
+			
+			var checkIn:Date  = DateField.stringToDate(res.checkInDate.text, "YYYY-MM-DD");
+			
+			if(ObjectUtil.dateCompare(dateFrom, checkIn)< 1 && ObjectUtil.dateCompare(checkIn, dateTo)< 1)
+				isApplicable = true;
+				
+			return isApplicable;	
+		}
+		
+		public override function calculateRateResultsHandler (event:ResultEvent):void 
+		{
+			taxesList = new ArrayCollection;
+			taxesList = event.result as ArrayCollection;
+			
+			//removeNotSavedTaxes();
+			
+			if(taxesList.length>0)
+				generateTaxGrid();
+		}
+		
+		private function removeNotSavedTaxes():void
+		{
+			for(var i:int=0; i<taxesList.length; i++)
+			{
+				var _tax:Tax = taxesList.getItemAt(i) as Tax;
+				if(_tax.status == JWHConstants.STATUS_LABLE_ACTIVE)// tax only inactive when user uncheck it
+					checkApplicableTax(_tax);				
+			}
+		}
+		
+		public override function dmcMarketFetchResultsHandler (event:ResultEvent):void
+		{	
+			stoptBusyCursor();
+			dmcMarketList	=	new ArrayCollection;
+			dmcMarketList	=	event.result as ArrayCollection;
+			_view.CMB_dmcMarket.dataProvider = dmcMarketList;
+			
+			if(isRetriewMode)
+			{
+				_view.CMB_dmcMarket.selectedIndex = setComboSelectedItemById(dmcMarketList, "uuid", _view.reservation.dmcMarketId);
+				arrangeLinesForRetriewMode(_view.reservation.reservationList);
+			}
+				
+			//loadAgentType();
+		}
+		
+		public override function PDFGeneratorResultsHandler(event:ResultEvent):void
+		{
+			stoptBusyCursor();
+			fileName = event.result as String;
+			fileType = JWHConstants.DOCUMENT_TYPE_CONFIRMATION;
+			
+			var url:String			=	docURL + "Resources/" + JWHConstants.FOLDER_NAME_CONFIRMATION+ fileName;
+					
+			loadDocument(url);
+				
+			composeMail();
+			
+			addNew();
+		}
+		
+		public override function destinityFetchOccupancyResultsHandler (event:ResultEvent):void
+		{	
+			stoptBusyCursor();
+			occupancyList = new ArrayCollection();
+			occupancyList = event.result as ArrayCollection;
+			
+			loadOtherCosts();
+			
+			checkRoomAvailablityCommom();
+			
+		}
+		
+		public override function taxFetchResultsHandler (event:ResultEvent):void
+		{	
+			stoptBusyCursor();
+			taxesList = new ArrayCollection();
+			taxesList = event.result as ArrayCollection;
+			calculateTotalPax();
+		}
+		
+		private function checkRoomAvailablityCommom():void
+		{
+			if(isToCheckAvailability)
+			{
+				if(selectedIndex>-1 && dynamicList.length>selectedIndex)
+				{
+					var line:ReservationLineHBox = dynamicList.getItemAt(selectedIndex) as ReservationLineHBox;
+					var roomId:String;
+					if(line.cmb_roomCategory.selectedItem!=null)
+					{
+						roomId = (line.cmb_roomCategory.selectedItem as RoomCategory).roomCategoryCode;
+						
+						var roomCount:int = int(line.sglCount.text) + 	int(line.dblCount.text) + int(line.tplCount.text);
+						
+						if(!checkAvailablityOfRoom(roomId, roomCount))
+						{
+							createJHErrorAlert(_view, "Selected Room Categoty is not available");
+							_view.B_save.enabled = false;
+						}
+						else
+							_view.B_save.enabled = true;
+					}
+				}	
+			}
+		}
+		
+		private function checkAvailablityOfRoom(roomId:String, roomCount:int):Boolean
+		{
+			var isAvailable:Boolean = false;
+			
+			for(var i:int=0; i<occupancyList.length; i++)
+			{
+				var obj:DesOccupancy = occupancyList.getItemAt(i) as DesOccupancy;
+				if(roomId == obj.roomCategoryId)
+				{
+					if(obj.availableRooms>=roomCount)
+					{
+						isAvailable= true;
+						break;
+					}
+					else
+						break;
+				}
+			}
+			
+			return isAvailable;
+		}
+		
+		private function loadDocument(url:String):void
+		{
+			var pdfRequest:URLRequest = new URLRequest(url);
+			var pdfHTMLLoader:HTMLLoader = new HTMLLoader();
+			navigateToURL(pdfRequest);
+		}
+		
+		private function generateTaxGrid():void
+		{
+			_view.V_pd_dynamicTax.removeAllChildren();
+			dynamicTaxList.removeAll();
+			
+			_view.totalTaxAmount	 = 0;
+			_view.totalDisplayAmount = getDynamicTotalPayWhenTaxRemoved(_view.totalWithTaxAmount);
+			
+			for(var i:int=0; i<taxesList.length; i++)
+			{
+				var _tax:Tax = taxesList.getItemAt(i) as Tax;
+				
+				var taxLine:ReservationTaxLineHBox = new ReservationTaxLineHBox;
+					taxLine.L_taxLabel.text		   = _tax.taxDescription;
+					taxLine.L_taxAmount.text	   = _view.displayFinalRoundedFormattedValue(_tax.taxDisplayAmount);
+					taxLine.tax					   = _tax;
+					taxLine.taxTypeId			  += _tax.uuid;
+					taxLine.chk_select.addEventListener(Event.CHANGE, handleCheckBoxChange);
+					
+					if(_tax.status == JWHConstants.STATUS_LABLE_ACTIVE)
+					{
+						taxLine.chk_select.selected = true;
+						
+						_view.totalTaxAmount	   += _tax.taxCalculatedAmount;
+						taxLine.taxAmount		   += _tax.taxCalculatedAmount;
+						
+						_view.totalNetAmount	= _view.totalDisplayAmount - _view.totalTaxAmount;
+						
+					}
+					else
+						taxLine.chk_select.selected = false;
+					
+					_view.V_pd_dynamicTax.addChild(taxLine);	
+					dynamicTaxList.addItem(taxLine);
+					
+			}
+		}
+		
+		private function getDynamicTotalPayWhenTaxRemoved(totalValue:Number):Number
+		{
+			var returnValue:Number = totalValue;
+			
+			for(var i:int=0; i<taxesList.length; i++)
+			{
+				var _tax:Tax = taxesList.getItemAt(i) as Tax;
+				
+				if(_tax.status == JWHConstants.STATUS_LABLE_INACTIVE)
+				{
+					var vatAmount:Number = _tax.taxCalculatedAmount;
+					returnValue = returnValue - vatAmount;
+				}
+				
+			}
+			
+			return returnValue;
+		}
+		
+		private function handleCheckBoxChange(e:Event):void
+		{
+			var line:ReservationTaxLineHBox = e.currentTarget.owner as ReservationTaxLineHBox;
+			
+			if(line.chk_select.selected)
+				line.tax.status = JWHConstants.STATUS_LABLE_ACTIVE;
+			else	
+				line.tax.status = JWHConstants.STATUS_LABLE_INACTIVE;
+			
+			_view.totalDisplayAmount = _view.totalWithTaxAmount;
+				
+			calculateWithTaxes();
+		}
+		
+		private function checkApplicableTax(tax:Tax):void
+		{
+			
+			var list:ArrayCollection = _view.reservation.taxDetailsList;
+			
+			for(var i:int=0; i<list.length; i++)
+			{
+				if(tax.uuid == (list.getItemAt(i) as ReservationPaymentDetails).tax.uuid)
+				{
+					tax.status = JWHConstants.STATUS_LABLE_ACTIVE;
+					break;
+				}
+				else
+					tax.status = JWHConstants.STATUS_LABLE_INACTIVE;
+			}
+			
+		}
+		
+//		private function setGuestSearchButtonStatus(xStatus:Boolean):void
+//		{
+//			isGuestSearchingOn = xStatus;
+//			
+//			if(isGuestSearchingOn)
+//				_view.B_guestDetails.JLabel = "Guest";
+//			else
+//				_view.B_guestDetails.JLabel = "Clear";	
+//		}
+		
+	}
+}

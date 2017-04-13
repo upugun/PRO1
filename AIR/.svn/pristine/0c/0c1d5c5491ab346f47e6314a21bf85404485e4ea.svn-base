@@ -1,0 +1,943 @@
+/****************************************************************
+ * Change log													*
+ * Created by Upul Gunasinghe									*	
+ * Date: 2012/02/15												*
+ *--------------------------------------------------------------*  
+ * By	Date		Change										*	
+ *--------------------------------------------------------------*  
+ * UG	2012/02/15	Designed the dynamic hotel rate mechanisum  *			
+ * NF	2012/03/17	Created DAO									*
+ * UG	2012/04/03	Update rates fetching mechanisum			* 
+ ****************************************************************/
+ 
+package net.jwt.view.helper.tourHelper
+{
+	import flash.events.Event;
+	import flash.events.KeyboardEvent;
+	import flash.events.MouseEvent;
+	
+	import mx.collections.ArrayCollection;
+	import mx.containers.HBox;
+	import mx.containers.VBox;
+	import mx.controls.Alert;
+	import mx.controls.DateField;
+	import mx.controls.Label;
+	import mx.controls.RadioButton;
+	import mx.controls.TextInput;
+	import mx.core.UIComponent;
+	import mx.events.CloseEvent;
+	import mx.events.ListEvent;
+	import mx.rpc.events.FaultEvent;
+	import mx.rpc.events.ResultEvent;
+	import mx.rpc.remoting.mxml.RemoteObject;
+	import mx.utils.UIDUtil;
+	
+	import net.jwt.Constants;
+	import net.jwt.event.NotificationArguments;
+	import net.jwt.value.objects.Basis;
+	import net.jwt.value.objects.CostingHotelDetails;
+	import net.jwt.value.objects.CurrencyMaster;
+	import net.jwt.value.objects.DynamicHotel;
+	import net.jwt.value.objects.Hotel;
+	import net.jwt.value.objects.HotelCancelation;
+	import net.jwt.value.objects.HotelPayment;
+	import net.jwt.value.objects.HotelRateCategory;
+	import net.jwt.value.objects.HotelRates;
+	import net.jwt.value.objects.HotelRatesIdentity;
+	import net.jwt.value.objects.OccupencyType;
+	import net.jwt.value.objects.RoomCategoriesOfHotel;
+	import net.jwt.value.objects.RoomCategory;
+	import net.jwt.value.objects.User;
+	import net.jwt.view.Mediator;
+	import net.jwt.view.popup.JWTPopUp;
+	
+	public class TourHelperHotelOverrideMediator extends Mediator
+	{
+		private var _view:TourHelperHotelOverrideView;
+		private var _args:NotificationArguments;
+		public  var asService:RemoteObject;
+		private var _loginUser:User;
+		[Bindable]
+		public var _agents:ArrayCollection;
+		
+		[Bindable]
+		public var _user:ArrayCollection;
+		
+		[Bindable]
+		public var dynamicHotel:DynamicHotel;
+		
+		private var roomRate:TextInput;
+		
+		private var hotel_h1:Hotel;
+		private var hotel_h2:Hotel;
+		
+		private const RATESONMARKET:String 				= "RATES_BASED_ON_MARKET";
+		
+		private var hotelRate:HotelRates;
+		private var hotelCancelation:HotelCancelation;
+		private var hotelPayment:HotelPayment;
+		private var roomCatagoryOfHotel_r1:RoomCategoriesOfHotel;
+		private var roomCatagoryOfHotel_r2:RoomCategoriesOfHotel;
+		private var roomCatagoryOfHotel_r3:RoomCategoriesOfHotel;
+		
+		private var roomCatagory_c1:RoomCategory;
+		private var roomCatagory_c2:RoomCategory;
+		private var roomCatagory_c3:RoomCategory;
+		
+		private var occupencyList:ArrayCollection;
+		private var _tempRatesList:ArrayCollection = new ArrayCollection();
+		private var occupency_o1:OccupencyType;
+		private var occupency_o2:OccupencyType;
+		private var occupency_o3:OccupencyType;
+		
+		
+		private var basisList:ArrayCollection;
+		private var basis_b1:Basis;
+		private var basis_b2:Basis;
+		private var basis_b3:Basis;
+		private var basis_b4:Basis;
+		private var _tempRoomsCatagoriesOfHotelList:ArrayCollection = new ArrayCollection;//----------testing-------------------------
+		private var roomRateList:ArrayCollection;
+		private var selectedMarketRateIndentityUuid:String;
+		private var selectedHotelUuid:String;
+		private var selectedMarketUuid:String;
+		private var hotelRateIdntityObj:HotelRatesIdentity;
+		[Bindable] public var _currencyList:ArrayCollection;
+		[Bindable] public var _currencyListForGuid:ArrayCollection;
+		
+		
+		private var _app:JWTPopUp;
+		
+		//[Bindable] public var args:NotificationArguments;
+		[Bindable] private var _selectedIndex:int = -1;
+		[Bindable] private var selectedMarketRateIndex:int = -1;
+		[Bindable] public var _hotelObj:Hotel = new Hotel();
+		[Bindable] public var _hotellist:ArrayCollection;
+		
+		[Bindable] public var _hotelRatesObj:HotelRates = new HotelRates();
+		[Bindable] public var _hotelRatesMarketsList:ArrayCollection;
+		[Bindable] public var _hotelRateslist:ArrayCollection;
+		
+		[Bindable] public var _roomCatagoriesOfHotelObj:RoomCategoriesOfHotel = new RoomCategoriesOfHotel();
+		[Bindable] public var _roomCatagoriesOfHotellist:ArrayCollection;
+		
+		[Bindable] public var _roomCatagoriesObj:RoomCategory = new RoomCategory();
+		[Bindable] public var _roomCatagorieslist:ArrayCollection;
+		[Bindable] public var _roomOccupationlist:ArrayCollection;
+		[Bindable] public var _basislist:ArrayCollection;
+		[Bindable] public var _hotelRatesCategoryObj:HotelRateCategory = new HotelRateCategory();
+		[Bindable] public var _marketList:ArrayCollection;
+		[Bindable] public var _rateIdentityObj:HotelRatesIdentity = new HotelRatesIdentity();
+		[Bindable] public var _rateIdentityList:ArrayCollection;
+		
+		private const CONDITION_1:String = "fecthByMarketIdentity";
+		
+		private var currencyChanged:Boolean = false;
+		
+		public function TourHelperHotelOverrideMediator(view:UIComponent, args:NotificationArguments)
+		{
+			super(view);
+			if(view != null)
+			{
+				_view  = view as TourHelperHotelOverrideView;
+				_agents = new ArrayCollection();
+			
+			}
+			
+			 if(args != null)
+				this._args = args;
+				
+				_app = args.viewComponent as JWTPopUp;	
+			 
+			 if(_app != null)	
+				_loggedInUser	= _app.args.user;
+		}
+		
+		protected override function viewComponentInitialize():void{
+			initializeVariable();
+			initializeHotelRatesRemortingObject();
+			initializeHotelRatesIdentifyRemortingObject();
+			
+			_view.DG_Hotels.addEventListener(ListEvent.ITEM_CLICK, showSelectedItem);
+			_view.DG_Hotels.addEventListener(ListEvent.CHANGE, showSelectedItem);
+			_view.T_search.addEventListener(KeyboardEvent.KEY_UP, dynamicSearch);
+			_view.addEventListener(KeyboardEvent.KEY_UP, saveDocument);
+			_view.CM_market.addEventListener(ListEvent.CHANGE, marketChanged);
+			//_view.DG_HotelsRates.addEventListener(ListEvent.ITEM_CLICK, showRates);
+			//_view.DG_HotelsRates.addEventListener(ListEvent.CHANGE, showRates);
+			_view.addEventListener(MouseEvent.CLICK, resetStatus);
+			_view.CMB_currency.addEventListener(ListEvent.CHANGE, updateCurrencyId); 
+			
+			reloadCurrencyList();
+			initializeHotelRemortingObject();
+			initializeOccupationList();
+			initializeBasisList();
+			reloadHotelList();
+			showRoomsCategory();
+			loadMarketList();
+			setLoggedInUser();
+			
+		}
+		
+		private function setLoggedInUser():void
+		{
+			hotelRO.setLogedInUser(_loggedInUser);
+		}
+		
+		private function resetStatus(event:Event):void
+		{
+			_view.statusLabel.text = "";
+		}
+		
+		private function showSelectedItem(event:ListEvent):void
+		{
+			if(event !=null)
+				_selectedIndex 	 				= event.rowIndex;
+			
+			_hotelObj		 					= _hotellist.getItemAt(_selectedIndex) as Hotel;
+			startShowingSelectedItem(_selectedIndex);
+		}
+		
+		private function startShowingSelectedItem(index:int):void
+		{
+			//_view.DG_HotelsRates.dataProvider 	= null;
+			dynamicHotel						= new DynamicHotel();
+			hotelRateIdntityObj					= new HotelRatesIdentity;
+			
+			_selectedIndex 	 					= index;
+			_hotelObj		 					= _hotellist.getItemAt(_selectedIndex) as Hotel;
+			
+			dynamicHotel.hotel  				= _hotelObj;
+			_view.T_search.text 				= _hotelObj.hotelName;
+			selectedMarketRateIndentityUuid 	= "";
+			selectedHotelUuid					= "";
+			selectedMarketUuid					= "";
+			setHotelUuid(_hotelObj.uuid);
+			if(_view.CM_market.selectedItem !=null)
+				selectedMarketUuid				= (_view.CM_market.selectedItem as HotelRateCategory).uuid;
+			
+			showHotelRatesList(_hotelObj.uuid);
+			showRoomsofHotel(_hotelObj.uuid);
+			
+		}
+		
+		private function setInitialData():void
+		{
+			
+			
+			var _tempRoomsCatagoriesOfHotelList:ArrayCollection = new ArrayCollection;
+				_tempRoomsCatagoriesOfHotelList.addItem(roomCatagoryOfHotel_r1);
+				_tempRoomsCatagoriesOfHotelList.addItem(roomCatagoryOfHotel_r2);
+				_tempRoomsCatagoriesOfHotelList.addItem(roomCatagoryOfHotel_r3);
+			
+			var _tempCancelationList:ArrayCollection = new ArrayCollection;
+				_tempCancelationList.addItem(hotelCancelation);
+			
+			dynamicHotel 						= new DynamicHotel;
+			dynamicHotel.hotel 					= _hotelObj;
+			dynamicHotel.cancelationPolicyList 	= _tempCancelationList;
+			dynamicHotel.roomsOfHotelList		= _tempRoomsCatagoriesOfHotelList;
+			
+		}
+		private function initializeVariable():void
+		{
+			 _loginUser			= _loggedInUser; 	
+			hotelRateIdntityObj	= new HotelRatesIdentity;
+		}
+		
+		private function initializeOccupationList():void
+		{
+			initializeRoomOccupationRemortingObject();
+			roomOccupationRO.dynamicSearch("","");
+			
+		}
+		private function initializeBasisList():void
+		{
+			initializeBasisRemortingObject();
+			basisRO.dynamicSearch("","");
+			
+		}
+		public override function roomOccupationFetchResultsHandler(event:ResultEvent):void
+		{
+			
+			_roomOccupationlist  				= new ArrayCollection();
+			_roomOccupationlist					= event.result as ArrayCollection;
+			//_view.DG_HotelsRates.dataProvider   = _roomOccupationlist;
+		}
+		public override function basisFetchResultsHandler(event:ResultEvent):void
+		{
+			
+			_basislist  				= new ArrayCollection();
+			_basislist					= event.result as ArrayCollection;
+			//_view.DG_HotelsRates.dataProvider   = _roomOccupationlist;
+		}
+		
+		private function reloadCurrencyList():void
+		{
+			initializeCurrencyMasterRemortingObject();
+			currencyMasterRO.dynamicSearch("","");
+		}
+		
+		private function generateDynamicObjects():void
+		{
+			var noOfRoomsTypes:int 		= dynamicHotel.roomsOfHotelList.length;
+			var noOccupencyTypes:int 	= _roomOccupationlist.length; 
+			var noBasisTypes:int		= _basislist.length;
+			
+			roomRateList				= new ArrayCollection;
+			
+			var currencyUuid:String;
+			if(_view.CMB_currency.selectedItem == null)
+					currencyUuid       = _view.CMB_currency.text;
+			else
+				 	currencyUuid	   = (_view.CMB_currency.selectedItem as CurrencyMaster).uuid;
+			
+			var periodFrom:DateField 	 = new DateField;
+//			
+			var periodTo:DateField 		 = new DateField;
+			
+			var basisVbox:VBox 			 = new VBox;
+			
+
+			basisVbox.addChild(new Label);
+			basisVbox.addChild(new Label);
+			
+			_view.dynamicRateHBox.removeAllChildren();// remove rates text boxes and refresh when new item clicked
+			// Loop through type of rooms, the hotel got
+			for(var i:int =0; i< dynamicHotel.roomsOfHotelList.length; i++ )
+			{
+				var labelRoomCatagory:Label = new Label;
+				labelRoomCatagory.text = (dynamicHotel.roomsOfHotelList.getItemAt(i) as RoomCategoriesOfHotel).roomCatagoryObj.description;
+				labelRoomCatagory.setStyle("color", "#f9ac16");
+				
+				var outerFrame:VBox 			= new VBox;
+				var innerFrameOfRoomType:HBox 	= new HBox;
+				innerFrameOfRoomType.setStyle("backgroundColor", "#717368");
+				
+				outerFrame.addChild(labelRoomCatagory);
+				outerFrame.setStyle("backgroundColor", "#3f3c35");
+				
+				for(var c:int =0; c< _roomOccupationlist.length; c++ )
+				{
+					var labelOccupancy:Label = new Label;
+					labelOccupancy.text = (_roomOccupationlist.getItemAt(c) as OccupencyType).description;
+					
+					var innerFrameOfOccupancyType:VBox = new VBox;
+					//innerFrameOfOccupancyType.setStyle("backgroundColor", "#5c644d");
+					
+					innerFrameOfOccupancyType.addChild(labelOccupancy);
+					
+					for(var x:int =0; x< _basislist.length; x++ )
+					{
+						var rateInputFeild:TextInput = new TextInput;
+						rateInputFeild.width 	= 45;
+						rateInputFeild.id		= UIDUtil.createUID().toString();
+						rateInputFeild.setStyle("color", "#000000");
+						rateInputFeild.editable;
+						
+						var rate:HotelRates 	= new HotelRates;
+						rate.enteredbyId		= _loginUser.uuid;
+						rate.authorisedbyId		= (_loginUser.manager != null)? _loginUser.manager.uuid : "";
+						//rate.currencyId			= currencyUuid;
+						rate.idhotel			= _hotelObj.uuid;
+						
+						// Business decsion changed //
+						//rate.marketId			= _loginUser.market.uuid; //
+						
+						rate.marketId			= (_view.CM_market.selectedItem as HotelRateCategory).uuid;
+						rate.periodFrom			= periodFrom.text;
+						rate.periodTo			= periodTo.text;
+						rate.rateBox			= rateInputFeild;
+						rate.rate				= rateInputFeild.text;
+						rate.roomCatagory		= dynamicHotel.roomsOfHotelList.getItemAt(i) as RoomCategoriesOfHotel;	
+						rate.roomcategoryId		= rate.roomCatagory.idroomCategory;
+						rate.roomBasis			= _basislist.getItemAt(x) as Basis;
+						rate.roomBasisId		= rate.roomBasis.uuid;
+						rate.roomOccupation		= _roomOccupationlist.getItemAt(c) as OccupencyType;
+						rate.roomOccupationId	= rate.roomOccupation.uuid;
+						
+						// Set other details
+						rate.dirty				= false;
+						rate.rateBox.addEventListener(KeyboardEvent.KEY_UP, setDirtyFeild);
+						
+						roomRateList.addItem(rate);
+						
+						var lableBasis:RadioButton = new RadioButton;
+						lableBasis.label 	 =(_basislist.getItemAt(x) as Basis).description;
+						
+						if(lableBasis.label == "Bed and Breakfast")
+							lableBasis.selected = true;
+						
+						// This there only to add basis lable ONCE to the grid
+						if(i ==0 && c == 0){
+							basisVbox.addChild(lableBasis);
+						}
+							
+						 							
+						innerFrameOfOccupancyType.addChild(rateInputFeild);
+					}
+					innerFrameOfRoomType.addChild(innerFrameOfOccupancyType);
+				}
+				outerFrame.addChild(innerFrameOfRoomType);
+				
+				_view.dynamicRateHBox.addChild(outerFrame);
+			}
+			_view.dynamicRateHBox.addChild(basisVbox);
+		    updateRatesInputFeilds();
+			
+			//Alert.show("objects:" + roomRateList.length.toString());
+		}
+		
+		private function updateRatesInputFeilds():void
+		{
+			
+			for(var i:int = 0; i<roomRateList.length; i++)
+			{
+				var _hotelRate:HotelRates 			= roomRateList.getItemAt(i) as HotelRates;
+				
+				var _obj:CostingHotelDetails 		= new CostingHotelDetails();
+				
+					_obj					 		= _args.argumentObject as CostingHotelDetails;
+					
+				if(_obj !=null)
+					{
+					_view.hotelRatesIdentity	 	= _obj.hotelRatesIdentity;
+					
+					_view.hotelRatesIdentity.guidAccomodationObj	= _obj.hotelRatesIdentity.guidAccomodationObj;
+					
+				//	_view.CMB_currencyG.text		= _obj.hotelRatesIdentity.guidAccomodationObj.currencyUuid;
+					_view.T_noOfRooms.text			= _obj.noOfRooms.toString();
+					
+					selectedMarketRateIndentityUuid = _obj.hotelRatesIdentity.uuid;
+					
+					
+					var htc:HotelRateCategory 		= new HotelRateCategory;
+						htc.uuid 					= _obj.hotelRatesIdentity.idMarket
+						htc.description 			= _obj.hotelRatesIdentity.marketName;
+					
+					var _tempCol:ArrayCollection = _view.CM_market.dataProvider as ArrayCollection;
+					for(var o:int =0; o< _tempCol.length; o++)
+					{
+						if(htc.uuid == (_tempCol.getItemAt(o) as HotelRateCategory).uuid)
+						{
+							_view.CM_market.selectedIndex = o;
+							break;
+						}
+					}
+					
+					var _tempCurrencyG:ArrayCollection = _view.CMB_currencyG.dataProvider as ArrayCollection;
+						for(var e:int =0; e< _tempCurrencyG.length; e++)
+						{
+							if(_obj.hotelRatesIdentity.guidAccomodationObj.currencyUuid == (_tempCurrencyG.getItemAt(e) as CurrencyMaster).uuid)
+							{
+								_view.CMB_currencyG.selectedIndex = e;
+								break;
+							}
+						}
+				
+					for(var x:int = 0; x< _obj.hotelRatesList.length; x++)
+					{
+						if(	_hotelRate.roomBasis.uuid 			== (_obj.hotelRatesList.getItemAt(x) as HotelRates).roomBasisId	&& 
+							_hotelRate.roomOccupation.uuid		== (_obj.hotelRatesList.getItemAt(x) as HotelRates).roomOccupationId &&
+							_hotelRate.roomcategoryId			== (_obj.hotelRatesList.getItemAt(x) as HotelRates).roomcategoryId)
+							{
+								//_hotelRate.uuid						= _obj.uuid;
+								//_hotelRate.idhotel					= _obj.idhotel;
+								_hotelRate.rateBox.text 			= (_obj.hotelRatesList.getItemAt(x) as HotelRates).rate;
+								_hotelRate.rateBox.data 			=  _obj.hotelRatesList.getItemAt(x) as HotelRates;
+								_hotelRate.dirty					=  true;
+								_hotelRate.hotelRatesIdentity.uuid	=  selectedMarketRateIndentityUuid;
+								
+								// Set style
+								if(_hotelRate.rateBox.text != "")
+									setInputBoxStyle(_hotelRate.rateBox);
+								else
+									reSetInputBoxStyle(_hotelRate.rateBox);
+							}
+						
+						var _tempCurrency:ArrayCollection = _view.CMB_currency.dataProvider as ArrayCollection;
+						for(var a:int =0; a< _tempCurrency.length; a++)
+						{
+							if((_obj.hotelRatesList.getItemAt(0) as HotelRates).currencyId == (_tempCurrency.getItemAt(a) as CurrencyMaster).uuid)
+							{
+								_view.CMB_currency.selectedIndex = a;
+								break;
+							}
+						}
+						
+					}
+				}
+
+				
+			}
+		}	
+		
+		public function showHotelRatesList(hotelUuid:String) :void
+		{
+			initializeHotelRatesRemortingObject();
+			//HotelRatesRO.dynamicSearch("uuid",FetchByIdhotel);
+			//HotelRatesRO.dynamicSearch("RATES_BASED_ON_MARKET",FetchByIdhotel);
+			HotelRatesRO.getMarketsOfRates("RATES_BASED_ON_MARKET",hotelUuid);
+			
+		}
+		public function showRoomsofHotel(FetchByIdhotel:String) :void
+		{
+			initializeRoomCategoriesOfHotelRemortingObject();
+			RoomCategoriesOfHotelRO.dynamicSearch("uuid",FetchByIdhotel);
+		}
+		public function showRoomsCategory() :void
+		{
+			initializeRoomCategoriesRemortingObject();
+			RoomCategoriesRO.dynamicSearch("","");
+		}
+		//search Hotels
+		private function dynamicSearch(event:KeyboardEvent):void
+		{
+			reloadHotelListforDynamic();
+		}
+		private function reloadHotelListforDynamic():void
+		{
+			if(_view.CB_name.selected == true){
+				if(_view.T_search.text != "")
+				hotelRO.dynamicSearch("dynamicNameAllHotels",_view.T_search.text.toString());
+				}
+			else if(_view.CB_location.selected == true){	
+				if(_view.T_search.text != "")
+				hotelRO.dynamicSearch("dynamicLocations",_view.T_search.text.toString());
+			}
+				
+		}
+//		private function setRates():void
+//		{
+//			var rate1:HotelRates = (roomRateList.getItemAt(3) as HotelRates);
+//			rate1.rate.text = "57";
+//		}
+		
+		private function reloadHotelList():void
+		{
+			//hotelRO.dynamicSearch("","");
+			hotelRO.dynamicSearch("dynamicNameAllHotels",_view.T_search.text.toString());
+		}
+		private function loadMarketList():void
+		{
+			initializeHotelRatesCategoryRemortingObject();
+			hotelRateCategoryRO.dynamicSearch("","");
+		}
+		
+		public override function hotelFetchResultsHandler(event:ResultEvent):void
+		{
+			_hotellist = event.result as ArrayCollection;
+			_view.DG_Hotels.dataProvider = _hotellist;
+			
+			setSelectedItemOfVehicleList();
+			
+			if(_selectedIndex != -1)
+			{
+				_view.DG_Hotels.selectedIndex = _selectedIndex;
+				var tempEvent:ListEvent;
+				showSelectedItem(tempEvent);
+			}
+			
+		}
+		
+		private function setSelectedItemOfVehicleList():void
+		{
+			var _hotelCostObject:CostingHotelDetails = _args.argumentObject as CostingHotelDetails;
+			if(_hotelCostObject != null)
+			{				
+				for(var i:int=0; i< _hotellist.length; i++)
+				{
+					var _hotel:Hotel = _hotellist.getItemAt(i) as Hotel;
+					if(_hotel != null)
+					{
+						if(_hotel.hotelName == _hotelCostObject.hotelName)
+						{
+							_view.DG_Hotels.selectedIndex = i;
+							_selectedIndex				  = i;	
+							break;
+						}
+					}
+				}
+			}
+		}
+		
+		public override function roomCategoriesOfHotelFetchResultsHandler(event:ResultEvent):void
+		{
+			//Alert.show(_hotelObj.uuid + " : " +_hotelRatesObj.hotel.uuid);
+			dynamicHotel		= new DynamicHotel();
+			_roomCatagoriesOfHotellist  		= new ArrayCollection();
+			_roomCatagoriesOfHotellist			= event.result as ArrayCollection;
+			_tempRoomsCatagoriesOfHotelList     = _roomCatagoriesOfHotellist;
+			
+			dynamicHotel.roomsOfHotelList		= _tempRoomsCatagoriesOfHotelList;
+			generateDynamicObjects();
+			
+		}
+		public override function roomCategoriesFetchResultsHandler(event:ResultEvent):void
+		{
+			
+			_roomCatagorieslist  				= new ArrayCollection();
+			_roomCatagorieslist					= event.result as ArrayCollection;
+//			_view.DG_HotelsRates.dataProvider   = _roomCatagorieslist;
+		}
+		public override function hotelRateCategoryFetchResultsHandler(event:ResultEvent):void
+		{
+			
+			_marketList  				= new ArrayCollection();
+			_marketList					= event.result as ArrayCollection;
+			_view.CM_market.dataProvider= _marketList;
+			
+			_view.CM_market.selectedIndex = 1;
+			setMarketDetails();
+			
+			if (selectedMarketRateIndex != -1)
+				showingRates();
+				
+		}
+		
+		private function marketChanged(event:ListEvent):void
+		{
+			setMarketDetails();
+			generateDynamicObjects();
+		}
+		
+		private function updateCurrencyId(event:ListEvent):void
+		{
+			currencyChanged = true;
+		}
+		
+		private function setMarketDetails():void
+		{
+			setIdMarket((_view.CM_market.selectedItem as HotelRateCategory).uuid);
+			setIdMarketRateIndentity("");
+		}
+		
+		private function showRates(event:ListEvent):void
+		{
+			selectedMarketRateIndex 	= event.rowIndex;
+			showingRates();
+		}
+		
+		private function showingRates():void
+		{
+			generateDynamicObjects();
+			
+			//_view.DG_HotelsRates.selectedIndex 	= selectedMarketRateIndex;
+			//hotelRateIdntityObj					= (_view.DG_HotelsRates.dataProvider as ArrayCollection).getItemAt(selectedMarketRateIndex) as HotelRatesIdentity;
+			
+			//updateHotelRateMetaScreenDetails();
+			
+			HotelRatesRO.dynamicSearch(CONDITION_1, hotelRateIdntityObj.uuid );
+		}
+		
+		public override function hotelRatesResultsHandler(event:ResultEvent):void
+		{
+			_hotelRateslist 					= new ArrayCollection();
+			_hotelRateslist						= event.result as ArrayCollection;
+			
+			updateRatesInputFeilds();
+		}
+		
+		public override function hotelRatesMarketResultsHandler(event:ResultEvent):void
+		{
+			_hotelRatesMarketsList 				= new ArrayCollection();
+			_hotelRatesMarketsList				= event.result as ArrayCollection;
+			//_view.DG_HotelsRates.dataProvider   = _hotelRatesMarketsList;
+			
+			//if(selectedMarketRateIndex >-1)
+			//		_view.DG_HotelsRates.selectedIndex = selectedMarketRateIndex;
+			
+		}
+		
+		public function updateHotelRateMetaScreenDetails():void
+		{
+			_view.D_fromDate.text			= hotelRateIdntityObj.fromDate;
+			_view.D_toDate.text				= hotelRateIdntityObj.toDate;
+			_view.T_remarks.text			= hotelRateIdntityObj.remarks;
+			//_view.T_guide.text				= hotelRateIdntityObj.guidAccomodationObj.rate;
+			_view.chk_taxIncluded.selected 	= (hotelRateIdntityObj.taxIncluded == Constants.BOOLEAN_TRUE)? true: false;
+			
+			var htc:HotelRateCategory 		= new HotelRateCategory;
+			htc.uuid 						= hotelRateIdntityObj.idMarket
+			htc.description 				= hotelRateIdntityObj.marketName;
+			
+			selectedMarketRateIndentityUuid	= hotelRateIdntityObj.uuid;
+			selectedHotelUuid				= hotelRateIdntityObj.idHotel;
+			selectedMarketUuid				= hotelRateIdntityObj.idMarket;
+			
+			var _tempCol:ArrayCollection = _view.CM_market.dataProvider as ArrayCollection;
+			for(var o:int =0; o< _tempCol.length; o++)
+			{
+				if(htc.uuid == (_tempCol.getItemAt(o) as HotelRateCategory).uuid)
+				{
+					_view.CM_market.selectedIndex = o;
+					break;
+				}
+			}
+		}
+		
+		private function findSelectedCurrencyIndex(currencyUuid:String):int
+		{
+			var _selectedIndex:int = 2;
+			for(var i:int=0; i<_currencyList.length; i++)
+			{
+				if((_currencyList.getItemAt(i) as CurrencyMaster).uuid == currencyUuid)
+					_selectedIndex = i;
+			}
+			
+			return _selectedIndex;
+		}
+		
+		private function setDirtyFeild(event:Event):void
+		{
+			var _tf:TextInput = event.currentTarget as TextInput;
+			var _rate:HotelRates	 = findInputRateBoxBuId(_tf.id);
+			
+				if(_rate != null)
+					_rate.dirty = true;
+		}
+		
+		private function setInputBoxStyle(box:TextInput):void
+		{
+			box.setStyle("backgroundColor","#eade9c");
+		}
+		
+		private function reSetInputBoxStyle(box:TextInput):void
+		{
+			box.setStyle("backgroundColor","#ffffff");
+		}
+		
+		public function saveDocument(event:KeyboardEvent):void
+		{
+			if(event.keyCode == 119)
+				prepareToSaveRates();
+			else if(event.keyCode == 120)
+				//Alert.show("TODO:Delete this record");
+				confirmDelete();
+			else if(event.keyCode == 112)
+				Alert.show("TODO:Show HELP page");
+				
+		}
+		
+		private function saveAndClose():void
+		{
+			var obj:Object =  new Object;
+				//args.argumentObject = collection;
+				_app.dispatchEvent(new CloseEvent(CloseEvent.CLOSE));
+		}
+		
+		// Confirmation for delete
+		private function confirmDelete():void
+		{
+		Alert.show("Are you sure you want to delete this group?",
+		"Confirm delete",Alert.YES|Alert.NO,null,deleteHandler,null,Alert.NO);
+		}
+		
+		// delete method
+		private function deleteHandler(event:CloseEvent):void {
+		if (event.detail==Alert.YES){
+			deleteDocument();
+		//Your delete command here
+		}else if(event.detail==Alert.NO){
+		//do something else
+		 }
+		}
+		private function deleteDocument() : void {
+			var _temphotelRateList:ArrayCollection = new ArrayCollection;
+			var _tempRateIdentityList:ArrayCollection = new ArrayCollection;
+			
+			for(var i:int=0; i<roomRateList.length; i++)
+				{
+				var rate:HotelRates = (roomRateList.getItemAt(i) as HotelRates);
+				rate.idhotelRatesIdentity = hotelRateIdntityObj.uuid;
+				}
+				_temphotelRateList = roomRateList;
+				_tempRateIdentityList.addItem(hotelRateIdntityObj);
+			HotelRatesRO.hotelRateDelete(_temphotelRateList);
+			hotelRateIdentityRO.hotelRateIdentitydelete(_tempRateIdentityList);
+		}
+		private function indicateDateFeildError():void
+		{
+			if(_view.D_fromDate.text == "")
+					setFeildError(_view.D_fromDate, "red");
+			if(_view.D_toDate.text == "")
+					setFeildError(_view.D_toDate,  "red");
+		}
+		
+		private function setcostingDetails(_rate:HotelRates):void
+		{
+			if(_rate.rate != ""){
+				
+				var _obj:CostingHotelDetails = new CostingHotelDetails();
+				
+				if(_args.argumentObject != null)
+					_obj.uuid				= _args.argumentObject.uuid;
+//				else
+//					_obj.uuid				= UIDUtil.createUID();
+					
+				_obj.costingHotelUuid	= _args.originatorObject.costingHotel.uuid;
+				_obj.noOfRooms 			= int(_view.T_noOfRooms.text);
+				_obj.hotelRateUuid		= _rate.uuid;
+				_obj.roomCategory		= _rate.roomCatagory.roomCatagoryObj.description;
+				_obj.hotelName			= _hotelObj.hotelName;
+				_obj.roomRate			= _rate.rateBox.text;
+				_obj.roomBasis			= _rate.roomBasis.description;
+				_obj.occupancyBasis		= _rate.roomOccupation.description;	
+				_obj.currencyUuid		= _rate.currencyId;
+				_obj.hotelRatesIdentity = _rate.hotelRatesIdentity;
+				
+				_tempRatesList.addItem(_rate);
+				
+				_obj.hotelRatesList		= _tempRatesList;
+				_args.argumentObject 	= _obj;
+			}
+		
+		}
+		
+		private function resetDateFeildError():void
+		{
+			if(_view.D_fromDate.text != "")
+					setFeildError(_view.D_fromDate, "black");
+			if(_view.D_toDate.text != "")
+					setFeildError(_view.D_toDate,  "black");
+		}
+		
+		private function setFeildError(uio:UIComponent, color:String):void
+		{
+			uio.setStyle("borderColor", color);
+			uio.setStyle("borderColor", color);
+		}
+		
+		private function findInputRateBoxBuId(id:String):HotelRates
+		{
+			for(var i:int=0; i<roomRateList.length; i++)
+			{
+				var rate:HotelRates = (roomRateList.getItemAt(i) as HotelRates);
+					if(rate.rateBox.id == id)
+					{
+						return rate;
+						break;
+					}
+			}
+			return null;
+		}
+		
+		private function prepareToSaveRates():void
+		{
+			if(_view.D_fromDate.text == "" || _view.D_toDate.text == "")
+			{
+				indicateDateFeildError();
+						
+			}else
+			{
+				resetDateFeildError();
+				hotelRateIdntityObj.uuid 		= (selectedMarketRateIndentityUuid == "")? UIDUtil.createUID(): selectedMarketRateIndentityUuid;
+				hotelRateIdntityObj.idHotel		= selectedHotelUuid;
+				hotelRateIdntityObj.idMarket	= selectedMarketUuid;
+				
+				hotelRateIdntityObj.createdByUuid	= _loggedInUser.uuid;
+				hotelRateIdntityObj.rateType		= Constants.HOTEL_RATE_TYPE_USEROVERRIDEN;
+				
+				hotelRateIdntityObj.guidAccomodationObj					= _view.hotelRatesIdentity.guidAccomodationObj;
+				hotelRateIdntityObj.guidAccomodationObj.currencyUuid	= (_view.CMB_currencyG.selectedItem as CurrencyMaster).uuid;
+				
+				hotelRateIdntityObj.fromDate	= _view.D_fromDate.text;
+				hotelRateIdntityObj.toDate		= _view.D_toDate.text;
+				hotelRateIdntityObj.remarks		= _view.T_remarks.text;
+				hotelRateIdntityObj.taxIncluded	= (_view.chk_taxIncluded.selected == true) ? Constants.BOOLEAN_TRUE: Constants.BOOLEAN_FALSE;
+				
+				// Prepare rates list
+				var _temp:ArrayCollection = new ArrayCollection;
+				var str:String = "";
+				var rateInputFeild:TextInput = new TextInput;
+							rateInputFeild.width = 45;
+							rateInputFeild.setStyle("color", "#000000");
+							rateInputFeild.editable;
+				for(var i:int=0; i<roomRateList.length; i++)
+				{
+					var rate:HotelRates = (roomRateList.getItemAt(i) as HotelRates);
+					
+					// This is to override rate.dirt state, since on top of that currency has been CHANGED !
+					if(currencyChanged)
+					{
+						rate.dirty 		= true;
+						//rate.currencyId	= (_view.CMB_currency.selectedItem as CurrencyMaster).uuid;
+					}
+						
+					// Save ONLY dirt objects							
+					if(rate.dirty)
+					{
+						if(rate.rateBox.data!=null)
+							rate.uuid					= rate.rateBox.data.uuid;
+							
+						rate.rate					= rate.rateBox.text;
+						rate.hotelRatesIdentity 	= hotelRateIdntityObj;
+						rate.currencyId				= (_view.CMB_currency.selectedItem as CurrencyMaster).uuid;
+						_temp.addItem(rate);
+						setcostingDetails(rate);
+					}
+				}
+				var ratesIdentityList:ArrayCollection = new ArrayCollection;
+				ratesIdentityList.addItem(hotelRateIdntityObj);
+				
+				hotelRateIdentityRO.create(ratesIdentityList,_temp);
+			}
+			
+			// RESET it back to FASLE
+			currencyChanged = false;
+			
+		}
+		
+		private function setRatesIdentity():void
+		{
+		_rateIdentityObj.uuid		= selectedMarketRateIndentityUuid;
+		_rateIdentityObj.fromDate   = _view.D_fromDate.text;
+		_rateIdentityObj.toDate     = _view.D_toDate.text;
+		_rateIdentityObj.idMarket   = (_view.CM_market.selectedItem as HotelRateCategory).uuid;
+		_rateIdentityObj.idHotel 	= _hotelObj.uuid;
+		
+		}
+		
+		private function setIdMarket(value:String):void
+		{
+			selectedMarketUuid = value;
+		}
+		
+		private function setHotelUuid(value:String):void
+		{
+			selectedHotelUuid = value;
+		}
+		private function setIdMarketRateIndentity(value:String):void
+		{
+			selectedMarketRateIndentityUuid = value;
+		}
+		
+		public override function hotelRatesIdentityCreateResultsHandler(event:ResultEvent):void
+		{
+			_args.argumentObject.hotelRateUuid = event.result as String;
+			_view.statusLabel.text 			   = "Saved Successfully";
+			saveAndClose();
+		}
+		public override function hotelRateIdentityDeleteResultsHandler(event:ResultEvent):void
+		{
+			if(_selectedIndex != -1)
+			startShowingSelectedItem(_selectedIndex);
+		}
+		public override function faultHandler(event:FaultEvent):void
+		{
+			_view.statusLabel.text = "Failed, please contact the admin";
+			Alert.show("failed\n"+event.message);
+		}
+		
+		public override function currencyMasterFetchResultsHandler (event:ResultEvent):void
+		{
+			_currencyList 						= new ArrayCollection();
+			_currencyListForGuid				= new ArrayCollection();
+			_currencyList						= event.result as ArrayCollection;
+			_currencyListForGuid				= _currencyList;
+			_view.CMB_currency.dataProvider 	= _currencyList;
+			_view.CMB_currencyG.dataProvider 	= _currencyListForGuid;
+		}
+		
+	}
+}

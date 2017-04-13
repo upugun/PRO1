@@ -1,0 +1,622 @@
+package net.jwt.view
+{
+	import flash.events.Event;
+	import flash.events.KeyboardEvent;
+	import flash.events.MouseEvent;
+	
+	import mx.collections.ArrayCollection;
+	import mx.controls.Alert;
+	import mx.core.UIComponent;
+	import mx.events.ListEvent;
+	import mx.formatters.DateFormatter;
+	import mx.rpc.events.FaultEvent;
+	import mx.rpc.events.ResultEvent;
+	
+	import net.jwt.Constants;
+	import net.jwt.event.INotificationArguments;
+	import net.jwt.event.NotificationArguments;
+	import net.jwt.objects.TourAdvanceLineVisualObject;
+	import net.jwt.value.objects.CostingActivity;
+	import net.jwt.value.objects.CostingMiscellaneous;
+	import net.jwt.value.objects.CostingTechnicalVisit;
+	import net.jwt.value.objects.CurrencyMaster;
+	import net.jwt.value.objects.CurrencyRate;
+	import net.jwt.value.objects.EnquiryManagement;
+	import net.jwt.value.objects.QuerryObject;
+	import net.jwt.value.objects.TourAdvance;
+	import net.jwt.value.objects.TourAdvanceLine;
+	
+	public class TourAdvanceMediator extends Mediator
+	{
+		private var _view:TourAdvanceView;
+		private var _args:INotificationArguments;
+		private var _app:MainView;
+		
+		private var _versionNode:EnquiryManagement = new EnquiryManagement;
+		
+		[Bindable] private var reList:ArrayCollection			= new ArrayCollection;
+		private var costingexcurionsList:ArrayCollection 		= new ArrayCollection;
+		private var tourAdvanceList:ArrayCollection 			= new ArrayCollection;
+		private var miscellaneousLst:ArrayCollection;
+		private var activityLst:ArrayCollection;
+		public var _currencyList:ArrayCollection;
+		private var _obj:TourAdvance	=	new TourAdvance;
+		
+		[Embed(source='assets/logo/jetwing_single_solid_colour_logo.png')] 
+     	private static const logoClass:Class;
+     	
+     	[Embed(source='assets/icons/24x24emailnew.png')]
+     	private static const msgNew:Class;
+		
+		[Embed(source='assets/icons/24x24emailold.png')]
+     	private static const msgOld:Class;
+     	
+     	private var _selectedIndex:int = 0;
+     	
+		public function TourAdvanceMediator(view:UIComponent, args:NotificationArguments)
+		{
+			super(view);
+			if(view != null)
+			{
+				_view  = view as TourAdvanceView;
+			}
+			
+			if(args != null){
+				//_args 			= args;
+				_versionNode 	= args.originatorObject as EnquiryManagement;
+				_loggedInUser	= args.user;
+			}
+				
+			_app = args.viewComponent as MainView;	
+			
+		}
+		
+		protected override function viewComponentInitialize():void{
+			setLoggedInUser();
+			reloadCurrencyList();
+			_view.tourAdvance	=	setInitialData();
+			_view.B_extract.addEventListener(MouseEvent.CLICK, reloadEntranceList);
+			_view.B_request.addEventListener(MouseEvent.CLICK, requestAdvance);
+			_view.tree.addEventListener(ListEvent.ITEM_DOUBLE_CLICK, openTreeItem);
+			_view.B_new.addEventListener(MouseEvent.CLICK, newRecord);
+			_view.CMB_currency.addEventListener(Event.CHANGE, calculateItemsValuesHandler);
+			_view.D_date.addEventListener(Event.CHANGE, getConversionRateHandler);
+			_view.T_conversion.addEventListener(Event.CHANGE, calculateItemsValuesHandler);
+			setSavingStatus();
+		}
+		
+		private function setSavingStatus():void
+		{
+			if(!checkForAccountsStatusOfTour(_versionNode))
+			{
+				_view.B_extract.visible = true;
+				_view.H_request.enabled = true;
+			}
+			else
+			{
+				_view.B_extract.visible = false;
+				_view.H_request.enabled = false;
+			}
+		}
+		
+		private function getConversionRateHandler(e:Event):void
+		{
+			getConversionRate();
+		}
+		
+		private function getConversionRate():void
+		{
+			startBusyCursor();
+			initializeCurrencyRateRemortingObject();
+			var q:QuerryObject	=	new QuerryObject;
+				q.searchCode	=	"searchRateofTheMonth";
+				q.condition1	=	Constants.LABLE_CURRENCY_COMMERCIAL_BANK_TT;
+				q.condition2	=	_view.D_date.text.toString();
+				q.condition3	=	"USD";
+			currencyRateRO.dynamicSearch(q);
+		}
+		
+		private function reloadCurrencyList():void
+		{
+			currencyMasterRO.dynamicSearch("","");
+		}
+		
+		private function loadAdvanceList():void
+		{
+			tourAdvanceRO.dynamicSearch("searchByTourId",_versionNode.uuid);
+		}
+		
+		private function currenctConversion(rate:Number, currency:String):Number
+		{
+			var _rate:Number	=	0;
+			var conversionRate:Number	=	Number(_view.tourAdvance.conversionRate);
+			
+			if(_view.CMB_currency.selectedItem!=null)
+			{
+				if(conversionRate>0)
+				{
+					if((_view.CMB_currency.selectedItem as CurrencyMaster).uuid == "LKR")
+					{
+						if(currency == "LKR")
+							_rate	=	rate;
+						else if(currency == "USD")
+							_rate	=	rate*conversionRate;
+						else
+							_rate	=	0;		
+					}
+					else if((_view.CMB_currency.selectedItem as CurrencyMaster).uuid == "USD")
+					{
+						if(currency == "LKR")
+							_rate	=	rate / conversionRate;	
+						else if(currency == "USD")
+							_rate	=	rate;
+						else
+							_rate	=	0;
+					}
+				}
+			}
+			
+			return Math.round(_rate);
+		}
+		
+		private function newRecord(e:Event):void
+		{
+			_view.tourAdvance			=	setInitialData();
+			_view.B_request.enabled		=	true;
+			_view.B_extract.enabled		=	true;
+			
+			reList.removeAll();
+			_view.V_dynamicBox.removeAllChildren();
+			
+		}
+		private function setInitialData():TourAdvance
+		{
+			var tourAdvance:TourAdvance	=	new TourAdvance;
+			
+			if(_versionNode!=null)
+			{
+				tourAdvance.tourId			=	_versionNode.uuid;
+				tourAdvance.tourYear		=	_versionNode.tourIdYear;
+				tourAdvance.tourSequence	=	_versionNode.tourIdSequence;
+				tourAdvance.noOfPax			=	_versionNode.noOfPax;
+			}
+			
+			return tourAdvance;
+		}
+		
+		private function openTreeItem(e:Event):void
+		{
+			_view.tourAdvance	=	_view.tree.selectedItem as TourAdvance;
+			
+			//if(_view.tourAdvance.status == Constants.TOUR_ADVANCE_STATUS_Pending){
+				_view.B_request.enabled =	false;
+				_view.B_extract.enabled	=	false;
+			//}
+				
+			openGrid();
+		}
+		
+		private function requestAdvance(e:Event):void
+		{
+			var isDateAdded:Boolean = true;
+			
+			if(reList.length>0 && _view.tourAdvance.requiredDate.length>0 && Number(_view.tourAdvance.conversionRate)>0)
+			{
+				startBusyCursor();
+				_view.tourAdvance.advanceLineList.removeAll();
+				for(var i:int=0; i< reList.length; i++)
+				{
+					var line:TourAdvanceLineVisualObject 	= 	reList.getItemAt(i) as TourAdvanceLineVisualObject;
+					
+					if(line.selectItem.selected)
+					{
+						var tourAdvanceLine:TourAdvanceLine		=	new TourAdvanceLine;
+						
+						tourAdvanceLine.uuid				=	line.uuid;
+						tourAdvanceLine.costingItemId		=	line.costingItemId;
+						tourAdvanceLine.description			=	line.itemDescription.text;
+						tourAdvanceLine.currencyUuid		=	line.currency.text;
+						tourAdvanceLine.itemType			=	line.itemType.text;
+						tourAdvanceLine.noOfItems			=	line.noOfItems.text;
+						tourAdvanceLine.rate				=	line.itemValue.text;
+						tourAdvanceLine.itemNo				=	line.lineNo.text;
+						tourAdvanceLine.total				=	line.total.text;
+						tourAdvanceLine.createdBy			=	_loggedInUser.uuid;
+						tourAdvanceLine.createdOn			=	CurrentDateTimeString();
+						tourAdvanceLine.updatedBy			=	_loggedInUser.uuid;
+						tourAdvanceLine.itemDate			=	line.itemDate.text;
+						
+						if(tourAdvanceLine.itemType == "TICKET")
+						{
+							if(tourAdvanceLine.itemDate.length<1){
+								isDateAdded = false;
+								break;
+							}
+								
+							
+						}
+						
+						_view.tourAdvance.advanceLineList.addItem(tourAdvanceLine);
+					}
+					
+						
+				}
+				_view.tourAdvance.createdBy		=	_loggedInUser.uuid;
+				_view.tourAdvance.createdByName	=	_loggedInUser.firstName + ' ' + _loggedInUser.lastName;
+				_view.tourAdvance.createdOn		=	CurrentDateTimeString();
+				_view.tourAdvance.marketId		=	_loggedInUser.market.uuid;
+				
+				_view.tourAdvance.status	=	Constants.TOUR_ADVANCE_STATUS_Pending;;
+				
+				if(_view.CMB_currency.selectedItem !=null)
+					_view.tourAdvance.currencyUuid	=	(_view.CMB_currency.selectedItem as CurrencyMaster).uuid;
+					
+				_obj	=	_view.tourAdvance;
+				
+				var temp:ArrayCollection	=	new ArrayCollection;
+					temp.addItem(_obj)
+				if(isDateAdded)	
+					tourAdvanceRO.create(temp);	
+				else
+				{
+					stoptBusyCursor();
+					Alert.show("Please fill item date for tickets!");
+				}	
+			
+			
+			}
+			else
+				Alert.show("Please fill required fields");
+			
+			
+		}
+		
+		private function CurrentDateTimeString():String
+		{               
+		    var CurrentDateTime:Date 	= new Date();
+		    var CurrentDF:DateFormatter = new DateFormatter();
+		    	CurrentDF.formatString 	= "YYYY/MM/DD HH:NN:SS";
+		    var DateTimeString:String 	= CurrentDF.format(CurrentDateTime);
+		    return DateTimeString;
+		} 
+		
+		private function loadMiscleniousList():void
+		{
+			if(_versionNode !=null){
+				startBusyCursor();
+				costingMiscellineuosRO.dynamicSearch("dynamicOtherObjects",_versionNode.costing.uuid);
+			}
+		}
+		
+		private function reloadEntranceList(E:Event):void
+		{
+			loadEntranceList();
+		}
+		
+		private function loadEntranceList():void
+		{
+			if(_versionNode != null){
+				startBusyCursor();
+				costingTechnicalVisitRO.dynamicSearch("dynamicExcursionObjectsOnVerssion",_versionNode.costing.uuid);
+			}
+		}
+		
+		private function loadActivityList():void
+		{
+			if(_versionNode != null){
+				startBusyCursor();
+				costingActivityRO.dynamicSearch("dynamicExcursionObjectsOnVerssion",_versionNode.costing.uuid);
+			}
+		}
+		
+		private function  openGrid():void
+		{
+			reList.removeAll();
+			_view.V_dynamicBox.removeAllChildren();
+			
+			for(var i:int=0; i<_view.tourAdvance.advanceLineList.length; i++)
+			{
+				var _accessType:String		=	"";
+					_accessType				=	_view.tourAdvance.status;
+					
+				var line:TourAdvanceLineVisualObject	=	new TourAdvanceLineVisualObject(_accessType);
+				var advance:TourAdvanceLine					=	_view.tourAdvance.advanceLineList.getItemAt(i) as TourAdvanceLine;
+					
+					line.uuid							=	advance.uuid;
+					line.lineNo.text					=	advance.itemNo;
+					line.itemDescription.text			=	advance.description;
+					line.itemType.text					=	advance.itemType;
+					line.currency.text					=	advance.currencyUuid;
+					line.itemValue.text					=	advance.rate;
+					line.noOfItems.text					=	advance.noOfItems;
+					line.total.text						=	advance.total;
+					line.costingItemId					=	advance.uuid;
+					line.itemDate.text					=	advance.itemDate;
+					
+					line.cashIssued.text				=	advance.cashIssued;
+					line.cashReturned.text				=	advance.cashSettled;
+					line.ticketsIssued.text				=	advance.ticketIssued;
+					line.ticketsReturned.text			=	advance.ticketSettled;
+					
+					line.selectCash.selected			=	Boolean(advance.selecteCash);
+					line.selectTicket.selected			=	Boolean(advance.selectTicket);
+					
+				line.itemValue.addEventListener(KeyboardEvent.KEY_UP, calculateItemsValuesHandler);
+				line.noOfItems.addEventListener(KeyboardEvent.KEY_UP, calculateItemsValuesHandler);
+				line.cashIssued.addEventListener(KeyboardEvent.KEY_UP, calculatePayedValuesHandler);
+				line.cashReturned.addEventListener(KeyboardEvent.KEY_UP, calculatePayedValuesHandler);
+				line.ticketsIssued.addEventListener(KeyboardEvent.KEY_UP, calculatePayedValuesHandler);
+				line.ticketsReturned.addEventListener(KeyboardEvent.KEY_UP, calculatePayedValuesHandler);
+				line.selectItem.addEventListener(Event.CHANGE, calculateItemsValuesHandler);	
+					
+				_view.V_dynamicBox.addChild(line);
+				reList.addItem(line);	
+			}
+			
+			calculateItemsValues();
+			calculatePayedValues();
+		}
+		
+		private function  createGrid():void
+		{
+			reList.removeAll();
+			_view.V_dynamicBox.removeAllChildren();
+			
+			var sequence:int =0;
+			
+			for(var i:int=0; i<costingexcurionsList.length; i++)
+			{
+				var entrance:CostingTechnicalVisit 		= 	costingexcurionsList.getItemAt(i) as CostingTechnicalVisit;
+				var line:TourAdvanceLineVisualObject	=	addToGrid(sequence);
+				
+					line.itemDescription.text			=	entrance.excursionLabel;
+					line.itemType.text					=	"ENTRANCE";
+					line.currency.text					=	entrance.currencyUuid;
+					line.itemValue.text					=	entrance.excursionRate;
+					line.costingItemId					=	entrance.uuid;
+					line.noOfItems.text					=	_versionNode.noOfPax;
+					
+					if(entrance.peymentTerm == "TICKET")
+					{
+						line.itemValue.text		= "0";
+						line.itemType.text		= "TICKET";
+					}
+					
+				_view.V_dynamicBox.addChild(line);
+				reList.addItem(line);	
+				sequence = sequence + 1
+			}
+			
+			for(var j:int=0; j<miscellaneousLst.length; j++)
+			{
+				var misc:CostingMiscellaneous			= 	miscellaneousLst.getItemAt(j) as CostingMiscellaneous;
+				var line2:TourAdvanceLineVisualObject	=	addToGrid(sequence);
+				
+					line2.itemDescription.text			=	misc.miscellaneous.description;
+					line2.itemType.text					=	"MISCELLANEOUS";
+					line2.currency.text					=	misc.currencyUuid;
+					line2.itemValue.text				=	(Number(misc.miscellaneous.fee) * Number(misc.noOfunits)).toString();
+					//line.ite.text					=	misc.excursionRate;
+					
+					
+				_view.V_dynamicBox.addChild(line2);
+				reList.addItem(line2);
+				sequence = sequence + 1	
+			}
+			
+			for(var n:int=0; n<activityLst.length; n++)
+			{
+				var act:CostingActivity					= 	activityLst.getItemAt(n) as CostingActivity;
+				var line3:TourAdvanceLineVisualObject	=	addToGrid(sequence);
+				
+					line3.itemDescription.text			=	act.activityLabel;
+					line3.itemType.text					=	"ACTIVITY";
+					line3.currency.text					=	act.currencyUuid;
+					line3.itemValue.text				=	act.activityRate;
+					line3.noOfItems.text				=	_versionNode.noOfPax;
+					//line.ite.text					=	misc.excursionRate;
+					
+					
+				_view.V_dynamicBox.addChild(line3);
+				reList.addItem(line3);	
+				sequence = sequence + 1
+			}
+			
+			var adjustmentLine:TourAdvanceLineVisualObject = addToGrid(sequence+1);
+				adjustmentLine.itemDescription.editable	   = true;
+				adjustmentLine.itemType.text			   = "OTHER";
+				adjustmentLine.currency.text			   = "LKR";
+				
+			_view.V_dynamicBox.addChild(adjustmentLine);
+			reList.addItem(adjustmentLine);	
+		}
+		
+		private function  addToGrid(index:int):TourAdvanceLineVisualObject
+		{
+			
+			var _accessType:String	=	"";
+				_accessType			=	_view.tourAdvance.status;
+			var line:TourAdvanceLineVisualObject	=	new TourAdvanceLineVisualObject(_accessType);
+				line.lineNo.text			=	(index+1).toString();
+				
+				line.itemValue.addEventListener(KeyboardEvent.KEY_UP, calculateItemsValuesHandler);
+				line.noOfItems.addEventListener(KeyboardEvent.KEY_UP, calculateItemsValuesHandler);
+				line.cashIssued.addEventListener(KeyboardEvent.KEY_UP, calculatePayedValuesHandler);
+				line.cashReturned.addEventListener(KeyboardEvent.KEY_UP, calculatePayedValuesHandler);
+				line.ticketsIssued.addEventListener(KeyboardEvent.KEY_UP, calculatePayedValuesHandler);
+				line.ticketsReturned.addEventListener(KeyboardEvent.KEY_UP, calculatePayedValuesHandler);
+				line.selectItem.addEventListener(Event.CHANGE, calculateItemsValuesHandler);
+					
+			return line	;
+		}
+		
+		private function  calculateItemsValuesHandler(e:Event):void
+		{
+			calculateItemsValues();
+		}
+		
+		private function  calculatePayedValuesHandler(e:Event):void
+		{
+			calculatePayedValues();
+		}
+		
+		private function  calculatePayedValues():void
+		{
+			var total:Number				= 0;
+			var totalIssued:Number			=	0
+			var totalReturn:Number			=	0
+			
+			var totalTicketIssu:Number		=	0
+			var totalTicketReturn:Number	=	0
+			
+			for(var i:int=0; i<reList.length; i++)
+			{
+				var line:TourAdvanceLineVisualObject	=	reList.getItemAt(i) as TourAdvanceLineVisualObject;
+				
+				
+				 	totalIssued	   		   +=   Number(line.cashIssued.text);
+				 	totalReturn	   		   +=   Number(line.cashReturned.text);
+				 	
+				 	totalTicketIssu	   	   +=   Number(line.ticketsIssued.text);
+				 	totalTicketReturn	   +=   Number(line.ticketsReturned.text);
+				
+				_view.tourAdvance.totalCashIssued	=	totalIssued.toString();
+				_view.tourAdvance.totalCashSettled	=	totalReturn.toString();
+				
+				_view.tourAdvance.totalTicketIssued		=	totalTicketIssu.toString();
+				_view.tourAdvance.totalTicketSettled	=	totalTicketReturn.toString();
+			}
+		}
+		
+		private function  calculateItemsValues():void
+		{
+			var total:Number		= 0;
+			
+			for(var i:int=0; i<reList.length; i++)
+			{
+				var line:TourAdvanceLineVisualObject	=	reList.getItemAt(i) as TourAdvanceLineVisualObject;
+				
+				if(line.selectItem.selected)
+				{
+					var noOfItem:Number		=	Number(line.noOfItems.text)
+					var itemValue:Number	=	Number(line.itemValue.text)
+					var itemTotal:Number	=	Math.round(noOfItem * itemValue);
+				 		total	   			+=   currenctConversion(itemTotal, line.currency.text);
+				
+					line.total.text			=	itemTotal.toString();
+					
+					_view.tourAdvance.totalCashRequested	=	total.toString();
+				}
+				
+			}
+		}
+		
+		private function setLoggedInUser():void
+		{
+			initializeCostingMiscellineuosRemortingObject();
+			initializeCostingTechnicalVisitRemortingObject();
+			initializeCurrencyMasterRemortingObject();
+			initializeTourAdvanceRemortingObject();
+			initializeCostingActivityRemortingObject();
+			
+			costingMiscellineuosRO.setLogedInUser(_loggedInUser);
+			costingTechnicalVisitRO.setLogedInUser(_loggedInUser);
+			currencyMasterRO.setLogedInUser(_loggedInUser);
+			tourAdvanceRO.setLogedInUser(_loggedInUser);
+			costingActivityRO.setLogedInUser(_loggedInUser);
+		}
+		
+		public override function costingTechnicalVisitFetchResultsHandler (event:ResultEvent):void
+		{	
+			stoptBusyCursor();
+			costingexcurionsList		= new ArrayCollection;
+			costingexcurionsList 	  	= event.result as ArrayCollection;
+			
+			loadMiscleniousList();
+		}
+		
+		public override function costingMiscellineuosFetchResultsHandler (event:ResultEvent):void
+		{	
+			stoptBusyCursor();
+			miscellaneousLst	=	new ArrayCollection;
+			miscellaneousLst	=	event.result as ArrayCollection;
+			
+			loadActivityList();
+		}
+		
+		public override function costingBataFetchResultsHandler (event:ResultEvent):void
+		{	
+			stoptBusyCursor();
+			activityLst	=	new ArrayCollection;
+			activityLst	=	event.result as ArrayCollection;
+			
+			createGrid();
+		}
+		
+		public override function tourAdvanceFetchResultsHandler (event:ResultEvent):void
+		{	
+			stoptBusyCursor();
+			tourAdvanceList	=	new ArrayCollection;
+			tourAdvanceList	=	event.result as ArrayCollection;
+			
+			_view.tree.dataProvider	=	tourAdvanceList;
+		}
+		
+		public override function tourAdvanceCreateResultsHandler (event:ResultEvent):void
+		{
+			stoptBusyCursor();
+			
+			reList.removeAll();
+			_view.V_dynamicBox.removeAllChildren();
+			_view.tourAdvance	=	setInitialData();
+			
+			_view.statusLabel.text	=	"Saved Successfully";
+			
+			reloadCurrencyList();
+		}
+		
+		public override function currencyMasterFetchResultsHandler (event:ResultEvent):void
+		{
+			_currencyList 						= new ArrayCollection();
+			_currencyList						= event.result as ArrayCollection;
+			_view.CMB_currency.dataProvider 	= _currencyList;
+			
+			var _selected:int	=	0;
+		 
+		 	for(var i:int=0; i<_currencyList.length; i++){
+		 		
+		 		if((_currencyList.getItemAt(i) as CurrencyMaster).uuid == "LKR"){
+		 			_selected	=	i;
+		 			break;
+		 		}
+		 	}
+		 	_view.CMB_currency.selectedIndex	=	_selected;
+		 	
+		 	loadAdvanceList();
+		}
+		
+		
+		public override function currencyRateFetchResultsHandler (event:ResultEvent):void
+		{
+			var list:ArrayCollection		= new ArrayCollection();
+				list						= event.result as ArrayCollection;
+			stoptBusyCursor();
+			var conversion:String			=	"0";
+			
+			if(list.length>0){
+				conversion	=	(list.getItemAt(0) as CurrencyRate).buyRate;
+			}
+				
+			_view.tourAdvance.conversionRate= 	conversion;
+			
+			_view.T_conversion.dispatchEvent(new Event(Event.CHANGE));
+			
+		}
+		public override function faultHandler (event2:FaultEvent):void {
+			//_view.LBactionAcknow.text = "Failed, please contact the admin";
+			//To be overridden...
+			Alert.show("Transaction Failed. \nPlease check your inputs and try again", "Error Notification"+ event2.message.toString());
+		}
+		
+	}
+}

@@ -1,0 +1,575 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Panel xmlns:mx="http://www.adobe.com/2006/mxml" title="Vehicle Requisition view" width="100%" height="100%">
+<mx:Script>
+	<![CDATA[
+		import net.jwt.Constants;
+		import mx.controls.advancedDataGridClasses.AdvancedDataGridColumn;
+		import mx.controls.dataGridClasses.DataGridColumn;
+		import net.jwt.value.objects.TransportVehicleRequisitions;
+		import mx.managers.DragManager;
+		import mx.events.DragEvent;
+		
+		[Embed(source='assets/icons/24x24comment.png')]
+     	private static const message:Class;
+     	
+     	[Embed(source='assets/icons/quicktext-icon.png')]
+     	private static const qtext:Class;
+     	
+		private function dragAccept(event:DragEvent):void
+		{
+		  //var dropTarget:Canvas = event.currentTarget as Canvas;
+		  //DragManager.acceptDragDrop(dropTarget);
+		}
+		[Bindable] public var requistitions:TransportVehicleRequisitions = new TransportVehicleRequisitions();
+		
+		private function getRequestedUser(item:Object, column:DataGridColumn):String {
+		 	var userName:String = new String();
+		 	if(item.requestedUser != null)
+		 		userName = item.requestedUser.firstName +" "+ item.requestedUser.lastName;
+		  return userName;
+		}
+		
+		private function getRequestedMarket(item:Object, column:DataGridColumn):String {
+		 	var market:String = new String();
+		 	if(item.requestedUser != null)
+		 		market = item.requestedUser.market.description;
+		  return market;
+		}
+		
+		public function styleFunction_summaryRow(data:Object,col:AdvancedDataGridColumn):Object 
+		{ 
+			if (data.nightStops.length<2 && data.requisitionType == Constants.LABLE_REQUISITION_TYPE_ARRIVAL) 
+			{ 
+				return { color:Constants.LABLE_COLOR_REQUISITION_ARRIVAL,textAlign:"center" }; 
+			} 
+			else if (data.requisitionType == Constants.LABLE_REQUISITION_TYPE_DEPARTURE) 
+			{ 
+				return { color:Constants.LABLE_COLOR_REQUISITION_DEPARTURE,textAlign:"center" }; 
+			} 
+			else if (data.requisitionType == Constants.LABLE_REQUISITION_TYPE_TRANSFER) 
+			{ 
+				return { color:Constants.LABLE_COLOR_REQUISITION_TRANSFER,textAlign:"center" }; 
+			}
+			else if (data.nightStops.length>0 && data.requisitionType== Constants.LABLE_REQUISITION_TYPE_ARRIVAL) 
+			{ 
+				return { color:Constants.LABLE_COLOR_REQUISITION_ROUND_TOUR,textAlign:"center" }; 
+			}
+			return {}; 
+		} 
+		
+	]]>
+</mx:Script>
+	<mx:HDividedBox width="100%" height="100%">
+		<mx:VBox width="68%" height="100%">
+		
+			<mx:VDividedBox height="100%" width="100%">
+			
+				<mx:HDividedBox width="100%" height="100%"  paddingTop="5" paddingLeft="5" paddingRight="5" paddingBottom="5">
+					<mx:VBox width="45%" height="100%">
+					 <mx:Panel width="100%" height="100%"  title="Requisition Details"  borderThicknessBottom="1" borderThicknessLeft="1" borderThicknessRight="1" borderThicknessTop="1">
+					 	<mx:VBox width="100%" height="100%">
+					 		<mx:Grid width="100%">
+					 		<mx:GridRow height="10">
+								<mx:GridItem>
+								</mx:GridItem>
+								<mx:GridItem>
+								</mx:GridItem>
+								<mx:GridItem >
+								</mx:GridItem>
+								<mx:GridItem>
+								</mx:GridItem>
+							</mx:GridRow>
+							<mx:GridRow>
+								<mx:GridItem width="4" height="100%">
+								</mx:GridItem>
+								<mx:GridItem>
+									<mx:Label text="Tour No"/>
+								</mx:GridItem>
+								<mx:GridItem>
+									<mx:Label text="{requistitions.tourNo}" fontWeight="normal"/>
+								</mx:GridItem>
+							</mx:GridRow>
+							<mx:GridRow>
+								<mx:GridItem width="4" height="100%">
+								</mx:GridItem>
+								<mx:GridItem>
+									<mx:Label text="Requisition No"/>
+								</mx:GridItem>
+								<mx:GridItem>
+									<mx:Label text="{requistitions.requisitionNo}" fontWeight="normal"/>
+								</mx:GridItem>
+							</mx:GridRow>
+							<mx:GridRow>
+								<mx:GridItem width="4" height="100%">
+								</mx:GridItem>
+								<mx:GridItem>
+									<mx:Label text="Requested By"/>
+								</mx:GridItem>
+								<mx:GridItem>
+									<mx:Label text="{requistitions.requestedUser.firstName +' '+ requistitions.requestedUser.lastName}" fontWeight="normal"/>
+								</mx:GridItem>
+							</mx:GridRow>
+							<mx:GridRow>
+								<mx:GridItem>
+								</mx:GridItem>
+								<mx:GridItem>
+									<mx:Label text="Requested on" />
+								</mx:GridItem>
+								<mx:GridItem >
+									<mx:Label text="{requistitions.requestedDate}" fontWeight="normal"/>
+								</mx:GridItem>
+							</mx:GridRow>
+							<mx:GridRow>
+								<mx:GridItem>
+								</mx:GridItem>
+								<mx:GridItem>
+									<mx:Label text="Requisition Type" />
+								</mx:GridItem>
+								<mx:GridItem >
+									<mx:Label text="{requistitions.requisitionType}" fontWeight="normal"/>
+								</mx:GridItem>
+							</mx:GridRow>
+							<mx:GridRow>
+								<mx:GridItem>
+								</mx:GridItem>
+								<mx:GridItem>
+									<mx:Label text="Market" />
+								</mx:GridItem>
+								<mx:GridItem>
+									<mx:Label text="{requistitions.requestedMarketLabel}" fontWeight="normal"/>
+								</mx:GridItem>
+							</mx:GridRow>
+							<mx:GridRow>
+								<mx:GridItem width="4" height="100%">
+								</mx:GridItem>
+								<mx:GridItem>
+									<mx:Label text="Client Name" />
+								</mx:GridItem>
+								<mx:GridItem>
+									<mx:Label text="{requistitions.clientName}" fontWeight="normal"/>
+								</mx:GridItem>
+							</mx:GridRow>
+							<mx:GridRow>
+								<mx:GridItem width="4" height="100%">
+								</mx:GridItem>
+								<mx:GridItem >
+									<mx:Label text="No of Adults" />
+								</mx:GridItem>
+								<mx:GridItem>
+									<mx:Label text="{requistitions.noOfAdults}" fontWeight="normal"/>
+								</mx:GridItem>
+							</mx:GridRow>
+							<mx:GridRow>
+								<mx:GridItem width="4" height="100%">
+								</mx:GridItem>
+								<mx:GridItem>
+									<mx:Label text="No of Children"/>
+								</mx:GridItem>
+								<mx:GridItem>
+									<mx:Label text="{requistitions.noOfChilds}" fontWeight="normal"/>
+								</mx:GridItem>
+							</mx:GridRow>
+							<mx:GridRow>
+								<mx:GridItem>
+								</mx:GridItem>
+								<mx:GridItem>
+									<mx:Label text="Requested Vehicle"  fontWeight="bold"/>
+								</mx:GridItem>
+								<mx:GridItem >
+									<mx:Label text="{requistitions.requestedVehicle}" fontWeight="bold"/>
+								</mx:GridItem>
+								<mx:GridItem>
+								</mx:GridItem>
+							</mx:GridRow>
+							<mx:GridRow  >
+								<mx:GridItem>
+								</mx:GridItem>
+								<mx:GridItem>
+									<mx:Label text="Report To"  fontWeight="bold"/>
+								</mx:GridItem>
+								<mx:GridItem >
+									<mx:TextInput text="{requistitions.reportTo}"  fontWeight="normal" editable="false" id="T_reportTo"/>
+								</mx:GridItem>
+								<mx:GridItem>
+								</mx:GridItem>
+							</mx:GridRow>
+							<mx:GridRow>
+								<mx:GridItem>
+								</mx:GridItem>
+								<mx:GridItem>
+									<mx:Label text="Report D &amp; T" fontWeight="bold"/>
+								</mx:GridItem>
+								<mx:GridItem >
+									<mx:DateField id="D_reportDate"  width="101" color="#010000"  formatString="YYYY/MM/DD" editable="false" enabled="true"/>
+									<mx:TextInput id="T_reportTime"   color="#000000" width="52" editable="true"/>
+								</mx:GridItem>
+								<mx:GridItem>
+								</mx:GridItem>
+							</mx:GridRow>
+							<mx:GridRow>
+								<mx:GridItem>
+								</mx:GridItem>
+								<mx:GridItem>
+									<mx:Label text="Tour End Date &amp; Time"  fontWeight="bold"/>
+								</mx:GridItem>
+								<mx:GridItem >
+									<mx:DateField id="D_pickupDate"  width="101" color="#010000"  formatString="YYYY/MM/DD"/>
+									<mx:TextInput id="T_pickupTime"   color="#000000" width="52"/>
+								</mx:GridItem>
+								<mx:GridItem>
+								</mx:GridItem>
+							</mx:GridRow>
+							<mx:GridRow>
+									<mx:GridItem>
+									</mx:GridItem>
+									<mx:GridItem>
+											<mx:Label text="Water Bottles"/>
+									</mx:GridItem>
+									<mx:GridItem width="4" height="100%">
+											<mx:Label text="{requistitions.waterBottleAmount}" fontWeight="normal"/>
+									</mx:GridItem>
+								</mx:GridRow>
+								<mx:GridRow>
+									<mx:GridItem>
+									</mx:GridItem>
+									<mx:GridItem>
+										<mx:Label text="Sim Cards"/>
+									</mx:GridItem>
+									<mx:GridItem width="4" height="100%">
+										<mx:Label text="{requistitions.simCardAmount}" fontWeight="normal"/>
+									</mx:GridItem>
+								</mx:GridRow>
+								<mx:GridRow>
+									<mx:GridItem>
+									</mx:GridItem>
+									<mx:GridItem>
+										<mx:Label text="Garlands"/>
+									</mx:GridItem>
+									<mx:GridItem width="4" height="100%">
+									
+									<mx:Label text="{requistitions.garlandAmount}" fontWeight="normal"/>
+									</mx:GridItem>
+								</mx:GridRow>
+							<mx:GridRow width="100%">
+								<mx:GridItem width="4" height="100%">
+								</mx:GridItem>
+								<mx:GridItem>
+									<mx:Label text="Remarks"  color="#951A94"/>
+								</mx:GridItem>
+								<mx:GridItem>
+									<mx:Image id="I_addRemarks" source="{message}" />
+									<mx:Label id="L_addRemarks" text="Add Remarks" color="#951A94" />
+									<mx:Button id="B_help" width="30" height="30" skin="{qtext}" visible="false"/>
+								</mx:GridItem>
+							</mx:GridRow>
+						</mx:Grid>
+						<mx:Grid width="100%" height="100%">
+								<mx:GridRow width="100%" height="50%">
+									<mx:GridItem width="99%" height="100%">
+										<mx:TextArea id="T_remarksHistory" color="#020202" width="95%" backgroundColor="#D8E8D3" editable="true" enabled="true" height="90%" text="{requistitions.remarks}" change="{requistitions.remarks = T_remarksHistory.text}">
+										</mx:TextArea>
+									</mx:GridItem>
+								</mx:GridRow>
+								<mx:GridRow width="100%" height="50%">
+									<mx:GridItem width="99%" height="100%">
+										<mx:TextArea id="T_remarks" color="#020202" width="95%" backgroundColor="#FFFFFF" editable="true" enabled="true" height="100%" visible="false">
+											<mx:text></mx:text>
+										</mx:TextArea>
+									</mx:GridItem>
+								</mx:GridRow>
+						</mx:Grid>
+						</mx:VBox>
+					 	
+						
+					 </mx:Panel>
+					</mx:VBox>
+					<mx:VBox width="55%" height="100%">
+					 <mx:Panel width="100%" height="160" title="Flight Details" borderThicknessBottom="1" borderThicknessLeft="1" borderThicknessRight="1" borderThicknessTop="1">
+						<mx:VBox width="100%" height="100%">
+					 		<mx:Grid width="100%">
+							<mx:GridRow>
+								<mx:GridItem>
+								</mx:GridItem>
+								<mx:GridItem>
+								</mx:GridItem>
+								<mx:GridItem >
+									<mx:Label text="Arrival Details" fontWeight="normal"/>
+								</mx:GridItem>
+								<mx:GridItem>
+								</mx:GridItem>
+								<mx:GridItem>
+									<mx:Label text="Departure Details" fontWeight="normal"/>
+								</mx:GridItem>
+							</mx:GridRow>
+							<mx:GridRow >
+								<mx:GridItem>
+								</mx:GridItem>
+								<mx:GridItem>
+									<mx:Label text="Flight No" />
+								</mx:GridItem>
+								<mx:GridItem>
+									<mx:Label text="{requistitions.arrivalFlightNo}" fontWeight="normal"/>
+								</mx:GridItem>
+								<mx:GridItem>
+								</mx:GridItem>
+								<mx:GridItem>
+									<mx:Label text="{requistitions.departureFlightNo}" fontWeight="normal"/>
+								</mx:GridItem>
+							</mx:GridRow>
+							<mx:GridRow  >
+								<mx:GridItem >
+								</mx:GridItem>
+								<mx:GridItem>
+									<mx:Label text="Flight D &amp; T" />
+								</mx:GridItem>
+								<mx:GridItem >
+									<mx:Label text="{requistitions.arrivalFlightTime}" fontWeight="normal"/>
+								</mx:GridItem>
+								<mx:GridItem >
+								</mx:GridItem>
+								<mx:GridItem>
+									<mx:Label text="{requistitions.departureFightTime}" fontWeight="normal"/>
+								</mx:GridItem>
+							</mx:GridRow>
+							<mx:GridRow  >
+								<mx:GridItem>
+								</mx:GridItem>
+								<mx:GridItem>
+									<mx:Label text="Airport" />
+								</mx:GridItem>
+								<mx:GridItem >
+									<mx:Label text="{requistitions.arrivalAirPort}" fontWeight="normal"/>
+								</mx:GridItem>
+								<mx:GridItem>
+								</mx:GridItem>
+								<mx:GridItem>
+									<mx:Label text="{requistitions.departureAirport}" fontWeight="normal"/>
+								</mx:GridItem>
+							</mx:GridRow>
+							</mx:Grid>
+						</mx:VBox>
+						
+							</mx:Panel>
+							
+							<mx:Panel width="100%" height="169"  title="Vehicle Allocation"  borderThicknessLeft="1" borderThicknessRight="1" borderThicknessTop="1" borderThicknessBottom="1">
+								<mx:VBox width="100%" height="100%">
+					 		<mx:Grid width="100%" >
+									<mx:GridRow height="10">
+										<mx:GridItem>
+										</mx:GridItem>
+										<mx:GridItem>
+										</mx:GridItem>
+										<mx:GridItem >
+										</mx:GridItem>
+										<mx:GridItem>
+										</mx:GridItem>
+									</mx:GridRow>
+									<mx:GridRow >
+										<mx:GridItem width="4" height="100%">
+										</mx:GridItem>
+										<mx:GridItem>
+											<mx:Label text="Select a vehicle" />
+										</mx:GridItem>
+										<mx:GridItem>
+											<mx:GridItem>
+												<mx:TextInput color="#000000" text="{requistitions.vehicle.registrationNo +' '+requistitions.vehicle.model}" id="T_vehicle" width="100%" editable="false" backgroundColor="#D8E8D3"/>
+											</mx:GridItem>
+										</mx:GridItem>
+										<mx:GridItem>
+											<mx:Button id="vehicleHelp" label="?" width="35"/>
+										</mx:GridItem>
+									</mx:GridRow>
+									<mx:GridRow >
+										<mx:GridItem width="4" height="100%">
+										</mx:GridItem>
+										<mx:GridItem>
+											<mx:Label text="Change Driver" />
+										</mx:GridItem>
+										<mx:GridItem>
+											<mx:TextInput color="#000000" width="100%" text="{requistitions.driver.firstName +' ' + requistitions.driver.lastName}" id="T_driver" editable="false" backgroundColor="#D8E8D3"/>
+										</mx:GridItem>
+										<mx:GridItem>
+											<mx:Button id="driverHelp" label="?" width="35"/>
+										</mx:GridItem>
+									</mx:GridRow>
+									<mx:GridRow >
+										<mx:GridItem width="4" height="100%">
+										</mx:GridItem>
+										<mx:GridItem>
+											<mx:Label text="Guide" />
+										</mx:GridItem>
+										<mx:GridItem>
+											<mx:TextInput width="100%" color="#000000" text="{requistitions.guide.firstName + ' '+requistitions.guide.lastName}" id="T_guide" editable="false" backgroundColor="#D8E8D3"/>
+										</mx:GridItem>
+										<mx:GridItem>
+											<mx:Button id="guideHelp" label="?" width="35"/>
+										</mx:GridItem>
+									</mx:GridRow>
+									<mx:GridRow >
+										<mx:GridItem width="4" height="100%">
+										</mx:GridItem>
+										<mx:GridItem>
+											<mx:Label text="Allocated?" />
+										</mx:GridItem>
+										<mx:GridItem>
+											<mx:CheckBox id="CB_allocate" />
+											<mx:Button label="Confirm" id="B_save" width="89" enabled="false"/>
+											<mx:TextInput width="76" id="T_noOfSplit"/>
+											<mx:Button label="Split" id="B_split" enabled="false"/>
+										</mx:GridItem>
+										<mx:GridItem>
+										</mx:GridItem>
+									</mx:GridRow>
+								</mx:Grid>
+								</mx:VBox>
+								
+							</mx:Panel>
+							
+							<mx:Panel width="100%" height="100%" title="Night Stops"  borderThicknessBottom="2" borderThicknessLeft="1" borderThicknessRight="1" borderThicknessTop="1">
+								<mx:VBox width="100%" height="100%">
+								<mx:HBox width="100%" height="10%" id="H_removeNighs" enabled="false">
+						<mx:Label text="Wish to delete items?" fontWeight="normal"/>
+						<mx:CheckBox id="CHK_deleteItems"  label="Yes"/>
+						<mx:Image id="I_refresh"/>
+					</mx:HBox>
+					 				<mx:DataGrid id="DG_nightsList" width="100%" height="100%" 
+										 dragEnabled="true" dragMoveEnabled="false" dataProvider="{requistitions.nightStops}">
+										<mx:columns>
+											<mx:DataGridColumn headerText="#" 		dataField="stopOrder"   width="22"/>
+											<mx:DataGridColumn headerText="Date" 	dataField="travelDate"  width="100"/>
+											<mx:DataGridColumn headerText="Route" 	dataField="itinerary"/>
+											<mx:DataGridColumn headerText="Hotel" 	dataField="stopHotel"/>
+										</mx:columns>
+									</mx:DataGrid>
+								</mx:VBox>
+							
+							</mx:Panel>
+					</mx:VBox>
+				</mx:HDividedBox>
+				
+			</mx:VDividedBox>
+		</mx:VBox>
+		
+		<mx:VDividedBox width="32%" height="100%" >
+			<mx:VBox width="100%" height="50%">
+				<mx:HBox width="100%" height="100%">
+					<mx:VBox width="100%" height="100%"  paddingTop="5">
+					<mx:Panel width="100%" height="100%"  title="Reuisitions List">
+						<mx:VBox width="100%" height="30%">
+					 		<mx:Grid width="100%">
+						<mx:GridRow width="100%" height="100%">
+							<mx:GridItem>
+							</mx:GridItem>
+							<mx:GridItem>
+							</mx:GridItem>
+							<mx:GridItem width="100%" horizontalAlign="right">
+								<mx:Label id="LBactionAcknow" color="#FAB000"/>
+							</mx:GridItem>
+						</mx:GridRow>
+						<mx:GridRow width="100%" height="100%">
+							<mx:GridItem>
+							</mx:GridItem>
+							<mx:GridItem>
+								<mx:Label text="Vehicle Type"/>
+							</mx:GridItem>
+							<mx:GridItem >
+								<mx:ComboBox id="C_vehiclelist" color="#0A0909" labelField="description" width="117"></mx:ComboBox>
+							</mx:GridItem>
+						</mx:GridRow>
+						<mx:GridRow width="100%" height="100%">
+							<mx:GridItem>
+							</mx:GridItem>
+							<mx:GridItem>
+								<mx:Label text="Date Range"/>
+							</mx:GridItem>
+							<mx:GridItem >
+								<mx:VBox>
+									<mx:HBox>
+										<mx:DateField width="90" color="#0A0909" id="Date_from" formatString="YYYY/MM/DD"/>
+										<mx:DateField width="90" color="#1E1C1C" id="Date_to" formatString="YYYY/MM/DD" />
+									</mx:HBox>
+									<mx:HBox>
+										<mx:RadioButton label="RD" toolTip="Report Date" id="CB_reportDate" selected="true" groupName="search"/>
+										<mx:RadioButton label="PD" toolTip="Departure Pick-up Date" id="CB_pickUpDate" selected="false" groupName="search" visible="false"/>
+									</mx:HBox>
+								</mx:VBox>
+							</mx:GridItem>
+						</mx:GridRow>
+						<mx:GridRow width="100%" height="100%">
+							<mx:GridItem>
+							</mx:GridItem>
+							<mx:GridItem>
+								<mx:Label text="Market"/>
+							</mx:GridItem>
+							<mx:GridItem >
+								<mx:CheckBox label="Show Split Only" id="CHK_showSplit"/>
+							</mx:GridItem>
+						</mx:GridRow>
+						<mx:GridRow width="100%" height="100%">
+							<mx:GridItem>
+							</mx:GridItem>
+							<mx:GridItem>
+								<mx:Label text="Req No"/>
+							</mx:GridItem>
+							<mx:GridItem >
+								<mx:TextInput width="86" id="T_reqNo"/>
+								<mx:Label text="Tour No"/>
+								<mx:TextInput width="86" id="T_tourNo"/>
+							</mx:GridItem>
+						</mx:GridRow>
+						<mx:GridRow width="100%" height="100%">
+							<mx:GridItem>
+							</mx:GridItem>
+							<mx:GridItem>
+								<mx:Label text="Market"/>
+							</mx:GridItem>
+							<mx:GridItem >
+								<mx:ComboBox id="C_marketList" labelField="description" width="117"></mx:ComboBox>
+								<mx:Button label="search" id="B_date" width="70"/>
+								<mx:Button label="Refresh" id="B_refresh" />
+							</mx:GridItem>
+						</mx:GridRow>
+					</mx:Grid>
+						</mx:VBox>
+					
+					<mx:HBox width="100%" height="100%">
+						<mx:VBox width="4" height="100%" >
+						</mx:VBox>
+						<mx:VBox width="100%" height="100%">
+							<mx:AdvancedDataGrid textAlign="left" id="reqList" width="100%" height="100%" styleFunction="styleFunction_summaryRow" 
+										 dragEnabled="true" dragMoveEnabled="false">
+								<mx:columns>
+									<mx:AdvancedDataGridColumn headerText="Report Date" dataField="reportDateTime"/>
+									<mx:AdvancedDataGridColumn headerText="Depature" dataField="pickUpTime"/>
+									<mx:AdvancedDataGridColumn headerText="Vehicle Type" dataField="requestedVehicle"/>
+									<mx:AdvancedDataGridColumn headerText="Market" dataField="requestedMarketLabel"/>
+									<mx:AdvancedDataGridColumn headerText="Req No#" dataField="requisitionNo" width="80"/>
+								</mx:columns>
+							</mx:AdvancedDataGrid>
+							<mx:HBox width="100%">
+								<mx:Grid width="100%">
+									<mx:GridRow width="100%" height="100%">
+										<mx:GridItem>
+											<mx:Label text="Arrival" color="0xf213d5" fontWeight="plain"/>
+										</mx:GridItem>
+										<mx:GridItem>
+											<mx:Label text="Departure" color="0xf56110" fontWeight="plain"/>
+										</mx:GridItem>
+										<mx:GridItem>
+											<mx:Label text="Transfer" color="0x0d228e" fontWeight="plain"/>
+										</mx:GridItem>
+										<mx:GridItem width="100%">
+											<mx:Label text="Round Tour" color="0x0b7b08" fontWeight="plain"/>
+										</mx:GridItem>
+									</mx:GridRow>
+								</mx:Grid>	
+							</mx:HBox>
+						</mx:VBox>
+					</mx:HBox>
+					</mx:Panel>
+					</mx:VBox>
+				</mx:HBox>
+			</mx:VBox>
+		</mx:VDividedBox>
+	</mx:HDividedBox>
+</mx:Panel>

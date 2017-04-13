@@ -1,0 +1,232 @@
+package net.jhl.visual.objects
+{
+	import com.objects.JwtNumberInput;
+	
+	import flash.events.Event;
+	import flash.events.KeyboardEvent;
+	import flash.events.MouseEvent;
+	
+	import mx.collections.ArrayCollection;
+	import mx.containers.HBox;
+	import mx.controls.ComboBox;
+	import mx.controls.Label;
+	import mx.controls.RadioButton;
+	import mx.formatters.NumberFormatter;
+	
+	import net.jhl.value.objects.RateCode.RoomCatagoryCost;
+	import net.jhl.view.JWHConstants;
+	
+	public class RoomCategoryCostHBox extends HBox
+	{
+		private var _lineSelectedBackGroundColor:String = "#cfe4e7";
+		private var _lineRoleOverBackGroundColor:String = "#e5e5e5";
+		private var _lineDefaultBackGroundColor:String  = "#FFFFFF";
+		
+		[Bindable]
+		public var roomCatagoryCost:RoomCatagoryCost;
+		public var uuid:String		 	 		 = "";
+		public var sequence:int		 	 		 = 0;
+		public var cmb_roomCategory:ComboBox	 = new ComboBox;
+		public var cmb_currency:ComboBox		 = new ComboBox;
+		public var cmb_action:ComboBox			 = new ComboBox;
+		public var T_cost:JwtNumberInput 		 = new JwtNumberInput;
+		public var rd_pluse:RadioButton			 = new RadioButton;
+		public var rd_minus:RadioButton			 = new RadioButton;
+		public var T_addcost:JwtNumberInput 	 = new JwtNumberInput;
+		public var cmb_rateType:ComboBox		 = new ComboBox;
+		public var equalLable:Label				 = new Label;
+		public var T_totalcost:JwtNumberInput 	 = new JwtNumberInput;
+		public var rd_fixed:RadioButton			 = new RadioButton;
+		public var rd_pecentage:RadioButton		 = new RadioButton;
+		public var hbox:HBox		 			 = new HBox;
+		public var hbox2:HBox		 			 = new HBox;
+		
+		public var isHboxSelected:Boolean	=	false;
+		public var isBaseRate:Boolean		=	false;
+		
+		public var formatter:NumberFormatter = new NumberFormatter();	
+		
+		
+		public function RoomCategoryCostHBox(roomCategoryList:ArrayCollection, obj:RoomCatagoryCost, _isBaseRate:Boolean)
+		{ 
+			isBaseRate = _isBaseRate
+			
+			roomCatagoryCost = obj;
+			
+			setInitialValues(roomCategoryList);
+			
+			formatter.precision = 2;
+			
+			this.setStyle("horizontalGap","5");
+			T_cost.setStyle("textAlign","right");
+			T_addcost.setStyle("textAlign","right");
+			T_totalcost.setStyle("textAlign","right");
+			hbox.setStyle("horizontalGap","10");
+			hbox2.setStyle("horizontalGap","10");
+			
+			cmb_roomCategory.width 	= 198;
+			cmb_rateType.width 		= 120;
+			cmb_action.width 		= 71;
+			T_cost.width 			= 120;
+			T_addcost.width 		= 120;
+			T_totalcost.width 		= 120;
+			equalLable.width		= 16;
+			hbox.width				= 80;
+			hbox2.width				= 120;
+			
+			
+			T_totalcost.editable = false;
+			
+			equalLable.text	=	"=";
+			
+			cmb_action.labelField		=	"label";
+			cmb_rateType.labelField		=	"label";
+			cmb_roomCategory.labelField	=	"roomCategoryName";
+			
+			rd_pluse.label		=	"+";
+			rd_pluse.groupName 	=	"rateSign";
+			//rd_pluse.selected	=	true;
+			
+			rd_minus.label		=	"-";
+			rd_minus.groupName 	=	"rateSign";
+			
+			rd_fixed.label		=	"F";
+			rd_fixed.groupName 	=	"rateType";
+			//rd_fixed.selected	=	true;
+			
+			rd_pecentage.label		=	"%";
+			rd_pecentage.groupName 	=	"rateType";
+			
+			hbox.addChild(rd_pluse);
+			hbox.addChild(rd_minus);
+			
+			hbox2.addChild(rd_fixed);
+			hbox2.addChild(rd_pecentage);
+			
+			this.addChild(cmb_roomCategory);
+			if(!isBaseRate)
+			{
+				this.addChild(T_cost);
+				this.addChild(hbox);
+			}
+			this.addChild(T_addcost);
+			if(!isBaseRate)
+			{
+				this.addChild(hbox2);
+				this.addChild(equalLable);
+				this.addChild(T_totalcost);
+			}
+			
+			T_addcost.addEventListener(Event.CHANGE, calculateTotalHandler);
+			rd_fixed.addEventListener(MouseEvent.CLICK, calculateTotalHandler);
+			rd_pecentage.addEventListener(MouseEvent.CLICK, calculateTotalHandler);
+			rd_pluse.addEventListener(MouseEvent.CLICK, calculateTotalHandler);
+			rd_minus.addEventListener(MouseEvent.CLICK, calculateTotalHandler);
+			
+			this.addEventListener(MouseEvent.MOUSE_OVER, handleMouseOver);
+			this.addEventListener(MouseEvent.MOUSE_OVER, handleMouseOver);
+			this.addEventListener(MouseEvent.MOUSE_OUT, handleMouseOut);
+			this.addEventListener(MouseEvent.MOUSE_UP, handleMouseUp);
+			this.addEventListener(KeyboardEvent.KEY_UP, handleKeyUp);
+		}
+		
+		private function setInitialValues(roomCategoryList:ArrayCollection):void
+		{
+			uuid							= roomCatagoryCost.uuid;
+			
+			cmb_rateType.dataProvider 		= JWHConstants.rateTypeList;
+			cmb_roomCategory.dataProvider 	= roomCategoryList;
+			cmb_action.dataProvider			= JWHConstants.rateActionList;
+			
+			if(roomCatagoryCost.changeAction == JWHConstants.RATE_ACTION_TYPE_PLUS)
+				rd_pluse.selected = true;
+			else if(roomCatagoryCost.changeAction == JWHConstants.RATE_ACTION_TYPE_MINUS)
+				rd_minus.selected = true;
+				
+			if(roomCatagoryCost.changeType == JWHConstants.RATE_TYPE_FIXED)
+				rd_fixed.selected = true;
+			else if(roomCatagoryCost.changeType == JWHConstants.RATE_TYPE_PERCENTAGE)
+				rd_pecentage.selected = true;	
+					
+			cmb_roomCategory.selectedIndex 	= setComboSelectedItem(roomCategoryList, "uuid", roomCatagoryCost.appartmentUuid);
+			//cmb_action.selectedIndex 		= setComboSelectedItem(JWHConstants.rateActionList, "id", roomCatagoryCost.changeAction);
+			//cmb_rateType.selectedIndex 		= setComboSelectedItem(JWHConstants.rateTypeList, "id", roomCatagoryCost.changeType);
+			
+			T_addcost.text					= roomCatagoryCost.price.toString();
+			
+			calculateTotal();
+		}
+		
+		private function calculateTotalHandler(e:Event):void
+		{
+			calculateTotal();
+		
+		}
+		
+		public function calculateTotal():void
+		{
+			var parentCost:Number 	= Number(T_cost.text);
+			var addCost:Number 		= 0;
+			var totalCost:Number 	= 0;
+			
+			if(rd_pluse.selected)
+				addCost = Number(T_addcost.text);
+			else if(rd_minus.selected)
+				addCost = 0 - Number(T_addcost.text);	
+			
+			if(rd_fixed.selected)
+				totalCost = parentCost + addCost;
+			else if(rd_pecentage.selected)	
+				totalCost = parentCost + (parentCost * addCost / 100);
+			
+			this.T_totalcost.text	= roundToLastTwoDecimals(totalCost).toString();
+		
+		}
+		
+		private function handleMouseOver(event:Event):void
+		{
+			if(!isHboxSelected)
+				(event.currentTarget as HBox).setStyle("backgroundColor" ,_lineRoleOverBackGroundColor);
+			
+		}
+		
+		private function handleMouseOut(event:Event):void
+		{
+			(event.currentTarget as HBox).setStyle("backgroundColor" ,_lineDefaultBackGroundColor);
+		}
+		
+		private function handleMouseUp(event:Event):void
+		{
+			(event.currentTarget as HBox).setStyle("backgroundColor" ,_lineSelectedBackGroundColor);
+			isHboxSelected = true;
+		}
+		
+		private function handleKeyUp(event:KeyboardEvent):void
+		{
+			(event.currentTarget as HBox).setStyle("backgroundColor" ,_lineSelectedBackGroundColor);
+			isHboxSelected = true;
+		}
+		
+		
+		private function roundToLastTwoDecimals(number:Number):Number
+		{
+			return Math.round((number)*100)/100;
+		}
+		
+		private function setComboSelectedItem(list:ArrayCollection, attrib:String, condition:String):int{
+			var index:int = 0;
+			for(var i:int=0; i<list.length; i++)
+			{
+				var obj:Object = list.getItemAt(i);
+				if(obj[attrib] == condition)
+				{
+					index = i;
+					break;
+				}
+			}
+			
+			return index;
+		}
+
+	}
+}

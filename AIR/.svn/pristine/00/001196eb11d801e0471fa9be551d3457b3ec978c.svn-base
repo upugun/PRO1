@@ -1,0 +1,77 @@
+package net.jwt.objects
+{
+	import mx.containers.HBox;
+	import mx.containers.VBox;
+	import mx.controls.Button;
+	import mx.controls.Image;
+	import mx.controls.Label;
+	import mx.controls.TextArea;
+	import mx.controls.TextInput;
+	
+	public class ItinaryDayVisualObject extends VBox
+	{
+		[Bindable]
+		public var sequience:int;
+		public var beginStatement:TextArea	=	new TextArea;
+		public var title:TextInput			=	new TextInput;
+		public var locImage:Image			=	new Image;
+		public var locDetails:TextArea		=	new TextArea;
+		public var locaionHbox:HBox			=	new HBox;
+		public var locaionVbox:VBox			=	new VBox;
+		public var statementHbox:HBox		=	new HBox;
+		public var buttonHbox:HBox			=	new HBox;
+		public var statementLabel:Label		=	new Label;
+		public var removeButton:Button		=	new Button;
+		public var moreButton:Button		=	new Button;
+		public var locationName:String		=	"";
+		public var itemOrder:Label			=	new Label;
+		
+		public function ItinaryDayVisualObject()
+		{
+			this.setStyle("borderColor", "#cacaca");
+			this.setStyle("borderStyle", "solid");
+			this.setStyle("borderThickness", "0.5");
+			this.setStyle("verticalGap","10");
+//			this.setStyle("paddingTop","5");
+//			this.setStyle("paddingBottom","5");
+			
+			title.setStyle("fontWeight", "bold");
+			
+			title.width			= 370;
+			locImage.width			= 180;
+			locDetails.width		= 370;
+			locDetails.height	 	= 150;
+			statementLabel.width 	= 65;
+			beginStatement.width	= 500;
+			statementLabel.text 	= "Statement";
+			removeButton.label		= "Remove";
+			moreButton.label		= "Change Description";
+			
+			buttonHbox.setStyle("horizontalAlign","right");
+			buttonHbox.setStyle("backgroundAlpha","0.0");
+			statementHbox.setStyle("backgroundAlpha","0.0");
+			locaionHbox.setStyle("backgroundAlpha","0.0");
+			
+			//buttonHbox.addChild(itemOrder);
+			buttonHbox.addChild(moreButton);
+			buttonHbox.addChild(removeButton);
+			buttonHbox.setStyle("horizontalGap","10");
+			
+			statementHbox.addChild(statementLabel);
+			statementHbox.addChild(beginStatement);
+			
+			locaionVbox.addChild(title);
+			locaionVbox.addChild(locDetails);
+			
+			locaionHbox.setStyle("horizontalGap","15");
+			locaionHbox.addChild(locImage);
+			locaionHbox.addChild(locaionVbox);
+			
+			this.addChild(buttonHbox);
+			this.addChild(statementHbox);
+			this.addChild(locaionHbox);
+
+		}
+
+	}
+}

@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:HBox xmlns:mx="http://www.adobe.com/2006/mxml" width="700" height="21">
+	<mx:Label id="sequence"  minWidth="50"  height="21" color="black" fontFamily="" fontSize="9" fontStyle="normal"/>
+	<mx:Label id="date" 	 minWidth="150" height="21" color="black" fontFamily="" fontSize="9" fontStyle="normal"/>
+	<mx:Label id="route" 	 minWidth="250" height="21" color="black" fontFamily="" fontSize="9" fontStyle="normal"/>
+	<mx:Label id="nightstop" minWidth="250" height="21" color="black" fontFamily="" fontSize="9" fontStyle="normal"/>
+</mx:HBox>

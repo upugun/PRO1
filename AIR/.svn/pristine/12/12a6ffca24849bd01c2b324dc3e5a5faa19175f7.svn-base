@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="utf-8"?>
+<common:JHCanvas xmlns:mx="http://www.adobe.com/2006/mxml" title="Season" width="100%" height="100%" fontSize="11" xmlns:objects="com.objects.*" xmlns:common="net.jhl.view.common.*">
+	
+	<mx:Script>
+	<![CDATA[
+		import net.jhl.value.objects.RateCode.Season;
+		import net.jwt.value.objects.MarketingSeason;
+		import net.jwt.value.objects.MarketingPayment;
+		import net.jwt.value.objects.MarketingCostAccount;
+		import mx.collections.ArrayCollection;
+		import net.jwt.Constants;
+		import net.jwt.value.objects.TransportVehicleOwner;
+		import net.jwt.value.objects.Location;
+		import mx.controls.Alert;
+		import mx.binding.utils.BindingUtils;
+		
+		[Bindable] public var season:Season = new Season;
+		
+	]]>
+</mx:Script>
+	<mx:HBox width="100%" height="100%">
+		<mx:VBox width="100%" height="100%" >
+			<mx:VDividedBox height="100%" width="100%">
+				<mx:HDividedBox width="100%" height="60%">
+				  
+				  <mx:HBox width="100%" height="100%">
+					<mx:Grid width="100%" height="70%">
+						<mx:GridRow>
+							<mx:GridItem width="4" height="100%">
+							</mx:GridItem>
+							<mx:GridItem>
+								<mx:Label text="Short Name"/>
+							</mx:GridItem>
+							<mx:GridItem>
+								<common:JHTextInput id="T_note"  text="{season.seasonShortName.toUpperCase()}" change="{season.seasonShortName = T_note.text.toUpperCase()}"/>
+							</mx:GridItem>
+						</mx:GridRow>
+						<mx:GridRow>
+							<mx:GridItem width="4" height="100%">
+							</mx:GridItem>
+							<mx:GridItem>
+								<mx:Label text="Code"/>
+							</mx:GridItem>
+							<mx:GridItem>
+								<common:JHLabel id="T_code"  text="{season.seasonCode.toUpperCase()}" />
+							</mx:GridItem>
+						</mx:GridRow>
+						<mx:GridRow>
+							<mx:GridItem width="4" height="100%">
+							</mx:GridItem>
+							<mx:GridItem>
+								<mx:Label text="Description"/>
+							</mx:GridItem>
+							<mx:GridItem>
+								<common:JHTextArea id="T_desc" editable="true" text="{season.description}" change="{season.description = T_desc.text}" width="248" height="61"/>
+							</mx:GridItem>
+						</mx:GridRow>
+						<mx:GridRow>
+							<mx:GridItem width="4" height="100%">
+							</mx:GridItem>
+							<mx:GridItem>
+								<mx:Label text="Start Date"/>
+							</mx:GridItem>
+							<mx:GridItem>
+								<common:JHDateField id="D_start" editable="true" text="{season.startTime}" change="{season.startTime = D_start.text}" />
+							</mx:GridItem>
+						</mx:GridRow>
+						<mx:GridRow>
+							<mx:GridItem width="4" height="100%">
+							</mx:GridItem>
+							<mx:GridItem>
+								<mx:Label text="End Date"/>
+							</mx:GridItem>
+							<mx:GridItem>
+								<common:JHDateField id="D_end" editable="true" text="{season.endTime}" change="{season.endTime = D_end.text}" />
+							</mx:GridItem>
+						</mx:GridRow>
+						<mx:GridRow>
+							<mx:GridItem width="4" height="100%">
+							</mx:GridItem>
+							<mx:GridItem>
+								<mx:Label text="Status"/>
+							</mx:GridItem>
+							<mx:GridItem>
+								<common:JHStatusButton JLabel="ACTIVE" id="B_status"/>
+							</mx:GridItem >
+						</mx:GridRow>
+						<mx:GridRow>
+							<mx:GridItem width="4" height="100%">
+							</mx:GridItem>
+							<mx:GridItem>
+							</mx:GridItem>
+							<mx:GridItem>
+								<mx:HBox horizontalGap="5">
+									<common:JHButton id="B_save" JLabel="Save" JStyle="jhButtonStyleB1"/>
+									<common:JHButton id="B_new" JLabel="New" JStyle="jhButtonStyleB1"/>
+								</mx:HBox>	
+							</mx:GridItem>
+						</mx:GridRow>
+					</mx:Grid>
+					
+					<mx:VBox paddingLeft="10" horizontalAlign="right" width="30%">
+					  	 <mx:VBox paddingLeft="0" id="button_box" paddingBottom="10">
+					  	 </mx:VBox>
+					  	 <mx:VBox paddingLeft="0">
+					  	 	<common:JHTimeStampBox JDataSet="{season.timeStamp}" />
+					  	 </mx:VBox>
+					</mx:VBox>
+					
+				  </mx:HBox>
+				</mx:HDividedBox>
+				
+				<mx:HBox width="100%" height="40%">
+					<mx:VBox width="100%" height="100%">
+					<mx:Grid width="100%">
+						<mx:GridRow width="100%" height="10">
+							<mx:GridItem width="4" height="100%">
+							</mx:GridItem>
+						</mx:GridRow>
+						<mx:GridRow  height="100%">
+							<mx:GridItem width="4" height="100%">
+							</mx:GridItem>
+							<mx:GridItem width="38%" height="100%">
+								<mx:Label text="Serach by"/>
+								<mx:TextInput id="T_search" color="#000000"/>
+								<mx:RadioButton label="Code" id="RD_code" selected="true"/>
+								<mx:RadioButton label="Label" id="RD_lable"/>
+							</mx:GridItem>
+							<mx:GridItem width="50%" height="100%">
+							</mx:GridItem>
+						</mx:GridRow>
+					</mx:Grid>
+					<mx:HBox width="99%" height="100%">
+						<mx:VBox width="4" height="100%">
+						</mx:VBox>
+						<mx:VBox width="100%" height="100%">
+							<mx:AdvancedDataGrid width="97%" height="97%" id="DG_List"  sortableColumns="false">
+								<mx:columns>
+									<mx:AdvancedDataGridColumn headerText="Code" dataField="seasonCode"/>
+									<mx:AdvancedDataGridColumn headerText="Label" dataField="description"  />
+								</mx:columns>
+							</mx:AdvancedDataGrid>
+						</mx:VBox>
+					</mx:HBox>
+					</mx:VBox>
+				</mx:HBox>
+				
+			</mx:VDividedBox>
+		</mx:VBox>
+		
+		
+				  
+	</mx:HBox>
+</common:JHCanvas>

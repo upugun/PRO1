@@ -1,0 +1,227 @@
+package net.jwt.view
+{
+	import flash.events.Event;
+	import flash.events.KeyboardEvent;
+	import flash.events.MouseEvent;
+	
+	import mx.collections.ArrayCollection;
+	import mx.controls.Alert;
+	import mx.core.UIComponent;
+	import mx.events.ListEvent;
+	import mx.formatters.DateFormatter;
+	import mx.rpc.events.FaultEvent;
+	import mx.rpc.events.ResultEvent;
+	
+	import net.jwt.ApplicationFacade;
+	import net.jwt.event.INotificationArguments;
+	import net.jwt.event.NotificationArguments;
+	import net.jwt.value.objects.QuerryObject;
+	import net.jwt.value.objects.TransportVehicleOwner;
+	import net.jwt.value.objects.User;
+	
+	public class VehicleSuppliersMediator extends Mediator
+	{
+		private var _view:VehicleSuppliersView;
+		private var _args:INotificationArguments;
+		//private var _loggedInUser:User;
+		
+		[Bindable] private var _selectedIndex:int = -1;
+		[Bindable] private var _selectedIndexOfCategory:int = -1;
+		[Bindable] public var _obj:User = new User();
+		
+		[Bindable] public var _suppliersList:ArrayCollection;
+		
+		[Bindable] public var _supplierObj:TransportVehicleOwner = new TransportVehicleOwner();
+//		[Bindable] public var popup:JWTPopUp;
+		[Bindable] public var args:NotificationArguments = new NotificationArguments();
+
+		public function VehicleSuppliersMediator(view:UIComponent, args:INotificationArguments)
+		{
+			super(view);
+			if(view != null)
+			{
+				_view  = view as VehicleSuppliersView ;
+	
+			}
+			
+			if(args != null)
+			{
+				_args = args;
+				_loggedInUser = (_args.viewComponent as MainView).user;
+			}
+		}
+		
+		protected override function viewComponentInitialize():void{
+			
+			setLoggedInUser();
+			loadObjectsList();
+//			
+			_view.addEventListener(KeyboardEvent.KEY_UP, saveDocument);
+			_view.DG_List.addEventListener(ListEvent.ITEM_CLICK, showSelectedItem);
+			_view.DG_List.addEventListener(ListEvent.CHANGE, showSelectedItem);
+			_view.RD_code.addEventListener(MouseEvent.CLICK, DynamicSearch);
+			_view.RD_fname.addEventListener(MouseEvent.CLICK, DynamicSearch);
+			_view.RD_lname.addEventListener(MouseEvent.CLICK, DynamicSearch);
+			_view.T_search.addEventListener(KeyboardEvent.KEY_UP, DynamicSearch);
+			_view.addEventListener(MouseEvent.CLICK, resetStatus);
+			
+		}
+		
+		private function setLoggedInUser():void
+		{
+			initializeTransportVehicleOwnerRemortingObject();
+			transportVehicleOwnerRO.setLogedInUser(_loggedInUser);
+		}
+		
+		private function resetStatus(event:Event):void
+		{
+			_view.statusLabel.text = "";
+		}
+		
+		
+		public override function closePopup(event:Event):void
+            {
+                popup = null;
+                if(args != null)
+                {
+//                	if((event.target as JWTPopUp).id == HELP_LOCATION)
+//                		_view.activities.location = args.argumentObject as Location;
+                	
+                }
+                _supplierObj = _view.supplier;
+            }
+		
+		
+		private function openLocationHelp(event:MouseEvent):void
+		{
+			createPopUp(HELP_LOCATION, _view, args, "Search and select Location", ApplicationFacade.HELP_LOCATION_SEARCH, true);
+		}
+		
+		private function loadObjectsList():void
+		{
+			var q:QuerryObject = new QuerryObject;
+				q.searchCode   = "";
+				q.condition1   = "";
+			
+			transportVehicleOwnerRO.dynamicSearch(q);
+		}
+		
+		private function showSelectedItem(event:ListEvent):void
+		{
+			if(event.rowIndex > -1)
+			{
+			_selectedIndex 	 		= event.rowIndex;
+				_view.supplier	 		= _suppliersList.getItemAt(_selectedIndex) as TransportVehicleOwner;
+				
+				for(var i:int=0; i< _view.ownerTypeList.length; i++)
+				{
+					if(_view.supplier.ownerType	==	_view.ownerTypeList.getItemAt(i).id)
+					{	
+						_view.CMB_owerType.selectedIndex	= i;
+						break;
+					}
+				}
+			}
+			
+		}
+		
+		
+		public function saveDocument(event:KeyboardEvent):void
+		{
+			if(event.keyCode == 119)
+				saveObject();
+			else if(event.keyCode == 120)
+				Alert.show("TODO:Delete this record");
+			else if(event.keyCode == 112)
+				Alert.show("TODO:Show HELP page");
+				
+		}
+		public function saveObject():void
+		{
+				
+				_view.supplier.createdBy		=	_loggedInUser.uuid;
+				_view.supplier.updatedBy		=	_loggedInUser.uuid;
+				_view.supplier.createdOn		=	CurrentDateTimeString();
+				_view.supplier.lastUpdatedOn	=	CurrentDateTimeString();
+				
+				if(_view.CHK_status.selected)
+					_view.supplier.status	=	1;
+				else
+					_view.supplier.status	=	0;
+				
+				if(_view.CMB_owerType.selectedItem!=null)
+					_view.supplier.ownerType	=	_view.CMB_owerType.selectedItem.id;	
+				
+				_supplierObj	=	_view.supplier;
+			
+			var _temp:ArrayCollection = new ArrayCollection;
+				_temp.addItem(_supplierObj);
+				transportVehicleOwnerRO.create(_temp);
+			
+				
+		}
+		
+		private function CurrentDateTimeString():String
+		{               
+		    var CurrentDateTime:Date 	= new Date();
+		    var CurrentDF:DateFormatter = new DateFormatter();
+		    	CurrentDF.formatString 	= "YYYY/MM/DD HH:NN:SS";
+		    var DateTimeString:String 	= CurrentDF.format(CurrentDateTime);
+		    
+		    return DateTimeString;
+		}
+		
+		private function DynamicSearch(event:Event):void
+		{
+			filter();
+		}
+		
+		public function filter():void {
+             
+             
+               _suppliersList.filterFunction = filterFirst;
+               _suppliersList.refresh();
+                 
+        }
+            
+            
+         private function filterFirst(item:Object):Boolean
+        {
+            var searchBy:String = "";
+            
+            if(_view.RD_fname.selected)
+            	searchBy = "ownerName";
+            else if(_view.RD_lname.selected)
+            	searchBy = "surename";	
+            else if(_view.RD_code.selected)
+            	searchBy = "glCode";
+            
+            return item[searchBy].match(new RegExp(_view.T_search.text, 'i'))
+        }
+		
+				
+		
+		public override function transportVehicleOwnerCreateResultsHandler (event:ResultEvent):void
+		{	
+			_view.statusLabel.text = "Saved Successfully";
+			stoptBusyCursor();
+			loadObjectsList();
+		}
+		
+		
+		public override function transportVehicleOwnerFetchResultsHandler (event:ResultEvent):void
+		{	
+			stoptBusyCursor();
+			_suppliersList = new ArrayCollection();
+			_suppliersList = event.result as ArrayCollection;
+			_view.DG_List.dataProvider = _suppliersList;
+			
+		}
+		
+		public override function faultHandler (event:FaultEvent):void
+		{	
+			stoptBusyCursor();
+			Alert.show("Error");
+		}
+	}
+}

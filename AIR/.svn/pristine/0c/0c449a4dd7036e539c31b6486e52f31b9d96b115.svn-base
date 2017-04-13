@@ -1,0 +1,879 @@
+package net.jwt.view
+{
+	import flash.events.ContextMenuEvent;
+	import flash.events.Event;
+	import flash.events.MouseEvent;
+	import flash.ui.ContextMenu;
+	import flash.ui.ContextMenuItem;
+	import flash.utils.ByteArray;
+	
+	import mx.collections.ArrayCollection;
+	import mx.controls.Alert;
+	import mx.controls.TextInput;
+	import mx.controls.dataGridClasses.DataGridItemRenderer;
+	import mx.controls.dataGridClasses.DataGridListData;
+	import mx.core.UIComponent;
+	import mx.events.DataGridEvent;
+	import mx.events.ListEvent;
+	import mx.rpc.events.FaultEvent;
+	import mx.rpc.events.ResultEvent;
+	import mx.utils.UIDUtil;
+	
+	import net.jwt.ApplicationFacade;
+	import net.jwt.Constants;
+	import net.jwt.event.INotificationArguments;
+	import net.jwt.event.NotificationArguments;
+	import net.jwt.value.objects.CostingHotelDetails;
+	import net.jwt.value.objects.EnquiryManagement;
+	import net.jwt.value.objects.Hotel;
+	import net.jwt.value.objects.HotelReservation;
+	import net.jwt.value.objects.HotelVoucher;
+	import net.jwt.value.objects.QuerryObject;
+	import net.jwt.view.popup.JWTPopUp;
+	
+	
+	public class TourBookingMealReservationMediator extends Mediator
+	{
+		private var _view:TourBookingMealReservationView;
+		private var _args:INotificationArguments;
+		
+		private var tempBorderColor:uint;
+	    // Flag to indicate that tempBorderColor has been set.
+	    private var borderColorSet:Boolean 	= false;
+	    
+	     private var goToAdvancedView:Boolean = true;
+	    
+	     private var isFetchingSupplimentries:Boolean = false;
+	   // private var _loginUser:Employee;
+	    
+	    [Bindable]private var _selectedIndex:int = -1;
+	     [Bindable]private var _selectedIndexOfVouchers:int = -1;
+	    private var _costingHotelList:ArrayCollection;
+	     private var _suplimentaryCostingHotelList:ArrayCollection;
+	    private var _reservationList:ArrayCollection = new ArrayCollection;
+	    private var _mergedHotelList:ArrayCollection = new ArrayCollection;
+	    private var _newReservationList:ArrayCollection;
+	    private var _deleteReservationList:ArrayCollection = new ArrayCollection;
+	     private var _vouchersList:ArrayCollection = new ArrayCollection;
+	     
+	     private var _versionNode:EnquiryManagement = new EnquiryManagement;
+	     
+	     private var _selectedItem:HotelReservation;
+
+		[Bindable]public var args:NotificationArguments = new NotificationArguments();
+		
+		[Bindable][Embed(source="assets/icons/13-x13-Hotel-voucher-new.png")]  
+        public var voucher:Class;
+        
+        [Bindable][Embed(source="assets/icons/13-x13-Hotel-voucher-amende-old.png")]  
+        public var voucher_amended_latest:Class;
+        
+        [Bindable][Embed(source="assets/icons/13-x13-Hotel-voucher-cancel.png")]  
+        public var voucher_canceled:Class;
+        
+        [Bindable][Embed(source="assets/icons/13 x13-Hotel-voucher-new-printed.png")]  
+        public var voucher_printed:Class;
+        
+        [Bindable][Embed(source="assets/icons/13 x13-Hotel-voucher-amended-not-latest-printed.png")]  
+        public var voucher_amended_printedt:Class;
+        
+        [Bindable][Embed(source="assets/icons/13 x13-Hotel-voucher-canceled-printed.png")]  
+        public var voucher_canceled_printed:Class;
+        
+        [Bindable]
+        private var selectedHotelItem:HotelReservation = new HotelReservation;
+		
+		
+		public function TourBookingMealReservationMediator(view:UIComponent, args:NotificationArguments)
+		{
+			super(view);
+			if(view != null)
+			{
+				_view  = view as TourBookingMealReservationView ;
+			
+			}
+			
+			if(args != null){
+				//_args 			= args;
+				_versionNode 	= args.originatorObject as EnquiryManagement;
+				_loggedInUser	= args.user;
+			}
+		}
+		
+		protected override function viewComponentInitialize():void{
+			test();
+			initializeCostingReservationRemortingObject();
+			_view.B_extract.addEventListener(MouseEvent.CLICK, extractDate);
+			_view.B_vouchers.addEventListener(MouseEvent.CLICK, saveDocument);
+			_view.DG_list.addEventListener(DataGridEvent.ITEM_EDIT_END, handleRowUpdates);
+			_view.DG_list.addEventListener(ListEvent.ITEM_CLICK, activateDeleteOption);
+			_view.tree.addEventListener(MouseEvent.DOUBLE_CLICK, openvouherHelp);
+			_view.DG_list.addEventListener(ListEvent.ITEM_CLICK, showSelectedVoucher);
+			_view.DG_list.addEventListener(ListEvent.CHANGE, showSelectedVoucher);
+			_view.tree.addEventListener(ListEvent.ITEM_CLICK, showSelectedReservation);
+			_view.tree.addEventListener(ListEvent.CHANGE, showSelectedReservation);
+//			_view.L_advance.addEventListener(MouseEvent.CLICK,gotoAdvancedView);
+			_view.B_rates.addEventListener(MouseEvent.CLICK, openRatesHelp);
+			_view.DG_list.addEventListener(ListEvent.ITEM_ROLL_OVER,setRollOverIndex);
+			loadReservations();
+			setLoggedInUser();
+			setSavingStatus();
+		}
+		
+		private function setSavingStatus():void
+	{
+		if(!checkForAccountsStatusOfTour(_versionNode))
+		{
+			setStatusOfButtons(true);
+		}
+		else
+		{
+			setStatusOfButtons(false);
+		}
+	}
+	
+	private function setStatusOfButtons(status:Boolean):void
+	{
+		_view.B_extract.visible  = status;
+		_view.B_vouchers.visible = status;
+		_view.CHK_delete.visible = status;
+	}
+		
+		private function setRollOverIndex(e:ListEvent):void
+		{
+			_selectedItem = e.itemRenderer.data as HotelReservation;
+		}
+		
+		private function test():void
+		{
+			if(isSavingEnable)
+			{
+			var duplicate:ContextMenuItem = new ContextMenuItem("Duplicate");
+                duplicate.addEventListener(ContextMenuEvent.MENU_ITEM_SELECT, duplicateHandler);
+                            
+			var customContextMenu:ContextMenu = new ContextMenu();
+				 customContextMenu.customItems.push(duplicate);
+				  _view.DG_list.contextMenu = customContextMenu;
+			}
+		}
+		
+		private function duplicateHandler(e:ContextMenuEvent):void
+		{
+			if(_selectedItem!=null)
+			{
+				var res:HotelReservation = copyObject(_selectedItem);
+					res.uuid		=	UIDUtil.createUID();
+					res.ownership	=	Constants.OWNERSHIP_User;
+					res.update = 1
+			_reservationList.addItem(res);
+				
+			}
+				
+		}
+		
+//	private function setWindowWidth():void
+//	{
+//		if(!goToAdvancedView)
+//		{
+//			_view.V_reservation.percentWidth	=	80;
+//			_view.V_vouchers.percentWidth		=	20;
+//			
+//			_view.DGguide.visible		=	false;
+//			_view.DGtourleader.visible	=	false;
+//			_view.DGsglChild.visible	=	false;
+//			_view.DGdblChild.visible	=	false;
+//			_view.DGtplChild.visible	=	false;
+//			_view.DGtwinChild.visible	=	false;
+//			_view.DGother.visible		=	false;
+//			goToAdvancedView			=	true;
+//		}
+//		else
+//		{
+//			_view.V_reservation.percentWidth	=	100;
+//			_view.V_vouchers.width				=	0;
+//			
+//			_view.DGguide.visible		=	true;
+//			_view.DGtourleader.visible	=	true;
+//			_view.DGsglChild.visible	=	true;
+//			_view.DGdblChild.visible	=	true;
+//			_view.DGtplChild.visible	=	true;
+//			_view.DGtwinChild.visible	=	true;
+//			_view.DGother.visible		=	true;
+//			goToAdvancedView			=	false;
+//		}
+//		
+//	}	
+	
+//	private function gotoAdvancedView(e:Event):void
+//	{
+//			setWindowWidth();
+//	}
+		
+		
+	private function setLoggedInUser():void
+		{
+			reservationRo.setLogedInUser(_loggedInUser);
+		}
+		
+		private function setTreeIcons(_list:ArrayCollection):void 
+     	{
+     		for(var i:int=0; i<_list.length; i++ ){
+     			var _voucher:HotelVoucher	=	_list.getItemAt(i) as HotelVoucher;
+     			
+     			setSubTreeIcons(_voucher);	
+     			
+     		}
+     	}
+     	
+     	private function showSelectedVoucher(e:ListEvent):void
+     	{
+     		var res:HotelReservation	=	_view.DG_list.selectedItem as HotelReservation;
+     		var tableHeader:String		= ((e.itemRenderer as DataGridItemRenderer).listData as DataGridListData).dataField.toString();
+     		selectedHotelItem			=  (e.itemRenderer as DataGridItemRenderer).data as HotelReservation;
+     		
+     		if(tableHeader == "hotelName" && _view.CHK_delete.selected==false)
+     			openHotelHelp();
+     		
+     		
+     		if(_view.CHK_delete.selected){
+			 _view.DG_list.editable = false;
+			 _deleteReservationList.addItem(_mergedHotelList.getItemAt(e.rowIndex));
+			 _mergedHotelList.removeItemAt(e.rowIndex);
+			 _view.CHK_delete.selected	= false;
+			 _view.DG_list.editable = true;
+			}
+			
+			
+     		
+     		if(res !=null){
+     			
+     			for(var i:int=0; i<_vouchersList.length; i++){
+     			
+     			
+	     			if(res.hotelId	==	(_vouchersList.getItemAt(i) as HotelVoucher).hoteld){
+	     				_selectedIndexOfVouchers	=	i;
+	     				break;
+	     			}
+	     			
+	     		}
+     			
+     		}
+     		
+     		
+     		_view.tree.selectedIndex	=	_selectedIndexOfVouchers;
+     	}
+     	
+     	private function openHotelHelp():void
+		{
+			var dimention:Object = new Object;
+			dimention.width	 = 650;
+        	dimention.heigth = 400;
+        	args.user = _loggedInUser;
+			createPopUp(HELP_HOTELS_FOR_CLASSIC_TOUR_DESIGNER, _view, args, "Select Hotel", ApplicationFacade.TOUR_DESIGNER_CLASSIC_HOTEL, true, dimention);
+		}
+     	
+     	
+		
+     	private function showSelectedReservation(e:ListEvent):void
+     	{
+     		var voucher:HotelVoucher	=	_view.tree.selectedItem as HotelVoucher;
+     		
+     		for(var i:int=0; i<_reservationList.length; i++){
+     			
+     			if(voucher.hoteld	==	(_reservationList.getItemAt(i) as HotelReservation).hotelId){
+     				_selectedIndex	=	i;
+     				break;
+     			}
+     			
+     		}
+     		
+     		_view.DG_list.selectedIndex	=	_selectedIndex;
+     	}
+		
+		private function setSubTreeIcons(_voucher:HotelVoucher):void 
+     	{
+     			
+     			if(_voucher.voucherType	==	1){
+     				if(_voucher.printStatus == 0)
+     					_view.tree.setItemIcon(_voucher, voucher, voucher);
+     				else
+     					_view.tree.setItemIcon(_voucher, voucher_printed, voucher_printed);
+     			}
+     			else if(_voucher.voucherType	==	2){
+     				if(_voucher.printStatus == 0)
+     					_view.tree.setItemIcon(_voucher, voucher_amended_latest, voucher_amended_latest);	
+     				else
+     					_view.tree.setItemIcon(_voucher, voucher_amended_printedt, voucher_amended_printedt);		
+     			}
+     			else if(_voucher.voucherType	==	3){
+     				if(_voucher.printStatus == 0)
+     					_view.tree.setItemIcon(_voucher, voucher_canceled, voucher_canceled);
+     				else
+     					_view.tree.setItemIcon(_voucher, voucher_canceled_printed, voucher_canceled_printed);	
+     			}
+     				
+     			if(_voucher.children !=null)
+     					setSubTreeIcons(_voucher.children);	
+     	}
+		
+		private function loadCostingHotels():void
+		{
+			if(_versionNode.costing!=null){
+				initializeCostingHotelDetailsRemortingObject();
+				costingHotelDetailsRO.dynamicSearch("dynamicHotelObjects",_versionNode.costing.uuid, false);
+				costingHotelDetailsRO.setLogedInUser(_loggedInUser);
+			}
+			else
+				Alert.show("Costing not found !");
+		}
+		
+		private function loadSupplimentaryCostingHotels():void
+		{
+			if(_versionNode.supplementaryCosting!=null){
+				isFetchingSupplimentries	=	true;
+				initializeCostingHotelDetailsRemortingObject();
+				costingHotelDetailsRO.setLogedInUser(_loggedInUser);
+				costingHotelDetailsRO.dynamicSearch("dynamicHotelObjects",_versionNode.supplementaryCosting.uuid, false);
+			}
+		}
+		
+		public override function closePopup(event2:Event):void
+        {
+            popup = null;
+            
+            if(args != null)
+            {
+	            	if((event2.target as JWTPopUp).id == HELP_VOUCHER_VIEW){
+	            		if(args.argumentObject !=null){
+	            				loadReservations();
+	            		}
+	            	}
+	            	if((event2.target as JWTPopUp).id == HELP_HOTEL_RESERVATION_RATE_VIEW){
+	            		if(args.argumentObject !=null){
+	            			if(args.argumentObject as ArrayCollection){
+	            				_reservationList	=	args.argumentObject as ArrayCollection;
+	            			}
+	            		}
+	            	}
+	            	if((event2.target as JWTPopUp).id == HELP_HOTELS_DETAILS_FOR_TOUR_MANAGEMENT)
+	            	{
+	            		var _costingHotelDetails:Hotel 	=  args.argumentObject as Hotel;
+	            		if(_costingHotelDetails != null)
+	            		{
+	            			var hotelres:HotelReservation	=	new HotelReservation;
+	            			
+	            				hotelres			=	copyReservations(selectedHotelItem, selectedHotelItem.date);
+	            			
+	            			_deleteReservationList.addItem(hotelres);
+	            			
+	            			selectedHotelItem.hotelId	=	_costingHotelDetails.uuid;
+	            			selectedHotelItem.hotelName	=	_costingHotelDetails.hotelName;
+	            			selectedHotelItem.update	=	1;
+	            			
+	            		}
+	            					
+	            					
+	            	}
+            		
+            }
+            
+        }
+		
+		private static function copyReservations(value:HotelReservation , date:String):HotelReservation
+	    {
+	        var buffer:ByteArray = new ByteArray();
+	        buffer.writeObject(value);
+	        buffer.position = 0;
+	        var result:HotelReservation = buffer.readObject();
+	        	result.date	=	date;
+	        	
+	        return result;
+	    }
+	    
+		private function openvouherHelp(event:MouseEvent):void
+		{
+			
+			var _type:Object		 =	new Object;
+				_type.typeOfReq 	 =  "2" /** meal Type */;
+				_type.voucher		 =  _view.tree.selectedItem as HotelVoucher;
+				_type.versionNode 	 = _versionNode;
+				
+			args.originatorObject		=	_type;
+			args.user					=	_loggedInUser;
+			
+			var dimention:Object	=	new Object;
+				dimention.width		=   1000;
+				dimention.heigth	=   600;
+			createPopUp(HELP_VOUCHER_VIEW, _view, args, "Hotel Voucher", ApplicationFacade.POPUP_VOUCHER_VIEW, true, dimention);
+		}
+		
+		private function openRatesHelp(event:MouseEvent):void
+		{
+			var dimention:Object	=	new Object;
+				dimention.width		=   900;
+				dimention.heigth	=   400;
+				
+			args.originatorObject	=	_mergedHotelList;	
+			createPopUp(HELP_HOTEL_RESERVATION_RATE_VIEW, _view, args, "Hotel Rates", ApplicationFacade.HELP_HOTEL_RESERVATION_RATE, true, dimention);
+		}
+		
+		private function activateDeleteOption(event2:ListEvent):void
+		{
+			if(_view.CHK_delete.selected){
+			 _view.DG_list.editable = false;
+			 _deleteReservationList.addItem(_mergedHotelList.getItemAt(event2.rowIndex));
+			 _mergedHotelList.removeItemAt(event2.rowIndex);
+			 _view.CHK_delete.selected	= false;
+			 _view.DG_list.editable = true;
+			}
+		}
+		private function handleRowUpdates(event2:DataGridEvent):void
+		{
+			if(event2.currentTarget.itemEditorInstance as TextInput)
+			{
+				// Get the cell editor and cast it to TextInput.
+                var myEditor:TextInput = 
+                    TextInput(event2.currentTarget.itemEditorInstance);
+                    
+                      var newVal:String = myEditor.text;
+                
+                // Get the old value.
+                var oldVal:String = 
+	            event2.currentTarget.editedItemRenderer.data[event2.dataField]; 
+	            
+	            if(oldVal!= newVal){
+	            	event2.itemRenderer.data.update = 1; 
+	            	//save();
+	            }
+			}
+			
+		}
+		
+		private function extractDate(event:Event):void
+		{
+			loadCostingHotels();
+		}
+		
+		private function saveDocument(event:Event):void
+		{
+			
+			generateVouchers();
+		}
+		
+		private function generateVouchers():void
+		{
+			
+			startBusyCursor();
+			
+			initializeReservationHelperRemortingObject();
+			
+			var reservationList:ArrayCollection   = new ArrayCollection;
+			for(var i:int=0; i<_mergedHotelList.length; i++){
+				var obj:HotelReservation	=	_mergedHotelList.getItemAt(i) as HotelReservation;
+				if(obj.update == 1 && obj.hotelName.length>0){
+					reservationList.addItem(obj);
+				}
+			}
+			
+			reservationHelperRO.createHotelVouches(reservationList, _deleteReservationList,_versionNode, _loggedInUser);
+			_deleteReservationList	=	new ArrayCollection;
+		}
+		
+		private function saveByButton(eve:Event):void
+		{
+			save();
+		}
+		
+		private function save():void
+		{
+			initializeCostingReservationRemortingObject();
+			startBusyCursor();
+			
+			
+			var reservationList:ArrayCollection   = new ArrayCollection;
+			for(var i:int=0; i<_mergedHotelList.length; i++){
+				var obj:HotelReservation	=	_mergedHotelList.getItemAt(i) as HotelReservation;
+				if(obj.update == 1)
+					reservationList.addItem(obj);
+			}
+			
+			
+			reservationRo.create(reservationList);
+		}
+		
+		private function loadReservations():void
+		{
+			startBusyCursor();
+			
+			
+			var q:QuerryObject	=	new QuerryObject;
+			q.searchCode		=	"searchByTourIdOnType";
+			q.condition1		=	_versionNode.tourIdYear;
+			q.condition2		=	_versionNode.tourIdSequence.toString();
+			q.condition3		=	Constants.LABLE_HOTEL_REQ_TYPE_MEAL;
+			
+			reservationRo.dynamicSearch(q);
+		}
+		
+		private function loadVouchers():void
+		{
+			startBusyCursor();
+			initializeVoucherRemortingObject();
+			voucherRO.setLogedInUser(_loggedInUser);
+			var q:QuerryObject	=	new QuerryObject;
+			q.searchCode		=	"activeListOnType";
+			q.condition1		=	_versionNode.tourIdYear;
+			q.condition2		=	_versionNode.tourIdSequence.toString();
+			q.condition3		=	"2";
+			voucherRO.dynamicSearch(q, true);
+		}
+		
+		private function getMissingHotels():void
+		{
+			var missingHotels:int	=	0;
+			var dirtyField:Boolean	=	true;
+			
+		//	if(_costingHotelList.length < _reservationList.length)
+			//{
+				//missingHotels	 =_reservationList.length - _costingHotelList.length;
+				
+				for(var i:int=0; i<_reservationList.length; i++)
+				{
+					var res:HotelReservation	=	_reservationList.getItemAt(i) as HotelReservation;
+					for(var j:int=0; j<_costingHotelList.length; j++)
+					{
+						var hotel:CostingHotelDetails	=	_costingHotelList.getItemAt(j) as CostingHotelDetails;
+						
+						if(res.date	==	hotel.date){
+							dirtyField	=	false;
+							break;
+						}
+							dirtyField	=	true;
+					}
+						
+					if(dirtyField){
+						_deleteReservationList.addItem(res);
+						_reservationList.removeItemAt(i);
+					}
+						
+				}
+			//}
+			//Alert.show(missingHotels.toString());
+		}
+		
+		private function arrangeDataForExtract(list:ArrayCollection):void
+		{
+			getMissingHotels();
+			_newReservationList	=	new ArrayCollection;
+			
+			for(var i:int=0; i<list.length; i++){
+				
+				var costingHotel:CostingHotelDetails	= list.getItemAt(i) as CostingHotelDetails;
+				
+//				if(costingHotel.hotelName.length>0){
+					var _ob:HotelReservation = new HotelReservation;
+					_ob.date			=	costingHotel.date;
+					_ob.uuid			=	costingHotel.uuid;
+//					_ob.hotelName		=	costingHotel.hotelName;
+					_ob.hotelName		=	"";
+//					_ob.basis			=	costingHotel.roomBasis;
+					_ob.basis			=	"";
+					
+//					_ob.SGLRate			=	costingHotel.singleRate;
+//					_ob.DBLRate			=	costingHotel.roomRate;
+					_ob.buyCurency		=	costingHotel.currencyUuid;
+//					_ob.TPLRate			=	costingHotel.tripleRate;
+					
+//					_ob.sellRateSGL		=	costingHotel.singleRate;
+//					_ob.sellRateDBL		=	costingHotel.roomRate;
+					
+					_ob.sellCurency		=	costingHotel.currencyUuid;
+					
+					_ob.year			=	_versionNode.tourIdYear;
+					_ob.sequence		=	_versionNode.tourIdSequence.toString();
+					_ob.type			=   Constants.LABLE_HOTEL_REQ_TYPE_MEAL;
+					
+					_ob.update			=	1;
+					
+					if(Number(costingHotel.breakfast)>0)
+					{
+						var breakfast:HotelReservation	=	copyObject(_ob);
+							breakfast.hotelId			=	UIDUtil.createUID();
+							breakfast.costingHotelId	=	breakfast.hotelId;
+							breakfast.basis				=	"Breakfast";
+							breakfast.rate				=	costingHotel.breakfast;
+						_newReservationList.addItem(breakfast);
+					}
+					
+					if(Number(costingHotel.lunch)>0)
+					{
+						var lunch:HotelReservation	=	copyObject(_ob);
+							lunch.hotelId			=	UIDUtil.createUID();
+							lunch.costingHotelId	=	lunch.hotelId;
+							lunch.basis				=	"Lunch";
+							lunch.rate				=	costingHotel.lunch;
+						_newReservationList.addItem(lunch);
+					}
+					
+					if(Number(costingHotel.dinner)>0)
+					{
+						var temp:HotelReservation	=	copyObject(_ob);
+							temp.hotelId			=	UIDUtil.createUID();
+							temp.costingHotelId		=	temp.hotelId;
+							temp.basis				=	"Dinner";
+							temp.rate				=	costingHotel.dinner;
+						_newReservationList.addItem(temp);
+					}		
+//				}
+				
+			}
+			
+			checkForDuplicateEntries2();
+			
+			//generateVouchers();
+		}
+		
+		 public static function copyObject(value:HotelReservation):HotelReservation
+	    {
+	        var buffer:ByteArray = new ByteArray();
+	        buffer.writeObject(value);
+	        buffer.position = 0;
+	        var result:HotelReservation = buffer.readObject();
+	        return result;
+	    }
+		
+		
+		private function checkForDuplicateEntries2():void
+		{
+			_mergedHotelList = _reservationList;
+			
+			for(var i:int=0; i<_newReservationList.length; i++){
+				var newRes:HotelReservation	=	_newReservationList.getItemAt(i) as HotelReservation;
+					
+				var alreadyIn:Boolean	= false;
+				for(var j:int=0; j< _reservationList.length; j++){
+					var oldRes:HotelReservation	=	_reservationList.getItemAt(j) as HotelReservation;
+					
+					if(newRes.date == oldRes.date && newRes.basis ==oldRes.basis){
+						
+//						if(isHotelRemoved(newRes, oldRes)){
+//							alreadyIn = false;
+//							_deleteReservationList.addItem(oldRes);
+//							_reservationList.removeItemAt(j);
+//						}
+						if(checkforChangesInMeals(newRes, oldRes)){
+							alreadyIn = true;
+							oldRes.rate			=	newRes.rate;
+							
+							
+							oldRes.update = 1;
+							break;
+						}
+						else{
+							alreadyIn = true;
+							//oldRes.update = 0;
+							break;
+						}	
+					}
+					else
+						alreadyIn = false;
+					
+				}
+				if(!alreadyIn)
+				_mergedHotelList.addItem(newRes);
+			}
+			_view.DG_list.dataProvider = _mergedHotelList;
+			
+			_view.DG_list.dispatchEvent(new DataGridEvent(DataGridEvent.HEADER_RELEASE, false, true, 0, null, 0, null, null, 0));
+		}
+		
+		private function checkforChanges(newRes:HotelReservation, oldRes:HotelReservation):Boolean
+		{
+			var foundChanges:Boolean = false;
+			
+			if(newRes.date != oldRes.date || newRes.basis != oldRes.basis || newRes.sellRateSGL != oldRes.sellRateSGL || newRes.sellRateDBL != oldRes.sellRateDBL || newRes.sellRateTPL != oldRes.sellRateTPL)
+				foundChanges = true;
+			else
+				foundChanges = false;	
+				
+//			if(newRes.basis != oldRes.basis)
+//				foundChanges = true;
+//			else	
+//				foundChanges = false;
+//				
+//			if(newRes.SGLRate != oldRes.SGLRate)
+//				foundChanges = true;
+//			else	
+//				foundChanges = false;
+//				
+//			if(newRes.DBLRate != oldRes.DBLRate)
+//				foundChanges = true;
+//			else	
+//				foundChanges = false;
+//			
+//			if(newRes.TPLRate != oldRes.TPLRate)
+//				foundChanges = true;
+//			else	
+//				foundChanges = false;					
+				
+			return foundChanges;
+		}
+		
+		private function checkforChangesInMeals(newRes:HotelReservation, oldRes:HotelReservation):Boolean
+		{
+			var foundChanges:Boolean = false;
+			
+			if(newRes.basis != oldRes.basis || newRes.rate != oldRes.rate )
+				foundChanges = true;
+			else
+				foundChanges = false;	
+				
+//			if(newRes.basis != oldRes.basis)
+//				foundChanges = true;
+//			else	
+//				foundChanges = false;
+//				
+//			if(newRes.SGLRate != oldRes.SGLRate)
+//				foundChanges = true;
+//			else	
+//				foundChanges = false;
+//				
+//			if(newRes.DBLRate != oldRes.DBLRate)
+//				foundChanges = true;
+//			else	
+//				foundChanges = false;
+//			
+//			if(newRes.TPLRate != oldRes.TPLRate)
+//				foundChanges = true;
+//			else	
+//				foundChanges = false;					
+				
+			return foundChanges;
+		}
+		
+		private function isHotelRemoved(newRes:HotelReservation, oldRes:HotelReservation):Boolean
+		{
+			var foundChanges:Boolean = false;
+			
+			if(newRes.hotelId != oldRes.hotelId)
+				foundChanges = true;
+			else
+				foundChanges = false;	
+				
+			return foundChanges;
+		}
+	
+		
+		private function checkForDuplicateEntries():void
+		{
+			_mergedHotelList = _reservationList;
+			
+			for(var i:int=0; i<_newReservationList.length; i++){
+				
+				var newRes:HotelReservation	=	_newReservationList.getItemAt(i) as HotelReservation;
+				var alreadyIn:Boolean		= false;
+				for(var j:int=0; j< _reservationList.length; j++){
+					var oldRes:HotelReservation	=	_reservationList.getItemAt(j) as HotelReservation;
+					
+					if(newRes.date == oldRes.date && newRes.hotelId == oldRes.hotelId){
+						alreadyIn = true;
+						break;
+					}
+//					else if(newRes.hotelId == oldRes.hotelId && alreadyIn == false)
+//					{
+//						oldRes.update = 1;
+//					}
+					
+				}
+				if(!alreadyIn)
+				_mergedHotelList.addItem(newRes);
+			}
+			_view.DG_list.dataProvider = _mergedHotelList;
+			
+			_view.DG_list.dispatchEvent(new DataGridEvent(DataGridEvent.HEADER_RELEASE, false, true, 0, null, 0, null, null, 0));
+		}
+		
+		private function mergeArraList(alist:ArrayCollection, bList:ArrayCollection):void
+		{
+			
+		}
+		
+		public override function costingHotelDetailsFetchResultsHandler(event2:ResultEvent):void 
+		{
+			
+			if(isFetchingSupplimentries){
+				_suplimentaryCostingHotelList	=	new ArrayCollection;
+				_suplimentaryCostingHotelList	=   event2.result as ArrayCollection;
+				
+				if(_suplimentaryCostingHotelList.length > 0){
+					arrangeDataForExtract(_suplimentaryCostingHotelList);
+					Alert.show(_suplimentaryCostingHotelList.length.toString() +" supplementary record(s) found !");
+				}
+					
+				isFetchingSupplimentries	=	false;		
+			}
+			else{
+				//loadSupplimentaryCostingHotels();
+				
+				_costingHotelList	=	new ArrayCollection;
+				_costingHotelList	=   event2.result as ArrayCollection;
+				
+				if(_costingHotelList.length > 0)
+					arrangeDataForExtract(_costingHotelList);
+				else
+					Alert.show("No records found !");
+			}
+			stoptBusyCursor();
+		}
+		
+		
+		public override function reservationFetchResultsHandler(event2:ResultEvent):void 
+		{
+			_reservationList	=	new ArrayCollection;
+			_reservationList	=   event2.result as ArrayCollection;
+			_mergedHotelList	=	_reservationList;
+			_view.DG_list.dataProvider	=	_reservationList;
+			stoptBusyCursor();
+			loadVouchers();
+		}
+		
+		public override function faultHandler (event2:FaultEvent):void {
+			//_view.LBactionAcknow.text = "Failed, please contact the admin";
+			//To be overridden...
+			Alert.show("Transaction Failed. \nPlease check your inputs and try again", "Error Notification"+ event2.message.toString());
+		}
+		
+		
+		public override function reservationCreateResultsHandler(event2:ResultEvent):void 
+		{
+			stoptBusyCursor();
+			generateVouchers();
+		}
+		
+		public override function reservationHelperCreateResultsHandler(event2:ResultEvent):void 
+		{
+			stoptBusyCursor();
+			loadReservations();
+		}
+		
+		
+		public override function vouherFetchResultsHandler(event2:ResultEvent):void 
+		{
+			_vouchersList			=	new ArrayCollection;
+			_vouchersList			= 	event2.result as ArrayCollection;
+			
+			_view.tree.dataProvider = 	_vouchersList;
+			_view.tree.expandItem(0,true,true,true);
+			setTreeIcons(_vouchersList);
+			stoptBusyCursor();
+			
+			if(_vouchersList.length>0)
+				goToAdvancedView	=	false;
+			else
+				goToAdvancedView	=	true;	
+			
+//			setWindowWidth();
+		}
+		
+	}
+}

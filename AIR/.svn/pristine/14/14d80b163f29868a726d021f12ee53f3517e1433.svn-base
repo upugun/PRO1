@@ -1,0 +1,38 @@
+package net.jwt.value.objects
+{
+	[RemoteClass(alias="net.jwt.value.objects.ShoppingListDetails")]
+	
+	[Bindable]
+	public class ShoppingListDetails
+	{
+		public var uuid:String 					= "";
+		public var shoppingListId:String		= "";
+		public var shopingDate:String			= "";
+		public var locationId:String			= "";
+		public var shoppingTypeId:String		= "";
+		public var shoppingMasterId:String		= "";
+		public var shoppingMasterName:String	= "";
+		public var sales:String					= "";
+		public var noOfPax:String				= "";
+		public var createdDate:String			= "";
+		public var createdBy:String				= "";
+		public var timeStamp:String				= "";
+		public var updatedBy:String				= "";
+		public var remarks:String				= "";
+		public var locationName:String			= "";
+		public var shoppingTypeName:String		= "";
+		public var costingLocationId:String		= "";
+		
+		public var commissionRate:String		= "";
+		public var commissionValue:String		= "";
+		
+		public var status:int 					= 1;
+		public var visited:int 					= 0;
+		
+		
+		public function ShoppingListDetails()
+		{
+		}
+
+	}
+}

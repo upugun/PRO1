@@ -1,0 +1,189 @@
+package net.jwt.view.RateCode.view
+{
+	import flash.events.Event;
+	import flash.events.KeyboardEvent;
+	import flash.events.MouseEvent;
+	
+	import mx.collections.ArrayCollection;
+	import mx.controls.ComboBox;
+	import mx.controls.DateField;
+	import mx.controls.TextInput;
+	import mx.core.UIComponent;
+	import mx.events.ListEvent;
+	import mx.rpc.events.ResultEvent;
+	
+	import net.jwt.event.NotificationArguments;
+	import net.jwt.value.objects.RateCode;
+	import net.jwt.value.objects.RateCodeBaseRate;
+	import net.jwt.view.MainView;
+	import net.jwt.view.Mediator;
+
+	
+	public class HotelRateCodeMediator extends Mediator
+	{
+		private var _view:HotelRateCodeView;
+		private var _args:NotificationArguments;
+		
+		private var comboBox:ComboBox = new ComboBox;
+		private	var textBox:TextInput = new TextInput;
+		private	var date:DateField	  = new DateField;
+		
+		private var baseRateList:ArrayCollection 		= new ArrayCollection;
+		private var discountList:ArrayCollection 		= new ArrayCollection; 
+
+		[Bindable]public var args:NotificationArguments = new NotificationArguments();
+		
+     	
+		public function HotelRateCodeMediator(view:UIComponent, args:NotificationArguments)
+		{
+			super(view);
+			if(view != null)
+			{
+				_view  = view as HotelRateCodeView ;
+				
+			}
+			
+			if(args != null){
+				_args = args;
+				_loggedInUser = (_args.originalViewComponent as MainView).user;
+			}
+		}
+		
+		protected override function viewComponentInitialize():void{
+			setLoggedInUser();
+			loadBaseRates();
+			_view.B_save.addEventListener(MouseEvent.CLICK, saveItemHandler);
+			_view.DG_list.addEventListener(ListEvent.ITEM_CLICK, showSelectedItem);
+			_view.CMB_baseRate.addEventListener(ListEvent.ITEM_CLICK, showSelectedItemOfBaseCode);
+			_view.T_adjustment.addEventListener(KeyboardEvent.KEY_UP, calculateCommission);
+		}
+		
+		private function calculateCommission(e:Event):void
+		{
+			_view.L_withCommission.text = (_view.rate.baseRate.baseRate + _view.rate.baseRateAdjuster.adjusterRate + _view.rate.commission).toString();
+		}
+		
+		private function showSelectedItemOfBaseCode():void
+		{
+			var baseRate:RateCodeBaseRate = _view.CMB_baseRate.selectedItem as RateCodeBaseRate;
+				baseRate.baseRate = 90;
+			
+			_view.rate.baseRate = baseRate;
+		}
+		
+		private function showSelectedItem(e:Event):void
+		{
+			_view.rate = _view.DG_list.selectedItem as RateCode;
+			
+			for(var i:int=0; i<baseRateList.length; i++)
+			{
+				if((baseRateList.getItemAt(i) as RateCodeBaseRate).uuid == _view.rate.baseRateId)
+				{
+					_view.CMB_baseRate.selectedIndex = i;
+					break;
+				}	
+			}
+			
+			
+			for(var n:int=0; n<_view.dicountTypeList.length; n++)
+			{
+				if(_view.dicountTypeList.getItemAt(n).id == _view.rate.rateType)
+				{
+					_view.CMB_discountType.selectedIndex = n;
+					break;
+				}	
+			}
+			
+			for(var j:int=0; j<_view.currencyList.length; j++)
+			{
+				if(_view.currencyList.getItemAt(j).id == _view.rate.currency)
+				{
+					_view.CMB_cuttency.selectedIndex = j;
+					break;
+				}	
+			}
+		}
+		
+		private function setLoggedInUser():void
+		{
+			initializeRateCodeRemortingObject();
+			initializeRateCodeBaseRateRemortingObject();
+			rateCodeRO.setLogedInUser(_loggedInUser);
+			rateCodeBaseRateRO.setLogedInUser(_loggedInUser);
+		}
+		
+		private function loadRates():void
+		{
+			startBusyCursor();
+			rateCodeRO.dynamicSearch("","");
+		}
+		
+		private function loadBaseRates():void
+		{
+			startBusyCursor();
+			rateCodeBaseRateRO.dynamicSearch("","");
+		}
+		
+		private function saveItemHandler(e:Event):void
+		{
+			saveItem();
+		}
+		
+		private function saveItem():void
+		{
+			
+			
+				
+			if(_view.CMB_discountType.selectedItem!=null)
+				_view.rate.rateType = _view.CMB_discountType.selectedItem.id;
+				
+			if(_view.CMB_cuttency.selectedItem!=null)
+				_view.rate.currency = _view.CMB_cuttency.selectedItem.id;	
+				
+			if(_view.CMB_baseRate.selectedItem!=null)
+				_view.rate.baseRateId = _view.CMB_baseRate.selectedItem.uuid;	
+				
+				_view.rate.createdByUuid	=	_loggedInUser.uuid;
+				_view.rate.createdByUser	=	_loggedInUser.firstName + ' ' + _loggedInUser.lastName;		
+			
+			var temp:ArrayCollection = new ArrayCollection;
+				temp.addItem(_view.rate);
+				startBusyCursor();
+			rateCodeRO.create(temp);
+		}
+		
+		
+		public override function rateCodeCreateResultsHandler (event:ResultEvent):void
+		{	
+			_view.statusLabel.text = "Saved Successfully";
+			//reloadHotelList();
+			stoptBusyCursor();
+			_view.rate = new RateCode;
+		}
+		
+		public override function rateCodeFetchResultsHandler (event:ResultEvent):void
+		{	
+			stoptBusyCursor();
+			discountList	=	new ArrayCollection;
+			discountList	=	event.result as ArrayCollection;
+			
+			_view.DG_list.dataProvider = discountList;
+		}
+		
+		
+		public override function rateCodeBaseRateFetchResultsHandler (event:ResultEvent):void
+		{	
+			stoptBusyCursor();
+			baseRateList	=	new ArrayCollection;
+			baseRateList	=	event.result as ArrayCollection;
+			
+			_view.CMB_baseRate.dataProvider = baseRateList;
+			
+			loadRates();
+		}
+		
+		private var seasonBasedList:ArrayCollection = new ArrayCollection([
+					{ label:"Winter", id:"WINTER" },
+					{ label:"Summer", id:"SUMMER" } ]);
+	}
+}

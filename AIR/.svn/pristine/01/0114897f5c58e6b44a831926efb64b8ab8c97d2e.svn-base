@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Panel xmlns:mx="http://www.adobe.com/2006/mxml" title="Vehicle Suppliers View" width="100%" height="100%" fontSize="11">
+	
+	<mx:Script>
+	<![CDATA[
+		import net.jwt.value.objects.EnquiryManagement;
+		import net.jwt.value.objects.TransportDriverRating;
+		import mx.collections.ArrayCollection;
+		import net.jwt.Constants;
+		import net.jwt.value.objects.TransportVehicleOwner;
+		import net.jwt.value.objects.Location;
+		import mx.controls.Alert;
+		import mx.binding.utils.BindingUtils;
+		[Bindable] public var rating:TransportDriverRating = new TransportDriverRating();
+		[Bindable] public var selectedBooking:EnquiryManagement	=	new EnquiryManagement();
+		
+        [Bindable]
+        public var ownerTypeList:ArrayCollection = new ArrayCollection([
+		{ label:Constants.VEHICLE_OWNER_TYPE_Company, id:Constants.VEHICLE_OWNER_TYPE_Company },
+		{ label:Constants.VEHICLE_OWNER_TYPE_Individual, id:Constants.VEHICLE_OWNER_TYPE_Individual } ]);
+	]]>
+</mx:Script>
+	<mx:HBox width="100%" height="100%">
+		<mx:VBox width="100%" height="100%" >
+			<mx:VDividedBox height="100%" width="100%">
+				<mx:HDividedBox width="100%" height="60%">
+				  
+				  <mx:VBox width="100%" height="100%">
+					<mx:Grid width="100%" height="100%">
+						<mx:GridRow>
+							<mx:GridItem width="4" height="100%">
+							</mx:GridItem>
+							<mx:GridItem  height="30" verticalAlign="middle">
+								<mx:Label text="Supplier Details" color="#F9AC16"  fontWeight="bold"/>
+							</mx:GridItem>
+							<mx:GridItem>
+							</mx:GridItem>
+							<mx:GridItem>
+							</mx:GridItem >
+							<mx:GridItem width="100%" height="100%" horizontalAlign="left">
+								<mx:VBox width="100%" horizontalAlign="right">
+									<mx:Label id="statusLabel"  color="#FAB000" fontWeight="bold"/>
+								</mx:VBox>
+							</mx:GridItem>
+						</mx:GridRow>
+						<mx:GridRow>
+							<mx:GridItem width="4" height="100%">
+							</mx:GridItem>
+							<mx:GridItem>
+								<mx:Label text="Tour No"/>
+							</mx:GridItem>
+							<mx:GridItem>
+								<mx:TextInput color="#000000" id="T_tourYear" editable="true" text="{rating.tourYear}" change="{rating.tourYear = T_tourYear.text}" width="83"/>
+								<mx:Label text="-"/>
+								<mx:TextInput color="#000000" id="T_tourseq" editable="true" text="{rating.tourSequence}" change="{rating.tourSequence = T_tourseq.text}" width="83"/>
+							</mx:GridItem>
+						</mx:GridRow>
+						<mx:GridRow>
+							<mx:GridItem width="4" height="100%">
+							</mx:GridItem>
+							<mx:GridItem>
+								<mx:Label text="Guide/ Driver"/>
+							</mx:GridItem>
+							<mx:GridItem>
+								<mx:TextInput color="#000000" id="T_guide" editable="false" text="{rating.guideName}" change="{rating.guideName = T_guide.text}"/>
+								<mx:Button id="driverHelp" label="?" width="35"/>
+							</mx:GridItem>
+						</mx:GridRow>
+						<mx:GridRow>
+							<mx:GridItem width="4" height="100%">
+							</mx:GridItem>
+							<mx:GridItem>
+								<mx:Label text="General Remarks"/>
+							</mx:GridItem>
+							<mx:GridItem>
+								<mx:TextArea color="#000000" id="T_remarks" editable="true" text="{rating.remarks}" change="{rating.remarks = T_remarks.text}" width="518" height="97"/>
+							</mx:GridItem>
+						</mx:GridRow>
+						<mx:GridRow>
+							<mx:GridItem width="4" height="100%">
+							</mx:GridItem>
+							<mx:GridItem>
+								<mx:Label text="Critical Issues"/>
+							</mx:GridItem>
+							<mx:GridItem>
+								<mx:TextArea color="#000000" id="T_critical" editable="true" text="{rating.criticalIssues}" change="{rating.criticalIssues = T_critical.text}" width="518" height="97"/>
+							</mx:GridItem>
+						</mx:GridRow>
+						<mx:GridRow>
+							<mx:GridItem width="4" height="100%">
+							</mx:GridItem>
+							<mx:GridItem>
+								<mx:Label text="Good Comments"/>
+							</mx:GridItem>
+							<mx:GridItem>
+								<mx:TextArea color="#000000" id="T_goodComments" editable="true" text="{rating.goodCooments}" change="{rating.goodCooments = T_goodComments.text}" width="518" height="97"/>
+							</mx:GridItem>
+						</mx:GridRow>
+						<mx:GridRow>
+							<mx:GridItem width="4" height="100%">
+							</mx:GridItem>
+							<mx:GridItem>
+								<mx:Label text="Rate"/>
+							</mx:GridItem>
+							<mx:GridItem>
+								<mx:TextInput color="#045BBD" id="T_rate" editable="true" text="{rating.rate}" change="{rating.rate = T_rate.text}" fontSize="24" fontWeight="bold"/>
+								<mx:HBox id="H_stars" width="250" height="24"/>
+							</mx:GridItem>
+						</mx:GridRow>
+						<mx:GridRow>
+							<mx:GridItem width="4" height="100%">
+							</mx:GridItem>
+							<mx:GridItem>
+								
+							</mx:GridItem>
+							<mx:GridItem>
+							<mx:Button label="Save" id="B_save"/>
+								<mx:Button label="New" id="B_new"/>
+							</mx:GridItem>
+						</mx:GridRow>
+					</mx:Grid>
+				  </mx:VBox>
+				</mx:HDividedBox>
+				
+				<mx:HBox width="100%" height="40%">
+					<mx:VBox width="100%" height="100%">
+					<mx:Grid width="100%">
+						<mx:GridRow width="100%" height="10">
+							<mx:GridItem width="4" height="100%">
+							</mx:GridItem>
+						</mx:GridRow>
+						<mx:GridRow  height="100%">
+							<mx:GridItem width="4" height="100%">
+							</mx:GridItem>
+							<mx:GridItem height="100%">
+								<mx:Label text="Rating List" color="#F9AC16" fontWeight="bold" fontSize="11"/>
+							</mx:GridItem>
+							<mx:GridItem width="38%" height="100%">
+								<mx:Label text="Serach by"/>
+								<mx:TextInput id="T_search" color="#000000"/>
+								<mx:RadioButton label="Guide Name" id="RD_code" selected="true"/>
+							</mx:GridItem>
+							<mx:GridItem width="50%" height="100%">
+							</mx:GridItem>
+						</mx:GridRow>
+					</mx:Grid>
+					<mx:HBox width="99%" height="100%">
+						<mx:VBox width="4" height="100%">
+						</mx:VBox>
+						<mx:VBox width="100%" height="100%">
+							<mx:AdvancedDataGrid width="97%" height="97%" id="DG_List"  sortableColumns="false">
+								<mx:columns>
+									<mx:AdvancedDataGridColumn headerText="Tour Year" dataField="tourYear" width="150"/>
+									<mx:AdvancedDataGridColumn headerText="Tour #" dataField="tourSequence"  width="150"/>
+									<mx:AdvancedDataGridColumn headerText="Last Name" dataField="guideName"/>
+									<mx:AdvancedDataGridColumn headerText="Remarks" dataField="remarks"/>
+									<mx:AdvancedDataGridColumn headerText="Critical" dataField="criticalIssues"/>
+									<mx:AdvancedDataGridColumn headerText="Good Comments" dataField="goodCooments"/>
+								</mx:columns>
+							</mx:AdvancedDataGrid>
+						</mx:VBox>
+					</mx:HBox>
+					</mx:VBox>
+				</mx:HBox>
+				
+			</mx:VDividedBox>
+		</mx:VBox>
+	</mx:HBox>
+</mx:Panel>

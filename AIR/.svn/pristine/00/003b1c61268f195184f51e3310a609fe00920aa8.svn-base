@@ -1,0 +1,43 @@
+package net.jwt.control
+{
+	import mx.core.UIComponent;
+	
+	import net.jwt.event.NotificationArguments;
+	import net.jwt.view.helper.tourHelper.ViewModeTourHelperClassicLoadCostingsMediator;
+	import net.jwt.view.helper.tourHelper.ViewModeTourHelperClassicLoadCostingsView;
+	import net.jwt.view.popup.JWTPopUp;
+	
+	import org.puremvc.as3.interfaces.INotification;
+	import org.puremvc.as3.patterns.command.SimpleCommand;
+	
+	public class ViewModeTourHelperClassicLoadCostingsCommand extends SimpleCommand
+	{
+		private var _mediator:ViewModeTourHelperClassicLoadCostingsMediator;
+		private var _view:ViewModeTourHelperClassicLoadCostingsView;
+		private var _args:UIComponent;
+		
+		override public function execute(notification:INotification):void
+		{
+			var args:NotificationArguments = notification.getBody() as NotificationArguments;
+			
+			if (null != args){
+				var app:JWTPopUp 			= args.viewComponent as JWTPopUp;
+				var view:ViewModeTourHelperClassicLoadCostingsView  = new ViewModeTourHelperClassicLoadCostingsView;
+				//When mediator is assigned, it start setting up the view and mediator in Meditor.as
+				var mediator:ViewModeTourHelperClassicLoadCostingsMediator	= new ViewModeTourHelperClassicLoadCostingsMediator(view,args);
+			
+				this._mediator = mediator;
+				this._args     = args as UIComponent;
+				this._view     = view;
+				
+				
+				facade.registerMediator(mediator);
+				app.addChild(view);
+			}
+		}
+		public function ViewModeViewModeTourHelperClassicLoadCostingsCommand():void
+		{
+			//Alert.show("DailyGraphPriceBasedMediator command");
+		}
+	}
+}

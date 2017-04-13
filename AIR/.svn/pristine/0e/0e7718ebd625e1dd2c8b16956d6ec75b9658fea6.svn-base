@@ -1,0 +1,521 @@
+package net.jwt.view
+{
+	import flash.events.Event;
+	import flash.events.KeyboardEvent;
+	import flash.events.MouseEvent;
+	
+	import mx.collections.ArrayCollection;
+	import mx.controls.Alert;
+	import mx.core.UIComponent;
+	import mx.events.ListEvent;
+	import mx.rpc.events.FaultEvent;
+	import mx.rpc.events.ResultEvent;
+	
+	import net.jwt.ApplicationFacade;
+	import net.jwt.event.INotificationArguments;
+	import net.jwt.event.NotificationArguments;
+	import net.jwt.value.objects.Agent;
+	import net.jwt.value.objects.Country;
+	import net.jwt.value.objects.Market;
+	import net.jwt.value.objects.QuerryObject;
+	import net.jwt.view.popup.JWTPopUp;
+	
+	public class AgentApproveMediator extends Mediator
+	{
+		private var _view:AgentApproveView;
+		private var _args:INotificationArguments;
+		
+		private var tempBorderColor:uint;
+	    // Flag to indicate that tempBorderColor has been set.
+	    private var borderColorSet:Boolean = false;
+	    private var accessCodeVisibility:Boolean = true;
+	    
+	    [Bindable]private var _selectedIndex:int = -1;
+
+		[Bindable]public var _agentList:ArrayCollection;
+		[Bindable]public var _agent:Agent;
+		[Bindable]public var args:NotificationArguments = new NotificationArguments();
+		
+		private const AGENTONMARKET:String 				= "AGENTS_BASED_ON_MARKET";
+		private const AGENTONMARKET_OF_MANAGER:String 	= "AGENTS_BASED_ON_MARKET_AND_MANAGER";
+		private const SAVED_SUCSESSFULY:String 			= "#07B117";
+		private const SAVED_FAILED:String	 			= "#e63917";
+		
+		public function AgentApproveMediator(view:UIComponent, args:INotificationArguments)
+		{
+			super(view);
+			if(view != null)
+			{
+				_view  = view as AgentApproveView ;
+				_agentList = new ArrayCollection();
+			
+			}
+			
+			if(args != null)
+				_args = args;
+		}
+		
+		protected override function viewComponentInitialize():void{
+			//_view.dataGridAgents.addEventListener(ListEvent.ITEM_CLICK, showSelectedItem);
+			initializeAgentRemortingObject();
+			initializeVariable();
+			_view.addEventListener(KeyboardEvent.KEY_UP, saveDocument);
+			
+			_view.TextPhone.addEventListener(MouseEvent.DOUBLE_CLICK, setToDefault);
+			
+			_view.dataGridAgents.addEventListener(ListEvent.ITEM_CLICK, setSelectedItem);
+			_view.dataGridAgents.addEventListener(ListEvent.CHANGE, setSelectedItem);
+			
+			_view.marketHelp.addEventListener(MouseEvent.MOUSE_UP, openMarketHelp);
+			_view.countryHelp.addEventListener(MouseEvent.MOUSE_UP, openCountryHelp);
+			_view.TextAagentSearch.addEventListener(KeyboardEvent.KEY_UP, resetDynamicSearch);
+			
+			_view.text_search_name.addEventListener(MouseEvent.CLICK, resetDynamicSearch);
+			_view.text_search_code.addEventListener(MouseEvent.CLICK, resetDynamicSearch);
+			//_view.text_search_accessCode.addEventListener(MouseEvent.CLICK, resetDynamicSearch);
+			_view.text_search_contact_person.addEventListener(MouseEvent.CLICK, resetDynamicSearch);
+			_view.RD_pending.addEventListener(MouseEvent.CLICK, reloadAgents);
+			_view.RD_active.addEventListener(MouseEvent.CLICK, reloadAgents);
+			_view.B_save.addEventListener(MouseEvent.CLICK, saveHandler);
+			_view.addEventListener(MouseEvent.CLICK, disapearMessage);
+			setLoggedInUser();
+			setAccessCodeVisility();
+			fecthAgentList();
+			//setLogedinUserMarket();
+		}
+		
+		public function filter():void {
+             
+             
+               _agentList.filterFunction = filterFirst;
+               _agentList.refresh();
+                 
+        }
+            
+            
+         private function filterFirst(item:Object):Boolean
+        {
+            var searchBy:String = "";
+            
+            if(_view.text_search_name.selected){
+            	searchBy = "name";
+            	return item[searchBy].match(new RegExp(_view.TextAagentSearch.text, 'i'))
+            }
+            else  if(_view.text_search_code.selected){
+            		searchBy = "code";
+            	return item[searchBy].match(new RegExp(_view.TextAagentSearch.text, 'i'))
+            }
+            else  if(_view.text_search_contact_person.selected){
+            		searchBy = "contactDetails";
+            	return item[searchBy].match(new RegExp(_view.TextAagentSearch.text, 'i'))
+            }
+            
+            return false;
+        }
+        
+        private function filterByLocation(item:Object):Boolean
+        {
+            var searchBy:String = "";
+            
+            	searchBy = "locationName";	
+            
+            return item[searchBy].match(new RegExp(_view.TextAagentSearch.text, 'i'))
+        }
+		
+		private function saveHandler(e:Event):void
+		{
+			saveUser();
+		}
+		
+		private function reloadAgents(e:Event):void{
+			fecthAgentList();
+		}
+		
+		private function setLoggedInUser():void
+		{
+			agentsRO.setLogedInUser(_loggedInUser);
+		}
+		
+		private function setToDefault(e:MouseEvent):void
+		{
+			Alert.show(e.altKey.toString());
+		}
+		private function initializeVariable():void
+		{
+			_agent 		= new Agent;
+			_loggedInUser	= (_args.viewComponent as MainView).user;	
+		}
+		
+		private function resetDynamicSearch(event:Event):void
+		{
+			// Let it search by what in already
+			//_view.TextAagentSearch.text = "";
+			filter();
+		}
+		
+		private function dynamicSearch(evet:KeyboardEvent):void
+		{
+			startDynamicSearch();
+		}
+		
+		private function startDynamicSearch():void
+		{
+			_selectedIndex = -1;
+			resetFeilds();
+			
+			accessCodeVisibility = false;
+			setAccessCodeVisility();
+			
+			reloadUserList();	
+		}
+		
+		private function setAccessCodeVisility():void
+		{
+			if(_selectedIndex != -1)
+			{
+				_view.TextAccessCode.visible = false;
+				_view.LabelAccessCode.visible = false;
+			}
+			else if(accessCodeVisibility)
+			{
+				_view.TextAccessCode.visible = true;
+				_view.LabelAccessCode.visible = true;
+			}
+		}
+		
+		private function reloadUserList():void
+		{
+			var _q:QuerryObject = new QuerryObject;
+			_q.condition1 = _view.TextAagentSearch.text.toString();
+			
+			
+//			if(_view.text_search_name.selected == true)
+//				agentsRO.dynamicSearch("dynamicFName",_view.TextAagentSearch.text.toString());
+//			else if(_view.text_search_code.selected == true)	
+//				agentsRO.dynamicSearch("dynamicCode",_view.TextAagentSearch.text.toString());
+//			else if(_view.text_search_contact_person.selected == true)	
+//				agentsRO.dynamicSearch("dynamicContactPerson",_view.TextAagentSearch.text.toString());
+//			else if(_view.text_search_accessCode.selected == true)	
+//				agentsRO.dynamicSearch("dynamicAccessCode",_view.TextAagentSearch.text.toString());
+			
+			if(_view.text_search_name.selected == true)
+				_q.searchCode = "dynamicFName";
+			else if(_view.text_search_code.selected == true)	
+				_q.searchCode = "dynamicCode";
+			else if(_view.text_search_contact_person.selected == true)	
+				_q.searchCode = "dynamicContactPerson";
+//			else if(_view.text_search_accessCode.selected == true)	
+//				_q.searchCode = "dynamicAccessCode";
+					
+			agentsRO.dynamicSearch(_q, _loggedInUser);
+				
+		}
+		
+		public function saveDocument(event:KeyboardEvent):void
+		{
+			//Alert.show("event.keyCode = " + event.keyCode);
+			
+			if(event.keyCode == 119)
+				saveUser();
+			else if(event.keyCode == 120)
+				Alert.show("TODO:Delete this record");
+			else if(event.keyCode == 112)
+				Alert.show("TODO:Show HELP page");
+				
+		}
+		
+		private function openMarketHelp(event:MouseEvent):void
+		{
+			createPopUp(HELP_MARKET, _view, args, "Search and select Market", ApplicationFacade.HELP_MARKET_SEARCH, true);
+		}
+		
+		private function openCountryHelp(event:MouseEvent):void
+		{
+			createPopUp(HELP_COUNTRY, _view, args, "Search and select Country", ApplicationFacade.HELP_COUNTRY_SEARCH, true);
+		}
+		
+		public override function closePopup(event:Event):void
+            {
+                popup = null;
+                
+                if(args != null && args.argumentObject)
+                {
+                	if((event.target as JWTPopUp).id == HELP_MARKET){
+                		_agent.market = args.argumentObject as Market;
+                		_view.TextMarket.text		= _agent.market.description;
+                	}
+                	else if((event.target as JWTPopUp).id == HELP_COUNTRY){
+                		_agent.country = args.argumentObject as Country;
+                		_view.TextCountry.text = _agent.country.countryName;
+                	}
+                		
+                	//setHelperFeilds();
+                }
+                
+            }
+		    
+		public function saveUser():void
+		{
+			if(_view.errorFree)
+			{
+				//Alert.show("TODO:Save this record");
+			 	_agent.name	= _view.TextName.text;
+				_agent.code	= _view.TextCode.text;
+			 	_agent.city			= _view.TextCity.text;
+			 	_agent.accessCode	= _view.TextAccessCode.text;
+			 	_agent.remarks		= _view.TextRemarks.text;
+			 	_agent.accessCode	= _view.TextAccessCode.text;		
+				_agent.designation  = _view.TextDesignation.text;
+				_agent.market.description			= _view.TextMarket.text;
+	
+				_agent.contactDetails.contactPerson = _view.TextContactPerson.text;
+				_agent.contactDetails.landPhone		= _view.TextPhone.text;
+				_agent.contactDetails.mobilePhone	= _view.TextMobile.text;
+				_agent.contactDetails.fax			= _view.TextFax.text;
+				_agent.contactDetails.email			= _view.TextEmail.text;
+				_agent.contactDetails.address		= _view.TextAddress.text; 
+				_agent.contactDetails.web			= _view.TextWeb.text; 
+				_agent.contactDetails.skype			= _view.TextSkype.text;
+				
+				if(_view.CHK_status.selected)
+					_agent.status		=	1;
+				else
+					_agent.status		=	0;		
+					
+				var _temp:ArrayCollection = new ArrayCollection;
+				_temp.addItem(_agent);
+				
+				var _qObj:QuerryObject 	= new QuerryObject;
+					_qObj.searchCode	= "uuid";
+					_qObj.condition1 	= _agent.uuid;
+					
+				startBusyCursor();	
+				agentsRO.create(_temp);
+				
+			}else
+				Alert.show("Sorry! Some of the required fields are not in order. Please check and try again", "Warning");
+		}
+		
+		private function setSelectedItem(event:ListEvent):void
+		{
+			_selectedIndex = event.rowIndex;
+			setAccessCodeVisility();
+			showSelectedItem();
+		}
+		
+		private function showSelectedItem():void
+		{
+			_agent = (_agentList.getItemAt(_selectedIndex) as Agent);
+			
+			if(_agent.status == 1)
+				_view.CHK_status.selected = true;
+			else
+				_view.CHK_status.selected = false;
+					
+			resetFeilds();
+			mapTextFieldsToShow();
+		}
+		
+		private function setLogedinUserMarket():void
+		{
+			//_view.TextMarket.text = _loggedInUser.market.description;
+			//_agent.market		  = _loggedInUser.market;	
+		}
+		
+		private function mapTextFieldsToShow():void
+		{
+			_view.TextName.text 			= _agent.name;
+			_view.TextCode.text 			= _agent.code;	   
+			_view.TextRemarks.text			= _agent.remarks;
+			_view.TextCity.text				= _agent.city; 
+			_view.TextAccessCode.text		= _agent.accessCode;
+			_view.TextMarket.text			= _agent.market.description;
+			_view.TextDesignation.text		= _agent.designation;
+			
+			if(_agent.contactDetails != null)
+			{
+				_view.TextContactPerson.text	=	_agent.contactDetails.contactPerson	; 
+				_view.TextPhone.text 			=	_agent.contactDetails.landPhone;
+				_view.TextMobile.text 			=	_agent.contactDetails.mobilePhone; 
+				_view.TextFax.text				=	_agent.contactDetails.fax; 
+				_view.TextEmail.text 			=	_agent.contactDetails.email; 
+				_view.TextAddress.text 			=	_agent.contactDetails.address; 
+				_view.TextWeb.text 				=	_agent.contactDetails.web; 
+				_view.TextSkype.text 			=	_agent.contactDetails.skype;	
+			}
+			setHelperFeilds();
+		}
+		
+		private function setHelperFeilds():void
+		{
+			
+			
+			if(_agent.market != null)
+				_view.TextMarket.text		= _agent.market.description;
+				
+			if(_agent.country != null)
+				_view.TextCountry.text		= _agent.country.countryName;
+		}
+		
+		private function resetFeilds():void
+		{
+			_view.TextName.text 			= "";
+			_view.TextCode.text 			= "";
+			_view.TextRemarks.text			= "";
+			_view.TextCity.text				= ""; 
+			
+			_view.TextContactPerson.text	= "";
+			_view.TextPhone.text 			= "";
+			_view.TextMobile.text 			= "";
+			_view.TextFax.text				= "";
+			_view.TextEmail.text 			= "";
+			_view.TextAddress.text 			= "";
+			_view.TextWeb.text 				= ""; 
+			_view.TextSkype.text 			= "";
+			_view.TextMarket.text			= "";
+			_view.TextCountry.text			= "";
+			_view.TextAccessCode.text		= "";	
+			_view.TextDesignation.text		= "";
+		}
+		
+		private function gotoHomePage(event:Event):void{
+			_args.viewComponent.removeChild(_view);
+			facade.sendNotification(ApplicationFacade.LOGIN, _args);	
+			//Alert.show("go to home page...");
+		}
+		
+		private function fecthAgentList():void
+		{
+			var _q:QuerryObject = new QuerryObject;
+			
+			if(_view.RD_pending.selected)
+				_q.condition1 = "0";
+			else if(_view.RD_active.selected)	
+				_q.condition1 = "1";
+				
+			_q.searchCode = "searchByStatus";							
+			
+			startBusyCursor();
+			agentsRO.dynamicSearch(_q, _loggedInUser); 
+		}
+//		
+//		public function getAgentResultsHandler(event:ResultEvent):void {
+//			_agentList = event.result as ArrayCollection;
+//			_view.dataGridAgents.dataProvider = _agentList;
+//			mapTextFieldsToShow();
+//		}
+		
+		public override function  agentCreateResultsHandler(event:ResultEvent):void
+		{
+			_agent.uuid = event.result as String;
+			//reloadUserList();
+			fecthAgentList();
+			showMessage(_agent.name + " saved successfully", SAVED_SUCSESSFULY);
+			stoptBusyCursor();
+		}
+		
+		public override function agentFetchResultsHandler(event:ResultEvent):void
+		{
+			_agentList	= new ArrayCollection;
+			_agentList 	= event.result as ArrayCollection;
+			
+			if(_agentList != null)
+				_view.dataGridAgents.dataProvider  = _agentList;
+			
+			if(_selectedIndex != -1)
+			{
+				_view.dataGridAgents.selectedIndex = _selectedIndex;
+				showSelectedItem();
+			}
+			stoptBusyCursor();
+		}
+		
+		public function agentsFaultHandler (event:FaultEvent):void {
+			// Deal with event.fault.faultString, etc.
+			Alert.show(event.fault.faultString, 'Error');
+			showMessage("Error: ", SAVED_FAILED);
+			stoptBusyCursor();
+		}
+		
+		public override function faultHandler (event:FaultEvent):void {
+			Alert.show("Unexpected Error ! \n"+ event.fault.faultString.toString(), "Error Notification" );
+			showMessage("Unexpected Error !", SAVED_FAILED);
+			_view.notificationArea.text = "Failed, please contact the admin";
+			stoptBusyCursor();
+		}
+		
+		private function showMessage(message:String, color:String=null):void
+		{
+//			var notification:Label = new Label();
+//			if(color != null)
+//				notification.setStyle("color", color);
+//			
+//			notification.width = _view.Grid_dtandard_Widh.width - 5;
+//			notification.text = message;
+
+			disapearMessage();
+			_view.notificationArea.text = "Saved Successfully";			
+		}
+		
+		private function disapearMessage(e:Event=null):void
+		{
+			_view.notificationArea.text = "";
+		}
+//		// Drag event handler
+//		private function dragDropHandler(event:DragEvent):void {
+//               dragExitHandler(event);
+//        }            
+//
+//            // Restore the border color.
+//        private function dragExitHandler(event:DragEvent):void {
+//          //event.currentTarget.setStyle('borderColor', tempBorderColo);
+//          //borderColorSet = true;
+//        }
+//        
+//        private function dragOverHandler(event:DragEvent):void {
+//            
+//                // Explpicitly handle the dragOver event.            
+//                event.preventDefault();
+//                
+//                // Since you are explicitly handling the dragOver event,
+//                // call showDropFeedback(event) to have the drop target
+//                // display the drop indicator.
+//                // The drop indicator is removed
+//                // automatically for the list controls by the built-in 
+//                // event handler for the dragDrop event.
+//                event.currentTarget.showDropFeedback(event);
+//            
+//                if (event.dragSource.hasFormat("items"))
+//                {
+//                    // Set the border to green to indicate that 
+//                    // this is a drop target.
+//                    // Since the dragOver event is dispatched continuosly 
+//                    // as you move over the drop target, only set it once.
+//                    if (borderColorSet == false) {                 
+//                        tempBorderColor = 
+//                            event.currentTarget.getStyle('borderColor');
+//                        borderColorSet = true;
+//                    }
+//                
+//                    // Set the drag-feedback indicator based on the 
+//                    // type of drag-and-drop operation.
+//                    event.currentTarget.setStyle('borderColor', 'green');
+//                    if (event.ctrlKey) {                    
+//                        DragManager.showFeedback(DragManager.COPY);
+//                        return;
+//                    }
+//                    else if (event.shiftKey) {
+//                        DragManager.showFeedback(DragManager.LINK);
+//                        return;
+//                    }
+//                    else {
+//                        DragManager.showFeedback(DragManager.MOVE);
+//                        return;
+//                    }
+//                }
+//
+//                // Drag not allowed.
+//                DragManager.showFeedback(DragManager.NONE);                
+//            }
+	}
+}

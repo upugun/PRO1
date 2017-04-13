@@ -1,0 +1,156 @@
+package net.jhl.view.helper
+{
+	import flash.events.Event;
+	import flash.events.MouseEvent;
+	
+	import mx.collections.ArrayCollection;
+	import mx.controls.DateField;
+	import mx.core.UIComponent;
+	import mx.events.CloseEvent;
+	
+	import net.jhl.visual.objects.ReservationLineHBox;
+	import net.jwt.event.NotificationArguments;
+	import net.jwt.value.objects.QuerryObject;
+	import net.jwt.view.Mediator;
+	import net.jwt.view.popup.JWTPopUpCanvas;
+	
+	public class HelperReservationSummaryMediator extends Mediator
+	{
+		private var _view:HelperReservationSummaryView;
+		
+		private var _app:JWTPopUpCanvas;
+		[Bindable] public var args:NotificationArguments;
+		private var objectsList:ArrayCollection   	= new ArrayCollection();
+		
+		private var q:QuerryObject = new QuerryObject;
+		private var mainLine:ReservationLineHBox;
+		
+		public var isAgentsLoaded:Boolean	=	false;
+		
+		private const MS_PER_DAY:uint = 1000 * 60 * 60 * 24;
+		
+		public function HelperReservationSummaryMediator(view:UIComponent, args:NotificationArguments)
+		{
+			super(view);
+			if(view != null)
+			{
+				_view  = view as HelperReservationSummaryView;
+			}
+			
+			if(args != null){
+				this.args 		= args;
+				_loggedInUser	= args.user;
+			}
+				
+			_app = args.viewComponent as JWTPopUpCanvas;	
+		}
+		
+		protected override function viewComponentInitialize():void{
+			
+			addLine();
+			_view.B_save.addEventListener(MouseEvent.CLICK, selectAndClose);
+		}
+		
+		private function setCheckInDates(e:Event):void
+		{
+			q.condition1 = mainLine.checkInDate.text.toString();
+			q.condition2 = mainLine.checkOutDate.text.toString();
+		}
+		
+		private function addLine():void
+		{
+			if(args.originatorObject is QuerryObject)
+			{
+				q = args.originatorObject as QuerryObject;
+				
+				mainLine = new ReservationLineHBox(q.list);
+					
+					mainLine.sequence			=	0;
+					mainLine.checkInDate.text	=   q.condition1;
+					mainLine.checkOutDate.text	=	q.condition2;
+					mainLine.checkInDate.addEventListener(Event.CHANGE, setCheckInDates);
+					mainLine.checkOutDate.addEventListener(Event.CHANGE, setCheckInDates);
+					
+				
+				_view.V_dynamic.addChild(mainLine);
+			}
+		}
+		
+		private function arrangeResDays():ArrayCollection
+		{
+			var list:ArrayCollection 	= new ArrayCollection;
+			var length:int 				= calculateDays(q.condition1, q.condition2);
+			var tempCheckIn:String		= mainLine.checkInDate.text;
+			for(var i:int=0; i<length; i++)
+			{
+				var line:ReservationLineHBox 	= new ReservationLineHBox(q.list);
+					line.sequence						=	i;
+					line.checkInDate.text				= tempCheckIn;
+					line.checkOutDate.text				= setDateForGivenRange(tempCheckIn, 1);
+					line.cmb_roomCategory.selectedIndex	= mainLine.cmb_roomCategory.selectedIndex;
+					line.cmb_roomBasis.selectedIndex	= mainLine.cmb_roomBasis.selectedIndex;
+					line.sglCount.text					= mainLine.sglCount.text;
+					line.dblCount.text					= mainLine.dblCount.text;
+					line.tplCount.text					= mainLine.tplCount.text;
+					line.adultCount.text				= mainLine.adultCount.text;
+					line.childCount.text				= mainLine.childCount.text;
+					line.guideCount.text				= mainLine.guideCount.text;
+					
+					tempCheckIn	= setDateForGivenRange(tempCheckIn, 1);
+					
+				list.addItem(line);	
+			}
+			
+			return list;
+		}
+		
+//		private function setDateForGivenRange(startDate:String, dateGap:Number):String
+//		{
+//			var returnDate:String = "";
+//			if(startDate!=null)
+//			{
+//				if(startDate.length>8)
+//				{
+//					var sDate:Date 		= DateField.stringToDate(startDate,"YYYY-MM-DD");
+//					var endDate:Date	= sDate;
+//					endDate.date		+= dateGap
+//					returnDate		= DateField.dateToString(endDate, "YYYY-MM-DD");
+//				}
+//			}
+//			
+//			return returnDate;
+//		}
+		
+		private function calculateDays(checkInDate:String, checkOutDate:String):int {
+			if(checkInDate.length>5)
+			{
+				var checkIn:Date	=	DateField.stringToDate(checkInDate.toString(), "YYYY-MM-DD");
+                var checkOut:Date	=	DateField.stringToDate(checkOutDate.toString(), "YYYY-MM-DD");
+                if(checkIn!=null && checkOut!=null)
+                {
+	                var tempDate:Date = new Date(checkOut.time - checkIn.time);
+	              	var days:int	  = Math.round((tempDate.time / MS_PER_DAY));
+	              	
+	              	return days;
+                }
+			}
+			
+			return 0;
+        }
+		
+		private function selectAndClose(event:Event):void
+		{
+			args.argumentObjects = arrangeResDays();
+			_app.dispatchEvent(new CloseEvent(CloseEvent.CLOSE));
+			closeThisPopup(args.viewComponent as JWTPopUpCanvas);
+		}
+		
+		private function closeThisPopup(pcanvas:JWTPopUpCanvas):void
+		{
+			pcanvas.closeall();
+		}
+		
+		
+	
+	}
+}

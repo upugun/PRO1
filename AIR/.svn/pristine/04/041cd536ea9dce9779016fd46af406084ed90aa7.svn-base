@@ -1,0 +1,39 @@
+package net.jwt.view
+{
+	import mx.collections.ArrayCollection;
+	import mx.core.UIComponent;
+	import mx.rpc.remoting.mxml.RemoteObject;
+	
+	import net.jwt.event.INotificationArguments;
+	
+	public class HierachyManagementMediator extends Mediator
+	{
+		private var _view:HierachyManagementView;
+		private var _args:INotificationArguments;
+		public  var asService:RemoteObject;
+		
+		[Bindable]
+		public var _agents:ArrayCollection;
+		
+		[Bindable]
+		public var _user:ArrayCollection;
+		
+		public function HierachyManagementMediator(view:UIComponent, args:INotificationArguments)
+		{
+			super(view);
+			if(view != null)
+			{
+				_view  = view as HierachyManagementView ;
+				_agents = new ArrayCollection();
+			
+			}
+			
+			if(args != null)
+				_args = args;
+		}
+		
+		protected override function viewComponentInitialize():void{
+			
+		}
+	}
+}

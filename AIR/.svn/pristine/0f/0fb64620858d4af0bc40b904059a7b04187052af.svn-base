@@ -1,0 +1,1476 @@
+package net.jhl.view.RateCode
+{
+	import flash.events.Event;
+	import flash.events.KeyboardEvent;
+	import flash.events.MouseEvent;
+	
+	import mx.collections.ArrayCollection;
+	import mx.containers.VBox;
+	import mx.controls.Alert;
+	import mx.core.UIComponent;
+	import mx.events.ListEvent;
+	import mx.messaging.messages.ErrorMessage;
+	import mx.rpc.events.FaultEvent;
+	import mx.rpc.events.ResultEvent;
+	
+	import net.jhl.value.objects.AgentDetails;
+	import net.jhl.value.objects.AgentMarkets;
+	import net.jhl.value.objects.DiscountsAndSupplementMapping;
+	import net.jhl.value.objects.DmcMarket;
+	import net.jhl.value.objects.Property;
+	import net.jhl.value.objects.RateCode.Discounts;
+	import net.jhl.value.objects.RateCode.Season;
+	import net.jhl.view.JWHConstants;
+	import net.jhl.view.common.JHAttachmentIcon;
+	import net.jhl.view.common.JHRateManagementToolBox;
+	import net.jhl.view.logic.DSCalculation;
+	import net.jhl.visual.objects.DiscountSupplementsDateRange;
+	import net.jhl.visual.objects.DiscountSupplementsOccupancyBox;
+	import net.jhl.visual.objects.DiscountSupplementsSeasonAgentComboBox;
+	import net.jhl.visual.objects.DiscountSupplementsSeasonComboBox;
+	import net.jhl.visual.objects.DiscountSupplementsTextInput;
+	import net.jhl.visual.objects.RoomCategoryCheckBox;
+	import net.jwt.ApplicationFacade;
+	import net.jwt.Constants;
+	import net.jwt.event.INotificationArguments;
+	import net.jwt.event.NotificationArguments;
+	import net.jwt.value.objects.AccessDetails;
+	import net.jwt.value.objects.QuerryObject;
+	import net.jwt.view.MainView;
+	import net.jwt.view.Mediator;
+	import net.jwt.view.popup.JWTPopUpCanvas;
+
+	
+	public class RateCodeDiscountMediator extends Mediator
+	{
+		private var _view:RateCodeDiscountView;
+		private var _args:INotificationArguments;
+		
+		private var propertyList:ArrayCollection 		= new ArrayCollection;
+		private var discountList:ArrayCollection 		= new ArrayCollection; 
+		private var rateCodeList:ArrayCollection 		= new ArrayCollection;
+		private var agentList:ArrayCollection 			= new ArrayCollection;
+		private var seasonList:ArrayCollection 			= new ArrayCollection;
+		private var dynamicList:ArrayCollection 		= new ArrayCollection;
+		private var dmcMarketList:ArrayCollection 		= new ArrayCollection;
+		private var appliedAgentMarketList:ArrayCollection 	= new ArrayCollection;
+		private var appliedAgentList:ArrayCollection 		= new ArrayCollection;
+		private var appliedDMCMarketList:ArrayCollection 	= new ArrayCollection;
+		private var roomCategoryList:ArrayCollection  		= new ArrayCollection();
+		private var deleteList:ArrayCollection  			= new ArrayCollection();
+		private var _mainView:MainView;
+		
+		private var isDMCAvailable:Boolean = true;
+		
+		private var agentMarketAllId:String = "";
+		private var agentAllId:String 		= "";
+		private var dmcMarketAllId:String 	= "";
+		
+		[Bindable]public var args:NotificationArguments = new NotificationArguments();
+		
+		public function RateCodeDiscountMediator(view:UIComponent, args:INotificationArguments)
+		{
+			super(view);
+			if(view != null)
+			{
+				_view  = view as RateCodeDiscountView ;
+				
+			}
+			
+			_mainView	  = (args.viewComponent as MainView);
+			
+			if(args != null){
+				_args = args;
+				_loggedInUser = (_args.viewComponent as MainView).user;
+			}
+		}
+		
+		protected override function viewComponentInitialize():void{
+			setLoggedInUser();
+			loadProperties();
+			_view.addEventListener(KeyboardEvent.KEY_UP, keyInputHandler);
+			_view.B_save.addEventListener(MouseEvent.CLICK, saveItemHandler);
+			_view.DG_list.addEventListener(ListEvent.ITEM_CLICK, showSelectedItem);
+			_view.DG_list.addEventListener(ListEvent.CHANGE, showSelectedItem);
+			_view.B_new.addEventListener(MouseEvent.CLICK, addNewHandler);
+			_view.B_graph.addEventListener(MouseEvent.CLICK, openRasteGraph);
+			_view.CMB_property.addEventListener(ListEvent.CHANGE, propertyChangeHandler);
+			_view.CMB_conditionType.addEventListener(ListEvent.CHANGE, conditionTypeChangeHandler);
+			_view.B_add_market.addEventListener(MouseEvent.CLICK, openAgentMarketHelp);
+			_view.B_add_agnets.addEventListener(MouseEvent.CLICK, openAgentHelp);
+			_view.B_add_dmc.addEventListener(MouseEvent.CLICK, openDMCMarketHelp);
+			_view.CHK_all_markets.addEventListener(Event.CHANGE, allAgentMarketCheckBoxHandler);
+			_view.CHK_all_agets.addEventListener(Event.CHANGE, allAgentCheckBoxHandler);
+			_view.CHK_all_dmc.addEventListener(Event.CHANGE, allDMCCheckBoxHandler);
+			createButtonBox();
+		}
+		
+		private function openRasteGraph(e:Event):void
+		{
+			var dimention:Object = new Object;
+				dimention.width  = 1100;
+				dimention.heigth = 700;
+				
+			createPopUpCanvas(ApplicationFacade.HS743_HELPER_ROOM_RATE_GRAPH,_mainView,args,"",ApplicationFacade.HS743_HELPER_ROOM_RATE_GRAPH, false,dimention);
+		}
+		
+		private function loadRooms():void
+		{
+			var hotelId:String = "";
+			if(_view.CMB_property.selectedItem!=null)
+				hotelId = (_view.CMB_property.selectedItem as Property).uuid;
+				
+			startBusyCursor();
+			roomCategoryRO.dynamicSearch("searchByHotelId",hotelId);
+		}
+		
+		private function arrangeSelectedRooms(line:UIComponent):Array
+		{
+			var strArry:Array 			= new Array;
+			var list:ArrayCollection  	= new ArrayCollection;
+			
+			if(line is DiscountSupplementsSeasonComboBox)
+				list = (line as DiscountSupplementsSeasonComboBox).roomList;
+			else if(line is DiscountSupplementsDateRange)
+				list = (line as DiscountSupplementsDateRange).roomList;
+			else if(line is DiscountSupplementsDateRange)
+				list = (line as DiscountSupplementsDateRange).roomList;
+			else if(line is DiscountSupplementsTextInput)
+				list = (line as DiscountSupplementsTextInput).roomList;			
+			
+			for(var i:int=0; i<list.length; i++)
+			{
+				var room:RoomCategoryCheckBox = list.getItemAt(i) as RoomCategoryCheckBox
+				
+				if(room.selected)
+					strArry.push(room.roomcategory.uuid);
+			}
+			
+			return strArry;
+		}
+		
+		private function arrangeSelectedApplicableDays(line:UIComponent):Array
+		{
+			var strArry:Array = new Array;
+			
+			if(line is DiscountSupplementsDateRange)
+			{
+				if((line as DiscountSupplementsDateRange).CHK_sun.selected)
+					strArry.push("SUN");
+				
+				if((line as DiscountSupplementsDateRange).CHK_mon.selected)
+					strArry.push("MON");
+				
+				if((line as DiscountSupplementsDateRange).CHK_tue.selected)
+					strArry.push("TUE");
+				
+				if((line as DiscountSupplementsDateRange).CHK_wed.selected)
+					strArry.push("WED");
+				
+				if((line as DiscountSupplementsDateRange).CHK_thu.selected)
+					strArry.push("THU");
+				
+				if((line as DiscountSupplementsDateRange).CHK_fri.selected)
+					strArry.push("FRI");
+					
+				if((line as DiscountSupplementsDateRange).CHK_sat.selected)
+					strArry.push("SAT");						
+			}
+			else if(line is DiscountSupplementsSeasonComboBox)
+			{
+				if((line as DiscountSupplementsSeasonComboBox).CHK_sun.selected)
+					strArry.push("SUN");
+				
+				if((line as DiscountSupplementsSeasonComboBox).CHK_mon.selected)
+					strArry.push("MON");
+				
+				if((line as DiscountSupplementsSeasonComboBox).CHK_tue.selected)
+					strArry.push("TUE");
+				
+				if((line as DiscountSupplementsSeasonComboBox).CHK_wed.selected)
+					strArry.push("WED");
+				
+				if((line as DiscountSupplementsSeasonComboBox).CHK_thu.selected)
+					strArry.push("THU");
+				
+				if((line as DiscountSupplementsSeasonComboBox).CHK_fri.selected)
+					strArry.push("FRI");
+					
+				if((line as DiscountSupplementsSeasonComboBox).CHK_sat.selected)
+					strArry.push("SAT");						
+			}
+			
+			return strArry;
+			
+		}
+		
+		private function allAgentMarketCheckBoxHandler(e:Event):void
+		{
+			if(_view.CHK_all_markets.selected)
+			{
+				dispatchRemoveAgentMarket();
+				_view.B_add_market.enabled = false;
+				_view.tite_agentMarket.removeAllChildren();
+				appliedAgentMarketList.removeAll();
+			}
+			else
+			{
+				var dis:DiscountsAndSupplementMapping = new DiscountsAndSupplementMapping;
+					dis.uuid = agentMarketAllId;
+					deleteList.addItem(dis);
+				_view.B_add_market.enabled = true;	
+			}
+		}
+		
+		private function dispatchRemoveAgentMarket():void
+		{
+			for(var i:int=0; i<appliedAgentMarketList.length; i++)
+			{
+				var attach:JHAttachmentIcon = appliedAgentMarketList.getItemAt(i) as JHAttachmentIcon;
+					attach.closeButton.dispatchEvent(new MouseEvent(MouseEvent.CLICK));
+			}
+		}
+		
+		private function dispatchRemoveAgent():void
+		{
+			for(var i:int=0; i<appliedAgentList.length; i++)
+			{
+				var attach:JHAttachmentIcon = appliedAgentList.getItemAt(i) as JHAttachmentIcon;
+					attach.closeButton.dispatchEvent(new MouseEvent(MouseEvent.CLICK));
+			}
+		}
+		
+		private function dispatchRemoveDMCMarket():void
+		{
+			for(var i:int=0; i<appliedDMCMarketList.length; i++)
+			{
+				var attach:JHAttachmentIcon = appliedDMCMarketList.getItemAt(i) as JHAttachmentIcon;
+					attach.closeButton.dispatchEvent(new MouseEvent(MouseEvent.CLICK));
+			}
+		}
+		
+		private function allAgentCheckBoxHandler(e:Event):void
+		{
+			if(_view.CHK_all_agets.selected)
+			{
+				dispatchRemoveAgent();
+				_view.B_add_agnets.enabled = false;
+				_view.tile_agents.removeAllChildren();
+				appliedAgentList.removeAll();
+			}
+			else
+			{
+				var dis:DiscountsAndSupplementMapping = new DiscountsAndSupplementMapping;
+					dis.uuid = agentAllId;
+					deleteList.addItem(dis);
+				_view.B_add_agnets.enabled = true;	
+			}
+		}
+		
+		private function allDMCCheckBoxHandler(e:Event):void
+		{
+			if(_view.CHK_all_dmc.selected)
+			{
+				dispatchRemoveDMCMarket();
+				_view.B_add_dmc.enabled = false;
+				_view.tile_dmc.removeAllChildren();
+				appliedDMCMarketList.removeAll();
+			}
+			else
+			{
+				var dis:DiscountsAndSupplementMapping = new DiscountsAndSupplementMapping;
+					dis.uuid = dmcMarketAllId;
+					deleteList.addItem(dis);
+				_view.B_add_dmc.enabled = true;	
+			}
+		}
+		
+		private function openAgentMarketHelp(e:Event):void
+		{
+			var dimention:Object	=	new Object;
+				dimention.width		=   800;
+				dimention.heigth	=   600;
+			args.user			= _loggedInUser;	
+			createPopUpCanvas(ApplicationFacade.HS743_HELPER_SEARCH_AGENT_MARKETS, _view, args, "Search and select Agent Market", ApplicationFacade.HS743_HELPER_SEARCH_AGENT_MARKETS, true, dimention);
+		}
+		
+		private function openDMCMarketHelp(e:Event):void
+		{
+			var dimention:Object	=	new Object;
+				dimention.width		=   800;
+				dimention.heigth	=   600;
+			args.user			= _loggedInUser;	
+			createPopUpCanvas(ApplicationFacade.HS743_HELPER_DMC_MARKET_SELECT, _view, args, "Search and select DMC Market", ApplicationFacade.HS743_HELPER_DMC_MARKET_SELECT, true, dimention);
+		}
+		
+		private function openAgentHelp(e:Event):void
+		{
+			var dimention:Object	=	new Object;
+				dimention.width		=   800;
+				dimention.heigth	=   600;
+				
+			var q:QuerryObject = new QuerryObject;
+				q.searchCode   = "searchByMultipleMarkets";	
+				q.list		   = getSelectedAgentMarketIdList();
+				
+			args.argumentObject = q;
+			args.user			= _loggedInUser;	
+			createPopUpCanvas(HS743_HELP_AGENT_SEARCH, _view, args, "Search and select Agent", ApplicationFacade.HS743_HELPER_AGENT_SEARCH, true, dimention);
+		}
+		
+		private function getSelectedAgentMarketIdList():ArrayCollection
+		{
+			var list:ArrayCollection = new ArrayCollection;
+			
+			for(var i:int=0; i<appliedAgentMarketList.length; i++)
+			{
+				if((appliedAgentMarketList.getItemAt(i) as JHAttachmentIcon).getParentObject()!=null)
+					list.addItem((appliedAgentMarketList.getItemAt(i) as JHAttachmentIcon).getParentObject().uuid)
+			}
+			
+			return list;
+		}
+		
+		public override function closeCanvasPopup(event:Event):void
+        {
+            popup = null;
+            
+            if(args != null && args.argumentObject)
+            {
+            	if((event.target as JWTPopUpCanvas).id == ApplicationFacade.HS743_HELPER_SEARCH_AGENT_MARKETS)
+            	{
+            		if(args.argumentObject is AgentMarkets)
+            		{
+            			createAgentMarketTileattachment(args.argumentObject as AgentMarkets, "");
+            			
+            			setDMCVisibility();
+            		}
+            	}
+            	else if((event.target as JWTPopUpCanvas).id == HS743_HELP_AGENT_SEARCH)
+            	{
+            		if(args.argumentObject is AgentDetails)
+            		{
+            			createAgentTileattachment(args.argumentObject as AgentDetails, "");
+            			
+            			setDMCVisibility();
+            		}
+            	}
+            	else if((event.target as JWTPopUpCanvas).id == ApplicationFacade.HS743_HELPER_DMC_MARKET_SELECT)
+            	{
+            		if(args.argumentObject is DmcMarket)
+            			createDMCMarketTileattachment(args.argumentObject as DmcMarket, "");
+            	}
+            	else
+            	{
+            		if(args.argumentObject is Discounts)
+            			showSelectedItemOnTreeSelect(args.argumentObject as Discounts);
+            	}
+            		
+            }
+            
+        }
+        
+        private function checkDMCAvailable():Boolean
+        {
+        	isDMCAvailable = false;
+        	
+        	for(var i:int=0; i<appliedAgentList.length; i++)
+        	{
+        		var agent:AgentDetails = (appliedAgentList.getItemAt(i) as JHAttachmentIcon).getParentObject() as AgentDetails;
+        		if(agent.agentTypeId != JWHConstants.AGENT_CATEGORY_TYPE_DMC)
+        		{
+        			isDMCAvailable = false;
+        			break;
+        		}
+        		else
+        			isDMCAvailable = true;
+        	}
+        	
+        	return isDMCAvailable;
+        }
+        
+         private function checkDMCByMarketAvailable():Boolean
+        {
+        	isDMCAvailable = false;
+        	
+        	for(var i:int=0; i<appliedAgentMarketList.length; i++)
+        	{
+        		var agent:AgentMarkets = (appliedAgentMarketList.getItemAt(i) as JHAttachmentIcon).getParentObject() as AgentMarkets;
+        		if(agent.agentMarketCode != JWHConstants.AGENT_MARKET_TYPE_DMC)
+        		{
+        			isDMCAvailable = false;
+        			break;
+        		}
+        		else
+        			isDMCAvailable = true;
+        	}
+        	
+        	return isDMCAvailable;
+        }
+		
+		private function createAgentMarketTileattachment(agentMarkets:AgentMarkets, uuid:String):void
+		{
+			if(agentMarkets != null)
+			{
+				var attachment:JHAttachmentIcon = new JHAttachmentIcon;
+					attachment.uuid	= uuid;
+					attachment.setLabel(agentMarkets.description);
+					attachment.setParentObject(agentMarkets);
+					attachment.closeButton.addEventListener(MouseEvent.CLICK , removeAgentMarket);
+					
+				appliedAgentMarketList.addItem(attachment);
+				
+				createDynamicIcons();	
+				//_view.tite_agentMarket.addChild(attachment);
+			}
+		}
+		
+		private function createDynamicIcons():void
+		{
+			if(_view.tite_agentMarket.getChildren().length > 0)
+				_view.tite_agentMarket.removeAllChildren();
+			
+			for(var c:int=0; c<appliedAgentMarketList.length ; c++)
+			{
+				var attachment:JHAttachmentIcon = appliedAgentMarketList.getItemAt(c) as JHAttachmentIcon;
+				
+				if(attachment != null)
+					_view.tite_agentMarket.addChild(attachment);
+						
+			}
+			
+		}
+		
+		private function createDynamicAgentIcons():void
+		{
+			if(_view.tile_agents.getChildren().length > 0)
+				_view.tile_agents.removeAllChildren();
+			
+			for(var c:int=0; c<appliedAgentList.length ; c++)
+			{
+				var attachment:JHAttachmentIcon = appliedAgentList.getItemAt(c) as JHAttachmentIcon;
+				
+				if(attachment != null)
+					_view.tile_agents.addChild(attachment);
+						
+			}
+			
+		}
+		
+		private function createDynamicDMCMarketIcons():void
+		{
+			if(_view.tile_dmc.getChildren().length > 0)
+				_view.tile_dmc.removeAllChildren();
+			
+			for(var c:int=0; c<appliedDMCMarketList.length ; c++)
+			{
+				var attachment:JHAttachmentIcon = appliedDMCMarketList.getItemAt(c) as JHAttachmentIcon;
+				
+				if(attachment != null)
+					_view.tile_dmc.addChild(attachment);
+						
+			}
+			
+		}
+		
+		private function removeAgentMarket(evt:MouseEvent):void
+		{
+			var lbl:VBox = evt.currentTarget as VBox;
+			if(lbl != null)
+			{
+				var agentMarket:AgentMarkets = lbl.data as AgentMarkets;
+				
+				if(agentMarket != null)
+				{
+					for(var c:int=0; c<appliedAgentMarketList.length ; c++)
+					{
+						var attachment:JHAttachmentIcon = appliedAgentMarketList.getItemAt(c) as JHAttachmentIcon;
+						
+						if(attachment != null)
+						{
+							var obj:AgentMarkets = attachment.getParentObject() as AgentMarkets;
+							
+							if(obj.uuid == agentMarket.uuid)
+							{
+								var dis:DiscountsAndSupplementMapping = new DiscountsAndSupplementMapping;
+									dis.uuid = attachment.uuid;
+								deleteList.addItem(dis);
+								appliedAgentMarketList.removeItemAt(c);
+								break;
+							}
+						}
+							
+								
+					}
+				}
+			}
+			createDynamicIcons();
+			setDMCVisibility();
+		}
+		
+		private function removeAgent(evt:MouseEvent):void
+		{
+			var lbl:VBox = evt.currentTarget as VBox;
+			if(lbl != null)
+			{
+				var agent:AgentDetails = lbl.data as AgentDetails;
+				
+				if(agent != null)
+				{
+					for(var c:int=0; c<appliedAgentList.length ; c++)
+					{
+						var attachment:JHAttachmentIcon = appliedAgentList.getItemAt(c) as JHAttachmentIcon;
+						
+						if(attachment != null)
+						{
+							var obj:AgentDetails = attachment.getParentObject() as AgentDetails;
+							
+							if(obj.uuid == agent.uuid)
+							{
+								var dis:DiscountsAndSupplementMapping = new DiscountsAndSupplementMapping;
+									dis.uuid = attachment.uuid;
+								deleteList.addItem(dis);
+								appliedAgentList.removeItemAt(c);
+								break;
+							}
+						}
+							
+								
+					}
+				}
+			}
+			createDynamicAgentIcons();
+			setDMCVisibility();
+		}
+		
+		private function setDMCVisibility():void
+		{
+			if(checkDMCByMarketAvailable() || checkDMCAvailable() || appliedDMCMarketList.length>0)
+				_view.V_dmcBox.visible = true;
+			else
+			{
+				_view.V_dmcBox.visible = false;
+				_view.tile_dmc.removeAllChildren();
+				appliedDMCMarketList.removeAll();
+			}
+		}
+		
+		private function removeDMCMarket(evt:MouseEvent):void
+		{
+			var lbl:VBox = evt.currentTarget as VBox;
+			if(lbl != null)
+			{
+				var dmc:DmcMarket = lbl.data as DmcMarket;
+				
+				if(dmc != null)
+				{
+					for(var c:int=0; c<appliedDMCMarketList.length ; c++)
+					{
+						var attachment:JHAttachmentIcon = appliedDMCMarketList.getItemAt(c) as JHAttachmentIcon;
+						
+						if(attachment != null)
+						{
+							var obj:DmcMarket = attachment.getParentObject() as DmcMarket;
+							
+							if(obj.uuid == dmc.uuid)
+							{
+								var dis:DiscountsAndSupplementMapping = new DiscountsAndSupplementMapping;
+									dis.uuid = attachment.uuid;
+								deleteList.addItem(dis);
+								appliedDMCMarketList.removeItemAt(c);
+								break;
+							}
+						}
+							
+								
+					}
+				}
+			}
+			createDynamicDMCMarketIcons();
+		}
+		
+		private function createAgentTileattachment(agent:AgentDetails, uuid:String):void
+		{
+			if(agent != null)
+			{
+				var attachment:JHAttachmentIcon = new JHAttachmentIcon;
+					attachment.uuid = uuid;
+					attachment.setLabel(agent.agentName);
+					attachment.setParentObject(agent);
+					attachment.closeButton.addEventListener(MouseEvent.CLICK , removeAgent);
+					
+				appliedAgentList.addItem(attachment);
+				
+				createDynamicAgentIcons();	
+				//_view.tite_agentMarket.addChild(attachment);
+			}
+		}
+		
+		private function createDMCMarketTileattachment(obj:DmcMarket, uuid:String):void
+		{
+			if(obj != null)
+			{
+				var attachment:JHAttachmentIcon = new JHAttachmentIcon;
+					attachment.uuid = uuid;
+					attachment.setLabel(obj.dmcName);
+					attachment.setParentObject(obj);
+					attachment.closeButton.addEventListener(MouseEvent.CLICK , removeDMCMarket);
+					
+				appliedDMCMarketList.addItem(attachment);
+				
+				createDynamicDMCMarketIcons();	
+				//_view.tite_agentMarket.addChild(attachment);
+			}
+		}
+		
+		private function createButtonBox():void
+		{
+			for(var i:int = 0; i<_loggedInUser.accessList.length; i++)
+			 {
+			 	var _accessDetail:AccessDetails = _loggedInUser.accessList.getItemAt(i) as AccessDetails;
+			 	if(_accessDetail.roleId == Constants.ROLE_RATE_CODE_RateBox)
+			 	{
+			 		var rateToolBox:JHRateManagementToolBox;
+			 		rateToolBox = new JHRateManagementToolBox;
+					rateToolBox.args 	= _args;
+					rateToolBox.nargs	= args;
+					rateToolBox.facade 	= facade;
+					rateToolBox.view	= _view;
+					rateToolBox.mediator= this;
+					rateToolBox.createMetroIconRateManagementBarBox();
+					_view.button_box.addChild(rateToolBox);
+					break;
+			 	}
+			 }
+			
+		}
+		
+		private function conditionTypeChangeHandler(e:Event):void
+		{
+			var obj:Object = null
+			if(_view.CMB_conditionType.selectedItem !=null)
+			{
+				obj = _view.CMB_conditionType.selectedItem as Object;
+			
+				if(obj.type == JWHConstants.DISCOUNT_TYPE_SEASON)
+					loadRooms();
+				else if(obj.type == JWHConstants.DISCOUNT_TYPE_DMC_MARKET)
+					loadDMCMarkets();
+				else if(obj.type == JWHConstants.DISCOUNT_TYPE_CHECK_IN)
+					loadRooms();	
+				else if(obj.type == JWHConstants.DISCOUNT_TYPE_BOOKING)
+					loadRooms();
+				else if(obj.type == JWHConstants.DISCOUNT_TYPE_OCCUPANCY)
+					loadRooms();	
+			}	
+					
+				
+		}
+		
+		private function convsrtStringToArray(str:String):Array
+		{
+			var strArray:Array;
+			if(str!=null)
+			{
+				if(str != "")
+					strArray = str.split(",");
+			}
+				
+			return strArray;
+		}
+		
+		private function generateDynamicView():void
+		{
+			dynamicList.removeAll();
+			_view.V_dynamic_box.removeAllChildren();
+			
+			var obj:Object = null
+			if(_view.CMB_conditionType.selectedItem !=null)
+				obj = _view.CMB_conditionType.selectedItem as Object;
+				
+			if(obj.type == JWHConstants.DISCOUNT_TYPE_SEASON)
+			{
+				var hbox:DiscountSupplementsSeasonComboBox = new 	DiscountSupplementsSeasonComboBox("Season","seasonCode", seasonList,  convsrtStringToArray(_view.discount.discountConditions.condition2.conditionValue), roomCategoryList,convsrtStringToArray(_view.discount.discountConditions.condition5.conditionValue));
+					hbox.cmb_season.selectedIndex		   = setComboSelectedItemById(seasonList, "uuid", _view.discount.discountConditions.condition1.conditionValue);
+				
+				
+				dynamicList.addItem(hbox);
+				_view.V_dynamic_box.addChild(hbox);
+			}
+			else if(obj.type == JWHConstants.DISCOUNT_TYPE_DMC_MARKET)
+			{
+				var hbox2:DiscountSupplementsSeasonAgentComboBox = new DiscountSupplementsSeasonAgentComboBox("Agent","agentName", seasonList, true, agentList, dmcMarketList, "dmcName");
+//				if(_view.discount.discountConditions.condition2.conditionValue.length>0)
+//				{
+//					hbox2.cmb_list.selectedIndex		  = setComboSelectedItemById(agentList, "uuid", _view.discount.discountConditions.condition2.conditionValue);
+//					hbox2.cmb_list.dispatchEvent(new ListEvent(ListEvent.CHANGE));
+//				}
+					
+				hbox2.cmb_season.selectedIndex		  = setComboSelectedItemById(seasonList, "uuid", _view.discount.discountConditions.condition1.conditionValue);
+				hbox2.cmb_dmcList.selectedIndex		  = setComboSelectedItemById(dmcMarketList, "uuid", _view.discount.discountConditions.condition2.conditionValue);
+//				hbox2.cmb_list.addEventListener(ListEvent.CHANGE, handleAgenChange);
+				
+				dynamicList.addItem(hbox2);
+				_view.V_dynamic_box.addChild(hbox2);
+			}
+			else if(obj.type == JWHConstants.DISCOUNT_TYPE_CHECK_IN)
+			{
+				var hbox3:DiscountSupplementsDateRange = new DiscountSupplementsDateRange(seasonList,convsrtStringToArray(_view.discount.discountConditions.condition4.conditionValue), roomCategoryList,convsrtStringToArray(_view.discount.discountConditions.condition5.conditionValue));
+					hbox3.dateFrom.text				   = _view.discount.discountConditions.condition2.conditionValue;
+					hbox3.dateTo.text				   = _view.discount.discountConditions.condition3.conditionValue;
+					hbox3.cmb_season.selectedIndex	   = setComboSelectedItemById(seasonList, "uuid", _view.discount.discountConditions.condition1.conditionValue);
+				
+				
+				dynamicList.addItem(hbox3);
+				_view.V_dynamic_box.addChild(hbox3);
+			}
+			else if(obj.type == JWHConstants.DISCOUNT_TYPE_BOOKING)
+			{
+				var hbox4:DiscountSupplementsTextInput = new DiscountSupplementsTextInput("Promotion Code", seasonList, roomCategoryList,convsrtStringToArray(_view.discount.discountConditions.condition5.conditionValue));
+					hbox4.cmb_season.selectedIndex	   = setComboSelectedItemById(seasonList, "uuid", _view.discount.discountConditions.condition1.conditionValue);
+					hbox4.T_value.text				   = _view.discount.discountConditions.condition2.conditionValue;
+				
+					
+				dynamicList.addItem(hbox4);
+				_view.V_dynamic_box.addChild(hbox4);
+			}
+			else if(obj.type == JWHConstants.DISCOUNT_TYPE_OCCUPANCY)
+			{
+				var hbox5:DiscountSupplementsOccupancyBox = new DiscountSupplementsOccupancyBox(seasonList, roomCategoryList,convsrtStringToArray(_view.discount.discountConditions.condition5.conditionValue));
+					hbox5.cmb_season.selectedIndex		  = setComboSelectedItemById(seasonList, "uuid", _view.discount.discountConditions.condition1.conditionValue);
+					hbox5.T_value.text					  = _view.discount.discountConditions.condition2.conditionValue;
+					hbox5.cmb_condition.selectedIndex	  = setComboSelectedItemById(hbox5.dicountTypeList, "id", _view.discount.discountConditions.condition3.conditionValue);
+						
+				
+				dynamicList.addItem(hbox5);
+				_view.V_dynamic_box.addChild(hbox5);
+			}
+				
+		}
+		
+		private function handleAgenChange(e:Event):void
+		{
+			reArrangeDiscountConditions();
+		}
+		
+		private function reArrangeDiscountConditions():void
+		{
+			_view.V_dynamic_box.removeAllChildren();
+			
+			for(var i:int=0; i<dynamicList.length; i++)
+			{
+				_view.V_dynamic_box.addChild(dynamicList.getItemAt(i) as UIComponent);
+			}
+		}
+		
+		public function keyInputHandler(event:KeyboardEvent=null):void
+		{
+			if(event.keyCode == 119)
+				saveItem();
+			else if(event.keyCode == 120)
+				Alert.show("TODO:Delete this record");
+			else if(event.keyCode == 112)
+				Alert.show("TODO:Show HELP page");
+				
+		}
+		
+		
+		private function addNewHandler(e:Event):void
+		{
+			addNew();
+		}
+		
+		private function addNew():void
+		{
+			_view.discount = new Discounts;
+			_view.CMB_conditionType.selectedItem = null;
+			_view.CMB_discountType.selectedItem  = null;
+			_view.CMB_property.selectedItem 	 = null;
+			_view.RD_discount.selected			 = true;
+			
+			appliedAgentList 		= new ArrayCollection;
+			appliedAgentMarketList  = new ArrayCollection;
+			appliedDMCMarketList	= new ArrayCollection;
+			deleteList				= new ArrayCollection;
+			
+			agentMarketAllId  = "";
+			agentAllId		  = "";
+			dmcMarketAllId	  = "";
+			
+			_view.V_dynamic_box.removeAllChildren();
+			_view.B_status.setJLabel(JWHConstants.STATUS_LABLE_ACTIVE);
+			_view.tile_agents.removeAllChildren();
+			_view.tite_agentMarket.removeAllChildren();
+			_view.tile_dmc.removeAllChildren();
+		}
+		
+		private function loadSeasonsHandler(e:Event):void
+		{
+			loadSeasons();
+		}
+		
+		private function loadSeasons():void
+		{
+			startBusyCursor();
+			rc_seasonRO.dynamicSearch("","");
+		}
+		
+       
+		private function showSelectedItem(e:Event):void
+		{
+			_view.discount = _view.DG_list.selectedItem as Discounts;
+			_view.B_status.setJLabel(_view.discount.status);
+			
+			if(_view.discount.toBeAppliedOn == JWHConstants.DISCOUNT_APPLIED_ON_GrossRate)
+				_view.RD_onGross.selected = true;
+			else if(_view.discount.toBeAppliedOn == JWHConstants.DISCOUNT_APPLIED_ON_NetRate)
+				_view.RD_onNett.selected = true;	
+			
+			if(_view.discount.dsType == JWHConstants.DISCOUNT_SUPPLEMENT_TYPE_DISCOUNT)
+				_view.RD_discount.selected   = true;
+			else if(_view.discount.dsType == JWHConstants.DISCOUNT_SUPPLEMENT_TYPE_SUPPLEMENT)
+				_view.RD_supplement.selected = true;	
+			
+			for(var n:int=0; n<_view.dicountTypeList.length; n++)
+			{
+				if(_view.dicountTypeList.getItemAt(n).id == _view.discount.amountType)
+				{
+					_view.CMB_discountType.selectedIndex = n;
+					break;
+				}	
+			}
+			
+			showMappingList();
+			
+			_view.CMB_conditionType.selectedIndex = setComboSelectedItemById(_view.conditionTypeList, "type", _view.discount.conditionType);
+			_view.CMB_property.selectedIndex = setComboSelectedItemById(propertyList, "uuid", _view.discount.propertyId);
+			
+			_view.CMB_conditionType.dispatchEvent(new ListEvent(ListEvent.CHANGE));
+			
+		}
+		
+		private function showSelectedItemOnTreeSelect(discount:Discounts):void
+		{
+			addNew();
+			
+			_view.discount = discount;
+			_view.B_status.setJLabel(_view.discount.status);
+			
+			if(_view.discount.toBeAppliedOn == JWHConstants.DISCOUNT_APPLIED_ON_GrossRate)
+				_view.RD_onGross.selected = true;
+			else if(_view.discount.toBeAppliedOn == JWHConstants.DISCOUNT_APPLIED_ON_NetRate)
+				_view.RD_onNett.selected = true;
+				
+			if(_view.discount.dsType == JWHConstants.DISCOUNT_SUPPLEMENT_TYPE_DISCOUNT)
+				_view.RD_discount.selected   = true;
+			else if(_view.discount.dsType == JWHConstants.DISCOUNT_SUPPLEMENT_TYPE_SUPPLEMENT)
+				_view.RD_supplement.selected = true;	
+			
+			for(var n:int=0; n<_view.dicountTypeList.length; n++)
+			{
+				if(_view.dicountTypeList.getItemAt(n).id == _view.discount.amountType)
+				{
+					_view.CMB_discountType.selectedIndex = n;
+					break;
+				}	
+			}
+			
+			showMappingList();
+			//setDMCVisibility();
+			_view.CMB_conditionType.selectedIndex = setComboSelectedItemById(_view.conditionTypeList, "type", _view.discount.conditionType);
+			_view.CMB_property.selectedIndex 	  = setComboSelectedItemById(propertyList, "uuid", _view.discount.propertyId);
+			
+			_view.CMB_conditionType.dispatchEvent(new ListEvent(ListEvent.CHANGE));
+		}
+		
+		private function showMappingList():void
+		{
+			for(var i:int=0; i<_view.discount.discountSupplementMappingList.length; i++)
+			{
+				var mapObj:DiscountsAndSupplementMapping = _view.discount.discountSupplementMappingList.getItemAt(i) as DiscountsAndSupplementMapping;
+				
+				if(mapObj.concernedPartyType == JWHConstants.DISCOUT_APPLY_TO_TYPE_AGENTMARKET && mapObj.concernedParty == JWHConstants.DISCOUT_APPLY_TO_ALL)
+				{
+					_view.B_market_apply_status.setJLabel(mapObj.concern);
+					_view.CHK_all_markets.selected = true;
+					agentMarketAllId = mapObj.uuid;
+				}
+				else if(mapObj.concernedPartyType == JWHConstants.DISCOUT_APPLY_TO_TYPE_AGENTMARKET)
+				{
+					_view.B_market_apply_status.setJLabel(mapObj.concern);
+					_view.CHK_all_markets.selected = false;
+					
+					var market:AgentMarkets = new AgentMarkets;
+						market.uuid			= mapObj.concernedParty;
+						market.description	= mapObj.concernedPartyName;
+					createAgentMarketTileattachment(market, mapObj.uuid);
+				}
+				
+				if(mapObj.concernedPartyType == JWHConstants.DISCOUT_APPLY_TO_TYPE_AGENTS && mapObj.concernedParty == JWHConstants.DISCOUT_APPLY_TO_ALL)
+				{
+					_view.B_agent_apply_status.setJLabel(mapObj.concern);
+					_view.CHK_all_agets.selected = true;
+					agentAllId = mapObj.uuid;
+				}
+				else if(mapObj.concernedPartyType == JWHConstants.DISCOUT_APPLY_TO_TYPE_AGENTS)
+				{
+					_view.B_agent_apply_status.setJLabel(mapObj.concern);
+					_view.CHK_all_agets.selected = false;
+					
+					var agent:AgentDetails = new AgentDetails;
+					agent.uuid			   = mapObj.concernedParty;
+					agent.agentName		   = mapObj.concernedPartyName;
+					createAgentTileattachment(agent, mapObj.uuid);
+				}
+				
+				if(mapObj.concernedPartyType == JWHConstants.DISCOUT_APPLY_TO_TYPE_DMC_MARKET && mapObj.concernedParty == JWHConstants.DISCOUT_APPLY_TO_ALL)
+				{
+					_view.V_dmcBox.visible 		= true;
+					_view.B_dmc_apply_status.setJLabel(mapObj.concern);
+					_view.CHK_all_dmc.selected  = true;
+					dmcMarketAllId = mapObj.uuid;
+				}
+				else if(mapObj.concernedPartyType == JWHConstants.DISCOUT_APPLY_TO_TYPE_DMC_MARKET)
+				{
+					_view.V_dmcBox.visible 		= true;
+					_view.B_dmc_apply_status.setJLabel(mapObj.concern);
+					_view.CHK_all_dmc.selected  = false;
+					
+					var dmc:DmcMarket    = new DmcMarket;
+					dmc.uuid			 = mapObj.concernedParty;
+					dmc.dmcName		   	 = mapObj.concernedPartyName;
+					createDMCMarketTileattachment(dmc, mapObj.uuid);
+				}
+			}
+		}
+		
+		private function setLoggedInUser():void
+		{
+			initializeRCDiscountRemortingObject();
+			initializePropertyRemortingObject();
+			initializeRCRemortingObject();
+			initializeAgentDetailsRemortingObject();
+			initializeDepartmentRemortingObject();
+			initializeRCSeasonRemortingObject();
+			initializeDmcMarketRemortingObject();
+			propertyRO.setLogedInUser(_loggedInUser);
+			rc_discountRO.setLogedInUser(_loggedInUser);
+			rc_rateCodeRO.setLogedInUser(_loggedInUser);
+			agentDetailsRO.setLogedInUser(_loggedInUser);
+			rc_seasonRO.setLogedInUser(_loggedInUser);
+			dmcMarketRO.setLogedInUser(_loggedInUser);
+			
+			initializeRoomCategoryRemortingObject();
+			roomCategoryRO.setLogedInUser(_loggedInUser);
+			
+		}
+		
+		private function loadDiscounts():void
+		{
+			startBusyCursor();
+			rc_discountRO.dynamicSearch("","");
+		}
+		
+		private function loadAgents():void
+		{
+			startBusyCursor();
+			agentDetailsRO.dynamicSearch("","");
+		}
+		
+		private function loadDMCMarkets():void
+		{
+			startBusyCursor();
+			dmcMarketRO.dynamicSearch("","");
+		}
+		
+		private function propertyChangeHandler(e:Event):void
+		{
+			_view.CMB_conditionType.dispatchEvent(new ListEvent(ListEvent.CHANGE));
+		}
+		
+		private function loadRateCode():void
+		{
+			startBusyCursor();
+			var str:String = "";
+			
+			if(_view.CMB_property.selectedItem!=null)
+				str	=	(_view.CMB_property.selectedItem as Property).uuid;
+				
+			rc_rateCodeRO.dynamicSearch("searchByPropertyId",str);
+		}
+		
+		private function loadProperties():void
+		{
+			startBusyCursor();
+			propertyRO.dynamicSearch("","");
+		}
+		
+		private function saveItemHandler(e:Event):void
+		{
+			saveItem();
+		}
+		
+		private function saveItem():void
+		{
+			
+			if(_view.CMB_discountType.selectedItem!=null)
+				_view.discount.amountType = _view.CMB_discountType.selectedItem.id;
+			
+			if(_view.CMB_conditionType.selectedItem!=null)
+				_view.discount.conditionType = _view.CMB_conditionType.selectedItem.type;	
+				
+			_view.discount.status = _view.B_status.status;	
+				
+			if(_view.CMB_property.selectedItem!=null)
+				_view.discount.propertyId = _view.CMB_property.selectedItem.uuid;	
+				
+			if(_view.RD_discount.selected)
+				_view.discount.dsType = JWHConstants.DISCOUNT_SUPPLEMENT_TYPE_DISCOUNT;
+			else if(_view.RD_supplement.selected)
+				_view.discount.dsType = JWHConstants.DISCOUNT_SUPPLEMENT_TYPE_SUPPLEMENT;
+				
+			if(_view.CHK_choosable.selected)
+			{
+				_view.discount.choosable 		= true;
+				_view.discount.applicableStatus	= false;
+			}
+			else
+			{
+				_view.discount.choosable 		= false;
+				_view.discount.applicableStatus	= true;	
+			}	
+			
+			
+			if(_view.RD_onGross.selected)
+				_view.discount.toBeAppliedOn = JWHConstants.DISCOUNT_APPLIED_ON_GrossRate;
+			else if(_view.RD_onNett.selected)
+				_view.discount.toBeAppliedOn = JWHConstants.DISCOUNT_APPLIED_ON_NetRate;	
+				
+			var season:Season 	= new Season;
+				
+			if(_view.discount.conditionType == JWHConstants.DISCOUNT_TYPE_SEASON)
+			{
+				if(dynamicList.length>0)
+				{
+					if((dynamicList.getItemAt(0) as DiscountSupplementsSeasonComboBox).cmb_season.selectedItem!=null)
+					    season 			= (dynamicList.getItemAt(0) as DiscountSupplementsSeasonComboBox).cmb_season.selectedItem as Season;
+					    
+					var daysArray:Array = arrangeSelectedApplicableDays(dynamicList.getItemAt(0) as UIComponent);
+					
+					_view.discount.discountConditions.condition1.conditionValue = season.uuid;
+					_view.discount.discountConditions.condition1.condition		= JWHConstants.DISCOUNT_CONDITION_VALUE_TYPES_SEASON;	
+					
+					_view.discount.discountConditions.condition2.conditionValue = daysArray.join(",");
+					_view.discount.discountConditions.condition2.condition		= JWHConstants.DISCOUNT_CONDITION_VALUE_TYPES_APPLY_DAYS;
+					
+					if(daysArray.length<7)
+						_view.discount.daysApplyType = JWHConstants.DISCOUNT_DAYS_APPLY_TYPE_SELECTED;
+					else
+						_view.discount.daysApplyType = JWHConstants.DISCOUNT_DAYS_APPLY_TYPE_ALL;	
+					
+					_view.discount.discountConditions.condition5.conditionValue = arrangeSelectedRooms(dynamicList.getItemAt(0) as UIComponent).join(",");
+					_view.discount.discountConditions.condition5.condition		= JWHConstants.DISCOUNT_CONDITION_VALUE_TYPES_ROOM_CATEGORY;
+				}
+				_view.discount.discountApplyOrder = JWHConstants.DISCOUNT_TYPE_SEASON_ORDER;
+			}
+			else if(_view.discount.conditionType == JWHConstants.DISCOUNT_TYPE_DMC_MARKET)
+			{
+				if(dynamicList.length>0)
+				{
+//					var agent:AgentDetails 	= new AgentDetails;
+//					if((dynamicList.getItemAt(0) as DiscountSupplementsSeasonComboBox).cmb_list.selectedItem!=null)
+//					    agent 			= (dynamicList.getItemAt(0) as DiscountSupplementsSeasonComboBox).cmb_list.selectedItem as AgentDetails;
+//					
+//					_view.discount.discountConditions.condition2.conditionValue = agent.uuid;
+//					_view.discount.discountConditions.condition2.condition		= "AGENT";
+					
+					if((dynamicList.getItemAt(0) as DiscountSupplementsSeasonAgentComboBox).cmb_season.selectedItem!=null)
+					    season 			= (dynamicList.getItemAt(0) as DiscountSupplementsSeasonAgentComboBox).cmb_season.selectedItem as Season;
+					
+					_view.discount.discountConditions.condition1.conditionValue = season.uuid;
+					_view.discount.discountConditions.condition1.condition		= JWHConstants.DISCOUNT_CONDITION_VALUE_TYPES_SEASON;
+					
+					if((dynamicList.getItemAt(0) as DiscountSupplementsSeasonAgentComboBox).cmb_dmcList.selectedItem!=null)
+					{
+						_view.discount.discountConditions.condition2.conditionValue = (dynamicList.getItemAt(0) as DiscountSupplementsSeasonAgentComboBox).cmb_dmcList.selectedItem.uuid;
+						_view.discount.discountConditions.condition2.condition		= JWHConstants.DISCOUNT_CONDITION_VALUE_TYPES_DMC_MARKET;
+					}
+					
+				}
+				
+				_view.discount.discountApplyOrder = JWHConstants.DISCOUNT_TYPE_AGENT_ORDER;
+			}
+			else if(_view.discount.conditionType == JWHConstants.DISCOUNT_TYPE_CHECK_IN)
+			{
+				if(dynamicList.length>0)
+				{
+					if((dynamicList.getItemAt(0) as DiscountSupplementsDateRange).cmb_season.selectedItem!=null)
+					    season 			= (dynamicList.getItemAt(0) as DiscountSupplementsDateRange).cmb_season.selectedItem as Season;
+					    
+					var daysArray2:Array = arrangeSelectedApplicableDays(dynamicList.getItemAt(0) as UIComponent);
+					
+					_view.discount.discountConditions.condition1.conditionValue = season.uuid;
+					_view.discount.discountConditions.condition1.condition		= JWHConstants.DISCOUNT_CONDITION_VALUE_TYPES_SEASON;	
+					
+					_view.discount.discountConditions.condition2.conditionValue = (dynamicList.getItemAt(0) as DiscountSupplementsDateRange).dateFrom.text;
+					_view.discount.discountConditions.condition2.condition		= JWHConstants.DISCOUNT_CONDITION_VALUE_TYPES_FROM_DATE
+					
+					_view.discount.discountConditions.condition3.conditionValue = (dynamicList.getItemAt(0) as DiscountSupplementsDateRange).dateTo.text;
+					_view.discount.discountConditions.condition3.condition		= JWHConstants.DISCOUNT_CONDITION_VALUE_TYPES_TO_DATE;
+					
+					_view.discount.discountConditions.condition4.conditionValue = daysArray2.join(",");
+					_view.discount.discountConditions.condition4.condition		= JWHConstants.DISCOUNT_CONDITION_VALUE_TYPES_APPLY_DAYS;
+					
+					_view.discount.discountConditions.condition5.conditionValue = arrangeSelectedRooms(dynamicList.getItemAt(0) as UIComponent).join(",");
+					_view.discount.discountConditions.condition5.condition		= JWHConstants.DISCOUNT_CONDITION_VALUE_TYPES_ROOM_CATEGORY;
+					
+					if(daysArray2.length<7)
+						_view.discount.daysApplyType = JWHConstants.DISCOUNT_DAYS_APPLY_TYPE_SELECTED;
+					else
+						_view.discount.daysApplyType = JWHConstants.DISCOUNT_DAYS_APPLY_TYPE_ALL;
+				
+				}
+				_view.discount.discountApplyOrder = JWHConstants.DISCOUNT_TYPE_CHECK_IN_ORDER;
+			}
+			else if(_view.discount.conditionType == JWHConstants.DISCOUNT_TYPE_BOOKING)
+			{
+				if(dynamicList.length>0)
+				{
+					if((dynamicList.getItemAt(0) as DiscountSupplementsTextInput).cmb_season.selectedItem!=null)
+					    season 			= (dynamicList.getItemAt(0) as DiscountSupplementsTextInput).cmb_season.selectedItem as Season;
+					
+					_view.discount.discountConditions.condition1.conditionValue = season.uuid;
+					_view.discount.discountConditions.condition1.condition		= JWHConstants.DISCOUNT_CONDITION_VALUE_TYPES_SEASON;
+					
+					_view.discount.discountConditions.condition2.conditionValue = (dynamicList.getItemAt(0) as DiscountSupplementsTextInput).T_value.text;
+					_view.discount.discountConditions.condition2.condition		= JWHConstants.DISCOUNT_CONDITION_VALUE_TYPES_PROMOTION_CODE;
+					
+					_view.discount.discountConditions.condition5.conditionValue = arrangeSelectedRooms(dynamicList.getItemAt(0) as UIComponent).join(",");
+					_view.discount.discountConditions.condition5.condition		= JWHConstants.DISCOUNT_CONDITION_VALUE_TYPES_ROOM_CATEGORY;
+				}
+				
+				_view.discount.discountApplyOrder = JWHConstants.DISCOUNT_TYPE_BOOKING_ORDER;
+			}
+			else if(_view.discount.conditionType == JWHConstants.DISCOUNT_TYPE_OCCUPANCY)
+			{
+				if(dynamicList.length>0)
+				{
+					if((dynamicList.getItemAt(0) as DiscountSupplementsOccupancyBox).cmb_season.selectedItem!=null)
+					    season 			= (dynamicList.getItemAt(0) as DiscountSupplementsOccupancyBox).cmb_season.selectedItem as Season;
+					
+					_view.discount.discountConditions.condition1.conditionValue = season.uuid;
+					_view.discount.discountConditions.condition1.condition		= JWHConstants.DISCOUNT_CONDITION_VALUE_TYPES_SEASON
+					
+					_view.discount.discountConditions.condition2.conditionValue = (dynamicList.getItemAt(0) as DiscountSupplementsOccupancyBox).T_value.text;
+					_view.discount.discountConditions.condition2.condition		= JWHConstants.DISCOUNT_CONDITION_VALUE_TYPES_OCCUPANCY_VALUE;
+					
+					_view.discount.discountConditions.condition3.conditionValue = (dynamicList.getItemAt(0) as DiscountSupplementsOccupancyBox).cmb_condition.selectedItem.id;
+					_view.discount.discountConditions.condition3.condition		= JWHConstants.DISCOUNT_CONDITION_VALUE_TYPES_OCCUPANCY_CONDITION;
+					
+					_view.discount.discountConditions.condition5.conditionValue = arrangeSelectedRooms(dynamicList.getItemAt(0) as UIComponent).join(",");
+					_view.discount.discountConditions.condition5.condition		= JWHConstants.DISCOUNT_CONDITION_VALUE_TYPES_ROOM_CATEGORY;
+				}
+				
+				_view.discount.discountApplyOrder = JWHConstants.DISCOUNT_TYPE_OCCUPANCY_ORDER;
+			}		
+			
+			_view.discount.discountSupplementMappingList = arrangeDiscountToListForSaving();
+			
+			_view.discount.discountConditions.timeStamp.createdById 		= _loggedInUser.uuid;
+			_view.discount.discountConditions.timeStamp.createdByName 		= _loggedInUser.userName;
+			
+			_view.discount.discountConditions.timeStamp.updatedById 		= _loggedInUser.uuid;
+			_view.discount.discountConditions.timeStamp.updatedByName 		= _loggedInUser.userName;
+			
+			_view.discount.timeStamp.createdById 		= _loggedInUser.uuid;
+			_view.discount.timeStamp.createdByName 		= _loggedInUser.userName;
+			
+			_view.discount.timeStamp.updatedById 		= _loggedInUser.uuid;
+			_view.discount.timeStamp.updatedByName 		= _loggedInUser.userName;
+			
+			var populationOfMarket:String 	= JWHConstants.DISCOUT_APPLY_TO_NONE;	
+			var populationOfAgent:String 	= JWHConstants.DISCOUT_APPLY_TO_NONE;
+			
+			if(_view.CHK_all_markets.selected)
+				populationOfMarket = JWHConstants.DISCOUT_APPLY_TO_ALL;
+			else
+			{
+				if(appliedAgentMarketList.length>0)
+					populationOfMarket = JWHConstants.DISCOUT_APPLY_TO_SELECTED;
+			}
+			
+			if(_view.CHK_all_agets.selected)
+				populationOfAgent = JWHConstants.DISCOUT_APPLY_TO_ALL;
+			else
+			{
+				if(appliedAgentList.length>0)
+					populationOfAgent = JWHConstants.DISCOUT_APPLY_TO_SELECTED;
+			}	
+			
+			var discountCombinationTag:String = DSCalculation.validateDiscountMappingCombonation(_view.B_market_apply_status.status, populationOfMarket, _view.B_agent_apply_status.status, populationOfAgent);
+			
+			if(discountCombinationTag != JWHConstants.DISCOUNT_MAPPING_COMBINATION_TYPE_INVALID)
+			{
+				_view.discount.mappingCombinationTag = discountCombinationTag;
+				
+				var temp:ArrayCollection = new ArrayCollection;
+					temp.addItem(_view.discount);
+					startBusyCursor();
+				rc_discountRO.create(temp, deleteList);
+			}
+			else
+				createJHErrorAlert(_view, "Not a valid combination!");
+			
+		}
+		
+		private function arrangeDiscountToListForSaving():ArrayCollection
+		{
+			var saveList:ArrayCollection 			= new ArrayCollection;
+			var agentMarketList:ArrayCollection 	= arrangeAgentMarketDiscountList();
+			var agentList:ArrayCollection 			= arrangeAgentDiscountList();
+			var dmcMarketList:ArrayCollection		= new ArrayCollection; 	
+			
+			if(isDMCAvailable)	
+				dmcMarketList = arrangeDMCDiscountList();
+			
+			for(var i:int=0; i<agentMarketList.length; i++)
+			{
+				saveList.addItem(agentMarketList.getItemAt(i));
+			}
+			
+			for(var j:int=0; j<agentList.length; j++)
+			{
+				saveList.addItem(agentList.getItemAt(j));
+			}
+			
+			for(var n:int=0; n<dmcMarketList.length; n++)
+			{
+				saveList.addItem(dmcMarketList.getItemAt(n));
+			}
+			
+			return saveList;
+		}
+		
+		private function arrangeAgentMarketDiscountList():ArrayCollection
+		{
+			var saveList:ArrayCollection = new ArrayCollection;
+			
+			var concernSatus:String		 = _view.B_market_apply_status.status;
+			if(appliedAgentMarketList.length>0)
+			{
+				for(var i:int=0; i<appliedAgentMarketList.length; i++)
+				{
+					var obj:DiscountsAndSupplementMapping = new DiscountsAndSupplementMapping;
+					
+					obj.concern					= concernSatus;
+					obj.uuid					= (appliedAgentMarketList.getItemAt(i) as JHAttachmentIcon).uuid;
+					obj.concernedParty			= ((appliedAgentMarketList.getItemAt(i) as JHAttachmentIcon).getParentObject() as AgentMarkets).uuid;
+					obj.concernedPartyName		= ((appliedAgentMarketList.getItemAt(i) as JHAttachmentIcon).getParentObject() as AgentMarkets).description;
+					obj.concernedPartyType		= JWHConstants.DISCOUT_APPLY_TO_TYPE_AGENTMARKET;
+					
+					obj.timeStamp.createdById 	= _loggedInUser.uuid;
+					obj.timeStamp.createdByName = _loggedInUser.userName;
+					
+					obj.timeStamp.updatedById 	= _loggedInUser.uuid;
+					obj.timeStamp.updatedByName = _loggedInUser.userName;
+					saveList.addItem(obj);
+				}
+			}
+			else
+			{
+				var allMarketObj:DiscountsAndSupplementMapping = new DiscountsAndSupplementMapping;
+					
+					allMarketObj.uuid					= agentMarketAllId;
+					allMarketObj.concern				= concernSatus;
+					allMarketObj.concernedParty			= JWHConstants.DISCOUT_APPLY_TO_ALL
+					allMarketObj.concernedPartyType		= JWHConstants.DISCOUT_APPLY_TO_TYPE_AGENTMARKET;
+					
+					allMarketObj.timeStamp.createdById 	= _loggedInUser.uuid;
+					allMarketObj.timeStamp.createdByName= _loggedInUser.userName;
+					
+					allMarketObj.timeStamp.updatedById 	= _loggedInUser.uuid;
+					allMarketObj.timeStamp.updatedByName= _loggedInUser.userName;
+					saveList.addItem(allMarketObj);
+			}
+			
+			return saveList;
+		}
+		
+		private function arrangeAgentDiscountList():ArrayCollection
+		{
+			var saveList:ArrayCollection = new ArrayCollection;
+			
+			var concernSatus:String		 = _view.B_agent_apply_status.status;
+			if(appliedAgentList.length>0)
+			{
+				for(var i:int=0; i<appliedAgentList.length; i++)
+				{
+					var obj:DiscountsAndSupplementMapping = new DiscountsAndSupplementMapping;
+					
+					obj.concern					= concernSatus;
+					obj.uuid					= (appliedAgentList.getItemAt(i) as JHAttachmentIcon).uuid;
+					obj.concernedParty			= ((appliedAgentList.getItemAt(i) as JHAttachmentIcon).getParentObject() as AgentDetails).uuid;
+					obj.concernedPartyName		= ((appliedAgentList.getItemAt(i) as JHAttachmentIcon).getParentObject() as AgentDetails).agentName;
+					obj.concernedPartyType		= JWHConstants.DISCOUT_APPLY_TO_TYPE_AGENTS;
+					
+					obj.timeStamp.createdById 	= _loggedInUser.uuid;
+					obj.timeStamp.createdByName = _loggedInUser.userName;
+					
+					obj.timeStamp.updatedById 	= _loggedInUser.uuid;
+					obj.timeStamp.updatedByName = _loggedInUser.userName;
+					saveList.addItem(obj);
+				}
+			}
+			else
+			{
+				var allAgentObj:DiscountsAndSupplementMapping = new DiscountsAndSupplementMapping;
+				
+					allAgentObj.uuid					= agentAllId;
+					allAgentObj.concern					= concernSatus;
+					allAgentObj.concernedParty			= JWHConstants.DISCOUT_APPLY_TO_ALL
+					allAgentObj.concernedPartyType		= JWHConstants.DISCOUT_APPLY_TO_TYPE_AGENTS;
+					
+					allAgentObj.timeStamp.createdById 	= _loggedInUser.uuid;
+					allAgentObj.timeStamp.createdByName	= _loggedInUser.userName;
+					
+					allAgentObj.timeStamp.updatedById 	= _loggedInUser.uuid;
+					allAgentObj.timeStamp.updatedByName	= _loggedInUser.userName;
+					saveList.addItem(allAgentObj);
+			}
+			
+			return saveList;
+		}
+		
+		private function arrangeDMCDiscountList():ArrayCollection
+		{
+			var saveList:ArrayCollection = new ArrayCollection;
+			
+			var concernSatus:String		 = _view.B_dmc_apply_status.status;
+			if(appliedDMCMarketList.length>0)
+			{
+				for(var i:int=0; i<appliedDMCMarketList.length; i++)
+				{
+					var obj:DiscountsAndSupplementMapping = new DiscountsAndSupplementMapping;
+					
+					obj.concern					= concernSatus;
+					obj.uuid					= (appliedDMCMarketList.getItemAt(i) as JHAttachmentIcon).uuid;
+					obj.concernedParty			= ((appliedDMCMarketList.getItemAt(i) as JHAttachmentIcon).getParentObject() as DmcMarket).uuid;
+					obj.concernedPartyName		= ((appliedDMCMarketList.getItemAt(i) as JHAttachmentIcon).getParentObject() as DmcMarket).dmcName;
+					obj.concernedPartyType		= JWHConstants.DISCOUT_APPLY_TO_TYPE_DMC_MARKET;
+					
+					obj.timeStamp.createdById 	= _loggedInUser.uuid;
+					obj.timeStamp.createdByName = _loggedInUser.userName;
+					
+					obj.timeStamp.updatedById 	= _loggedInUser.uuid;
+					obj.timeStamp.updatedByName = _loggedInUser.userName;
+					saveList.addItem(obj);
+				}
+			}
+			else
+			{
+				var allDMCObj:DiscountsAndSupplementMapping = new DiscountsAndSupplementMapping;
+					
+					allDMCObj.uuid						= dmcMarketAllId;
+					allDMCObj.concern					= concernSatus;
+					allDMCObj.concernedParty			= JWHConstants.DISCOUT_APPLY_TO_ALL
+					allDMCObj.concernedPartyType		= JWHConstants.DISCOUT_APPLY_TO_TYPE_DMC_MARKET;
+					
+					allDMCObj.timeStamp.createdById 	= _loggedInUser.uuid;
+					allDMCObj.timeStamp.createdByName	= _loggedInUser.userName;
+					
+					allDMCObj.timeStamp.updatedById 	= _loggedInUser.uuid;
+					allDMCObj.timeStamp.updatedByName	= _loggedInUser.userName;
+					saveList.addItem(allDMCObj);
+			}
+			
+			return saveList;
+		}
+		
+		
+		public override function rateCodeDiscountCreateResultsHandler (event:ResultEvent):void
+		{	
+			//_view.statusLabel.text = "Saved Successfully";
+			//reloadHotelList();
+			stoptBusyCursor();
+			addNew();
+			loadDiscounts();
+			
+		}
+		
+		public override function rateCodeDiscountFetchResultsHandler (event:ResultEvent):void
+		{	
+			stoptBusyCursor();
+			discountList	=	new ArrayCollection;
+			discountList	=	event.result as ArrayCollection;
+			
+			_view.DG_list.dataProvider = discountList;
+			
+		}
+		
+		public override function dmcMarketFetchResultsHandler (event:ResultEvent):void
+		{	
+			stoptBusyCursor();
+			dmcMarketList	=	new ArrayCollection;
+			dmcMarketList	=	event.result as ArrayCollection;
+			loadSeasons();
+		}
+		
+		
+		public override function marketingPropertyFetchResultsHandler (event:ResultEvent):void
+		{	
+			stoptBusyCursor();
+			propertyList	=	new ArrayCollection;
+			propertyList	=	event.result as ArrayCollection;
+			
+			_view.CMB_property.dataProvider = propertyList;
+			
+			loadDiscounts();
+		}
+		
+		public override function rateCodeFetchResultsHandler (event:ResultEvent):void
+		{	
+			stoptBusyCursor();
+			rateCodeList = new ArrayCollection();
+			rateCodeList = event.result as ArrayCollection;
+			
+		}
+		
+		public override function agentDetailsFetchResultsHandler (event:ResultEvent):void
+		{	
+			stoptBusyCursor();
+			agentList = new ArrayCollection();
+			agentList = event.result as ArrayCollection;
+			
+			loadDMCMarkets();
+		}
+		
+		
+		public override function rateCodeSeasonFetchResultsHandler (event:ResultEvent):void
+		{	
+			stoptBusyCursor();
+			seasonList = new ArrayCollection();
+			seasonList = event.result as ArrayCollection;
+			
+			generateDynamicView();
+			
+		}
+		
+		public override function roomCategoryFetchResultsHandler (event:ResultEvent):void
+		{	
+			stoptBusyCursor();
+			roomCategoryList = new ArrayCollection();
+			roomCategoryList = event.result as ArrayCollection;
+			
+			loadSeasons();
+		}
+		
+		
+		public override function faultHandler(event:FaultEvent):void {
+			stoptBusyCursor();
+			
+			var error:ErrorMessage	=	event.message as ErrorMessage;
+			handleFaultMessage(error);
+					
+		}
+	}
+}

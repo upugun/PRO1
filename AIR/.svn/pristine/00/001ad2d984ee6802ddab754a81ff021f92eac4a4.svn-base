@@ -1,0 +1,213 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Panel title="Find Rate View" width="100%" height="100%" xmlns:mx="http://www.adobe.com/2006/mxml" 
+ 			fontSize="11" >
+	<mx:VBox xmlns:mx="http://www.adobe.com/2006/mxml" width="100%" height="100%" paddingTop="10">
+		<mx:VBox width="99%" height="60%">
+			<mx:Grid>
+				<mx:GridRow>
+					<mx:GridItem>
+					</mx:GridItem>
+					<mx:GridItem>
+					</mx:GridItem>
+					<mx:GridItem>
+						<mx:RadioButtonGroup id="RD_agentGroup"/>
+						<mx:RadioButton label="Agents" groupName="RD_agentGroup" id="RD_agent"/>
+						<mx:RadioButton label="Groups" groupName="RD_agentGroup" id="RD_group"/>
+					</mx:GridItem>
+					<mx:GridItem>
+					</mx:GridItem>
+					<mx:GridItem>
+					</mx:GridItem>
+					<mx:GridItem>
+					</mx:GridItem>
+				</mx:GridRow>
+				<mx:GridRow>
+					<mx:GridItem>
+					</mx:GridItem>
+					<mx:GridItem>
+						<mx:Label text="Agent/Group" fontWeight="bold"/>
+					</mx:GridItem>
+					<mx:GridItem>
+						<mx:ComboBox id="CMB_clients" labelField="description" prompt="-select-"></mx:ComboBox>
+					</mx:GridItem>
+					<mx:GridItem>
+					</mx:GridItem>
+					<mx:GridItem>
+					</mx:GridItem>
+					<mx:GridItem>
+					</mx:GridItem>
+				</mx:GridRow>
+				<mx:GridRow>
+					<mx:GridItem>
+					</mx:GridItem>
+					<mx:GridItem>
+						<mx:Label text="Hotel" fontWeight="bold"/>
+					</mx:GridItem>
+					<mx:GridItem>
+						<mx:ComboBox id="CMB_hotel" labelField="description" prompt="-select-"></mx:ComboBox>
+					</mx:GridItem>
+					<mx:GridItem>
+						<mx:TextInput id="T_hotelId"/>
+					</mx:GridItem>
+					<mx:GridItem>
+					</mx:GridItem>
+					<mx:GridItem>
+					</mx:GridItem>
+				</mx:GridRow>
+				<mx:GridRow>
+					<mx:GridItem>
+					</mx:GridItem>
+					<mx:GridItem>
+						<mx:Label text="Check in Date" fontWeight="bold"/>
+					</mx:GridItem>
+					<mx:GridItem>
+						<mx:DateField id="D_checkIn" formatString="YYYY/MM/DD"/>
+					</mx:GridItem>
+					<mx:GridItem>
+					</mx:GridItem>
+					<mx:GridItem>
+					</mx:GridItem>
+					<mx:GridItem>
+					</mx:GridItem>
+				</mx:GridRow>
+				<mx:GridRow>
+					<mx:GridItem>
+					</mx:GridItem>
+					<mx:GridItem>
+						<mx:Label text="Promotion Code" fontWeight="bold"/>
+					</mx:GridItem>
+					<mx:GridItem>
+						<mx:TextInput width="81" id="T_promotion"/>
+					</mx:GridItem>
+					<mx:GridItem>
+					</mx:GridItem>
+					<mx:GridItem>
+					</mx:GridItem>
+					<mx:GridItem>
+					</mx:GridItem>
+				</mx:GridRow>
+				<mx:GridRow>
+					<mx:GridItem>
+					</mx:GridItem>
+					<mx:GridItem>
+					</mx:GridItem>
+					<mx:GridItem>
+						<mx:Button label="Find" id="B_search"/>
+					</mx:GridItem>
+					<mx:GridItem>
+					</mx:GridItem>
+					<mx:GridItem>
+					</mx:GridItem>
+					<mx:GridItem>
+					</mx:GridItem>
+				</mx:GridRow>
+				<mx:GridRow>
+					<mx:GridItem>
+					</mx:GridItem>
+					<mx:GridItem>
+					</mx:GridItem>
+					<mx:GridItem>
+					</mx:GridItem>
+					<mx:GridItem>
+					</mx:GridItem>
+					<mx:GridItem>
+					</mx:GridItem>
+					<mx:GridItem>
+					</mx:GridItem>
+				</mx:GridRow>
+				<mx:GridRow>
+					<mx:GridItem>
+					</mx:GridItem>
+					<mx:GridItem>
+						<mx:Label text="Base Rate" fontWeight="bold"/>
+					</mx:GridItem>
+					<mx:GridItem>
+						<mx:Label id="L_baseRate" fontWeight="normal"/>
+					</mx:GridItem>
+					<mx:GridItem>
+						<mx:TextInput id="T_baseRateId"/>
+					</mx:GridItem>
+					<mx:GridItem>
+					</mx:GridItem>
+					<mx:GridItem>
+					</mx:GridItem>
+				</mx:GridRow>
+				<mx:GridRow>
+					<mx:GridItem>
+					</mx:GridItem>
+					<mx:GridItem>
+						<mx:Label fontWeight="bold" text="Rate"/>
+					</mx:GridItem>
+					<mx:GridItem>
+						<mx:Label fontWeight="normal" id="L_rate"/>
+						<mx:Label fontWeight="normal" id="L_rate0" text="@"/>
+						<mx:Label fontWeight="normal" id="L_rateType"/>
+					</mx:GridItem>
+					<mx:GridItem>
+						<mx:TextInput id="T_rateCodeId"/>
+					</mx:GridItem>
+					<mx:GridItem>
+					</mx:GridItem>
+					<mx:GridItem>
+					</mx:GridItem>
+				</mx:GridRow>
+				<mx:GridRow>
+					<mx:GridItem>
+					</mx:GridItem>
+					<mx:GridItem>
+						<mx:Label text="Rate Before Discount" fontWeight="bold"/>
+					</mx:GridItem>
+					<mx:GridItem>
+						<mx:Label id="L_finalRate" fontWeight="normal"/>
+					</mx:GridItem>
+					<mx:GridItem>
+					</mx:GridItem>
+					<mx:GridItem>
+					</mx:GridItem>
+					<mx:GridItem>
+					</mx:GridItem>
+				</mx:GridRow>
+			<mx:GridRow>
+					<mx:GridItem>
+					</mx:GridItem>
+					<mx:GridItem>
+							<mx:Label text="Discounts" fontWeight="bold"/>
+					</mx:GridItem>
+					<mx:GridItem>
+							<mx:DataGrid id="DG_list" width="100%" height="100%">
+								<mx:columns>
+									<mx:DataGridColumn headerText="Code" dataField="code"/>
+									<mx:DataGridColumn headerText="Condtion" dataField="condition"/>
+									<mx:DataGridColumn headerText="Condition Type" dataField="conditionType"/>
+									<mx:DataGridColumn headerText="Discount" dataField="discountValue"/>
+									<mx:DataGridColumn headerText="Discount Type" dataField="discountyType"/>
+								</mx:columns>
+							</mx:DataGrid>
+					</mx:GridItem>
+					<mx:GridItem>
+					</mx:GridItem>
+					<mx:GridItem>
+					</mx:GridItem>
+					<mx:GridItem>
+					</mx:GridItem>
+				</mx:GridRow>
+				<mx:GridRow>
+					<mx:GridItem>
+					</mx:GridItem>
+					<mx:GridItem>
+						<mx:Label text="Rate After Discount" fontWeight="bold"/>
+					</mx:GridItem>
+					<mx:GridItem>
+						<mx:Label id="L_finalAfterDiscount" fontWeight="normal"/>
+					</mx:GridItem>
+					<mx:GridItem>
+					</mx:GridItem>
+					<mx:GridItem>
+					</mx:GridItem>
+					<mx:GridItem>
+					</mx:GridItem>
+				</mx:GridRow>
+			</mx:Grid>
+		</mx:VBox>
+	</mx:VBox>
+</mx:Panel>

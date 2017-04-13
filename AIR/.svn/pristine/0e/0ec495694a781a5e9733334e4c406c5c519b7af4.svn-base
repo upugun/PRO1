@@ -1,0 +1,70 @@
+package net.jwt.value.objects
+{
+	import mx.collections.ArrayCollection;
+	
+	import net.jwt.Constants;
+	
+	[RemoteClass(alias="net.jwt.value.objects.Transaction")]
+	
+	[Bindable]
+	public class Transaction
+	{
+		public var uuid:String 			= "";
+		public var enteredBy:String		= "";
+		public var updatedBy:String		= "";
+		public var createdOn:String		= "";
+		public var lastUpdatedOn:String	= "";
+		public var type:String			= "";
+		public var referenceId:String   = "";
+		public var referenceType:String = "";
+		public var amount:String		= "";
+		public var notes:String			= "";
+		public var currency:String		= "";
+		public var tourId:String		= "";
+		public var mode:String			= Constants.TRANSACTION_MODE_Editable;
+		public var timeStamp:String		= "";
+		public var status:int 			= 1;
+		public var marketCode:String	= "";
+		public var billyear:String		= "";
+		public var invoiceNo:String		= "";
+		public var arrivalDate:String	= "";
+		public var remittanceNote:String= "";
+		public var creditorId:String	= "";
+		public var billNo:int 			= 1;
+		
+		public var declaration:String			= Constants.TRANCATIONS_PAYMENT_DECLARATION_Regular;
+		
+		public var billStatus:String= Constants.ITEMM_STATUS_UnPaid;
+		
+		public var refferanceNo:String		= "";
+		public var uniqeId:String			= "";
+		
+		public var transactionTypeName:String			= "";
+		
+		public var billType:String			= "";
+		public var sunTranferred:String		= "";
+		
+		public var sunTranferredTime:String			= "";
+		public var sunTranferredFileName:String		= "";
+		
+		public var billMatched:String	= "undefined"; /** use only in tour statement*/
+		
+		public var transactionDetailsList:ArrayCollection	=	new ArrayCollection;
+		
+		public var hotelSpecificObject:TransactionHotelSpecificData;
+		public var transportSpecificObject:TransactionTransportSpecificData;
+		public var activitySpecificObject:TransactionMiscellaneousSpecificData;
+		public var ticketSpecificObject:TransactionTicketSpecificData;
+		public var receiptSpecificObject:TransactionReceiptSpecificData;
+		public var enteredByUser:User;
+		
+		
+		public function Transaction()
+		{
+			hotelSpecificObject 	= new TransactionHotelSpecificData;
+			receiptSpecificObject	= new TransactionReceiptSpecificData;
+			enteredByUser			= new User;
+		}
+
+	}
+}

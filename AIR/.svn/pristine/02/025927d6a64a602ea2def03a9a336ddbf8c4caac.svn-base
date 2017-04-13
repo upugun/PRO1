@@ -1,0 +1,367 @@
+package net.jwt.view
+{
+	import com.objects.JWTCheckBox;
+	
+	import flash.events.Event;
+	import flash.events.KeyboardEvent;
+	import flash.events.MouseEvent;
+	
+	import mx.collections.ArrayCollection;
+	import mx.controls.Alert;
+	import mx.core.UIComponent;
+	import mx.events.ListEvent;
+	import mx.rpc.events.FaultEvent;
+	import mx.rpc.events.ResultEvent;
+	
+	import net.jwt.ApplicationFacade;
+	import net.jwt.event.INotificationArguments;
+	import net.jwt.event.NotificationArguments;
+	import net.jwt.value.objects.AccessDetails;
+	import net.jwt.value.objects.Country;
+	import net.jwt.value.objects.Department;
+	import net.jwt.value.objects.Manager;
+	import net.jwt.value.objects.Market;
+	import net.jwt.value.objects.RoleMaster;
+	import net.jwt.value.objects.User;
+	import net.jwt.view.popup.JWTPopUp;
+	
+	public class AccessAdministratorMediator extends Mediator
+	{
+		private var _view:AccessAdministratorView;
+		private var _args:INotificationArguments;
+		
+		[Bindable] private var _selectedIndex:int = -1;
+		[Bindable] private var _selectedRoleIndex:int = -1;
+		
+		[Bindable] public var _userCollection:ArrayCollection		= new ArrayCollection;
+		[Bindable] public var marketList:ArrayCollection			= new ArrayCollection;
+		[Bindable] public var _roleMasterList:ArrayCollection		= new ArrayCollection;
+		[Bindable] public var _usersRoleMasterList:ArrayCollection	= new ArrayCollection;
+		[Bindable] public var _rolesCheckBoxList:ArrayCollection	= new ArrayCollection;
+		
+		[Bindable] public var _roleMasteobj:RoleMaster	   		= new RoleMaster();
+		[Bindable] public var _accessDetailsobj:AccessDetails	= new AccessDetails();
+		[Bindable] public var _selectedUser:User 				= new User();
+		
+//		[Bindable] public var popup:JWTPopUp;
+		[Bindable] public var args:NotificationArguments = new NotificationArguments();
+		
+		private const CONDITION_1:String 	= "userId";
+		private const CLASS_NAME:String 	= "net.jwt.view.AccessAdministratorView.mxml \n" +
+											  "net.jwt.view.AccessAdministratorMediator.cs \n" +
+											  "net.jwt.view.AccessAdministratorCommand.cs \n" +
+											  "net.jwt.view.AccessAdministratorDAO.java \n" ;
+		
+		public var _objMkt:Market 	= new Market();
+		
+		public var _selectedMarketList:ArrayCollection = new ArrayCollection();
+		public var _showMarketList:ArrayCollection = new ArrayCollection();
+		
+		public function AccessAdministratorMediator(view:UIComponent, args:INotificationArguments)
+		{
+			super(view);
+			if(view != null)
+			{
+				_view  = view as AccessAdministratorView ;
+	
+			}
+			
+			if(args != null)
+			{
+				_args = args;
+				_loggedInUser = (_args.viewComponent as MainView).user;
+			}
+		}
+		
+		protected override function viewComponentInitialize():void{
+			_view.addEventListener(KeyboardEvent.KEY_UP, handleKeyBoardEvent);
+			_view.addEventListener(MouseEvent.CLICK, resetStatus);
+			_view.userList.addEventListener(ListEvent.ITEM_CLICK, showSelectedItem);
+			_view.userList.addEventListener(ListEvent.CHANGE, showSelectedItem);
+			_view.T_search.addEventListener(KeyboardEvent.KEY_UP, dynamicSearch);
+			
+			initializeUserRemortingObject();
+			initializeAccessDetailsRemortingObject();
+			
+			setLoggedInUser();
+			showRolesList()
+			reloadUserList();
+			loadMarketList();
+		}
+		
+		private function resetStatus(event:Event):void
+		{
+			_view.LBactionAcknow.text ="";
+		}
+		
+		private function openMarketHelp(event:MouseEvent):void
+		{
+			createPopUp(HELP_MARKET, _view, args, "Search and select Market", ApplicationFacade.HELP_MARKET_SEARCH, true);
+		}
+		
+		private function openCountryHelp(event:MouseEvent):void
+		{
+			createPopUp(HELP_COUNTRY, _view, args, "Search and select Country", ApplicationFacade.HELP_COUNTRY_SEARCH, true);
+		}
+		
+		private function openDepartmentHelp(event:MouseEvent):void
+		{
+			createPopUp(HELP_DEPARTMENT, _view, args, "Search and select Department", ApplicationFacade.HELP_DEPARTMENT_SEARCH, true);
+		}
+		
+		private function openMangerHelp(event:MouseEvent):void
+		{
+			createPopUp(HELP_MANAGER, _view, args, "Search and select Manager", ApplicationFacade.HELP_MANAGER_SEARCH, true);
+		}
+		
+		private function setLoggedInUser():void
+		{
+			userRO.setLogedInUser(_loggedInUser);
+		}
+		
+		public function showRolesList() :void
+		{
+			initializeRoleMasterRemortingObject();
+			roleMasterRO.dynamicSearch("","");
+		}
+		
+		private function generateDynamicObjects():void
+		{
+			var rolemaster:int = _roleMasterList.length;
+			
+			for(var i:int =0; i< rolemaster; i++)
+			{
+				var _jwtCheckBox:JWTCheckBox = new JWTCheckBox;
+					_jwtCheckBox.label 		 = (_roleMasterList.getItemAt(i) as RoleMaster).description;
+					_jwtCheckBox.roleMaster	 =  _roleMasterList.getItemAt(i) as RoleMaster;
+					_jwtCheckBox.setStyle("color", "#313131");
+				
+					_rolesCheckBoxList.addItem(_jwtCheckBox);
+					_view.roles.addChild(_jwtCheckBox);
+			}
+			
+		}
+		//Pop up is closed...hnadle the return..
+		public override function closePopup(event:Event):void
+            {
+            	//Alert.show((event.target as JWTPopUp).id);
+            	//Alert.show(">>>" + (args.argumentObject as Market).marketCode);
+                popup = null;
+                if(args != null)
+                {
+                	if((event.target as JWTPopUp).id == HELP_MARKET)
+                		_selectedUser.market = args.argumentObject as Market;
+                	
+                	else if((event.target as JWTPopUp).id == HELP_COUNTRY)
+                		_selectedUser.country = args.argumentObject as Country;
+                	
+                	else if((event.target as JWTPopUp).id == HELP_DEPARTMENT)
+                		_selectedUser.department = args.argumentObject as Department;
+                	
+                	else if((event.target as JWTPopUp).id == HELP_MANAGER)
+                		_selectedUser.manager = args.argumentObject as Manager;
+                }
+            }
+		
+		private function removeItemHandler(event:ListEvent):void
+		{
+			Alert.show((event.itemRenderer.data as Market).marketCode);	
+		}
+
+		private function showSelectedItem(event:ListEvent):void
+		{
+			_selectedIndex = event.rowIndex;
+			_selectedUser = _userCollection.getItemAt(_selectedIndex) as User;
+			_view.LBactionAcknow.text = "";
+			
+			_selectedRoleIndex	= event.rowIndex;
+			setRolesMatrix();
+		}
+		
+        private function setRolesMatrix():void
+        {
+			accessDetailsRO.dynamicSearch(CONDITION_1, _selectedUser.uuid );
+        }
+        
+        public override function accessDetailsFetchResultsHandler(event:ResultEvent):void
+        {
+        	_usersRoleMasterList = event.result as ArrayCollection;
+        	updateUsersRolesCheckBoxes();
+        }
+        
+        private function resetUsersRolesCheckBoxes():void
+        {
+        	for(var x:int=0; x< _rolesCheckBoxList.length; x++)
+			{
+				var _jwtCheckBox:JWTCheckBox = _rolesCheckBoxList.getItemAt(x) as JWTCheckBox;
+					_jwtCheckBox.selected = false;
+					_jwtCheckBox.setStyle("color", "#313131");
+					_jwtCheckBox.addEventListener(MouseEvent.CLICK, updateRoleList);
+			}
+			
+			_selectedUser.roleList.removeAll();
+        }
+        
+        private function updateUsersRolesCheckBoxes():void
+        {
+        	resetUsersRolesCheckBoxes();
+        	
+        	for(var i:int=0; i< _usersRoleMasterList.length; i++)
+        	{
+        		var _access:AccessDetails = _usersRoleMasterList.getItemAt(i) as AccessDetails;
+        		
+        			for(var x:int=0; x< _rolesCheckBoxList.length; x++)
+        			{
+        				var _jwtCheckBox:JWTCheckBox = _rolesCheckBoxList.getItemAt(x) as JWTCheckBox;
+        				if(_jwtCheckBox.roleMaster.uuid == _access.roleId)
+        				{
+        					_jwtCheckBox.selected = true;
+        					_jwtCheckBox.setStyle("color", "#0c81dc");
+        					_selectedUser.roleList.addItem(_access);
+        					break;
+        				}
+        			}
+        	}
+        }
+
+		private function updateRoleList(event:MouseEvent):void
+		{
+			var _jwtCheckBox:JWTCheckBox = event.target as JWTCheckBox;
+				
+			if(_jwtCheckBox.selected)
+			{
+				var accessDetails:AccessDetails = new AccessDetails;
+		  	 		accessDetails.uuid 			= UIDUtil.createUID();
+		 			accessDetails.roleId 		= _jwtCheckBox.roleMaster.uuid;
+		 	 		accessDetails.userId		= _selectedUser.uuid;
+		 	 		
+			 		_selectedUser.roleList.addItem(accessDetails);
+			}else
+				removeFromListIfAlreadyThere(_jwtCheckBox.roleMaster.uuid);
+		}
+		
+		private function removeFromListIfAlreadyThere(uuid:String):void
+		{
+			for(var i:int=0; i<_selectedUser.roleList.length; i++)
+			{
+				if((_selectedUser.roleList.getItemAt(i) as AccessDetails).roleId == uuid)	
+				{
+					_selectedUser.roleList.removeItemAt(i);
+					break;
+				}
+			}
+		}
+		
+		public function handleKeyBoardEvent(event:KeyboardEvent):void
+		{
+			//Alert.show("event.keyCode = " + event.keyCode);
+			
+			if(event.keyCode == 119)
+				saveUser();
+			else if(event.keyCode == 120)
+				Alert.show("TODO:Delete this record");
+			else if(event.keyCode == 112)
+				Alert.show("TODO:Show HELP page");
+			else if(event.keyCode == 115)
+				Alert.show(this.CLASS_NAME);
+				
+		}
+		
+		private function openUserTab(event:Event):void{
+			Alert.show("user tab");
+		}
+		
+		private function openUserTab1(event:Event):void{
+			Alert.show("user tab - 1");
+		}
+		
+		/**********************************
+		 * Data managing section for User
+		 **********************************/
+		private function loadMarket():void
+		{
+			
+		}
+		private function dynamicSearch(event:KeyboardEvent):void
+		{
+			startBusyCursor();
+			reloadUserList();
+		}
+		
+		public function saveUser():void
+		{
+			deleteBeforeCreate();
+						
+			var _temp:ArrayCollection = new ArrayCollection;
+			//_temp.addItem(_selectedUser);
+			_temp = _selectedUser.roleList;
+			accessDetailsRO.create(_temp);
+			
+			//TODO: _selectedUser.roleList got all the thnings to save of access details 
+		}
+		private function deleteBeforeCreate():void
+		{
+			accessDetailsRO.delet(_selectedUser.roleList);
+		}
+		private function activityAknowladgment():void
+		{
+			_view.LBactionAcknow.text = "Saved Successfully";
+		}
+		
+		public override function accessDetailsCreateResultsHandler(event:ResultEvent):void
+		{
+			reloadUserList();
+			activityAknowladgment();
+		}
+		
+		private function reloadUserList():void
+		{
+			if(_view.CB_fname.selected == true)
+				userRO.dynamicSearch("dynamicFNameAllUsers",_view.T_search.text.toString(), false);
+			else if(_view.CB_Dept.selected == true)	
+				userRO.dynamicSearch("dynamicMarketAllUsers",_view.T_search.text.toString(), false);
+				
+		}
+		
+		private function loadMarketList():void
+		{
+			initializeMarketRemortingObject();
+			marketRO.dynamicSearch("","");
+		}
+		
+		public override function marketFetchResultsHandler(event:ResultEvent):void {
+			marketList = new ArrayCollection();
+			marketList = event.result as ArrayCollection;
+		}
+		
+		public override function userFetchResultsHandler(event:ResultEvent):void 
+		{
+			// Handle the result by accessing the event.result property.
+			_userCollection = event.result as ArrayCollection;
+			_view.userList.dataProvider = _userCollection;
+			
+			if(_selectedIndex != -1)
+			{
+				_view.userList.selectedIndex = _selectedIndex;
+			}
+			stoptBusyCursor();
+		}
+		
+		public override function roleMasterFetchResultsHandler(event:ResultEvent):void
+		{
+			_roleMasterList  				= new ArrayCollection();
+			_roleMasterList					= event.result as ArrayCollection;
+			generateDynamicObjects()
+		}
+		
+		public function userROFaultHandler (event:FaultEvent):void {
+			Alert.show(event.fault.faultString, 'Error reported from UserDAO');
+		}
+		
+		public override function faultHandler (event:FaultEvent):void {
+			_view.LBactionAcknow.text = "Failed, please contact the admin";
+			//To be overridden...
+			//Alert.show("Transaction Failed. \nPlease check your inputs and try again", "Error Notification");
+		}
+	}
+}
